@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식/코인 실시간 시뮬레이션 계산기 (수수료 포함)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>주식/코인 실시간 시뮬레이션 계산기 (수수료 포함)</h1>
+
+        <div class="settings-section"> <!-- 수수료 설정 섹션 추가 -->
+            <h2>수수료 설정</h2>
+            <div class="input-group">
+                <label for="buy-fee-rate">매수 수수료율 (%):</label>
+                <input type="text" id="buy-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
+            </div>
+            <div class="input-group">
+                <label for="sell-fee-rate">매도 수수료율 (%):</label>
+                <input type="text" id="sell-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h2>거래 입력 (실시간 시뮬레이션)</h2>
+            <div class="input-group">
+                <label for="transaction-type">구분:</label>
+                <select id="transaction-type" onchange="handleInputChange()">
+                    <option value="buy">매수</option>
+                    <option value="sell">매도</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="price">단가 (체결가):</label>
+                <input type="text" id="price" placeholder="예: 10000" oninput="handleInputChange('price')">
+            </div>
+            <div class="input-group">
+                <label for="quantity">수량:</label>
+                <input type="text" id="quantity" placeholder="예: 10 또는 0.005" oninput="handleInputChange('quantity')">
+            </div>
+            <div class="input-group">
+                <label for="total-amount">총 체결금액:</label>
+                <input type="text" id="total-amount" placeholder="예: 100000" oninput="handleInputChange('total-amount')">
+            </div>
+            <button onclick="addTransaction()" id="add-transaction-button">거래 내역에 추가</button>
+        </div>
+
+        <div class="transactions-section">
+            <h2>거래 내역</h2>
+            <ul id="transaction-list">
+                <!-- 거래 내역이 여기에 추가됩니다 -->
+            </ul>
+        </div>
+
+        <div class="results-section">
+            <h2>계산 결과 (미리보기 포함)</h2>
+            <button onclick="resetCalculator()">초기화</button>
+            <button onclick="applyResultsAsNewStart()" id="apply-new-start-btn">현재 결과를 새 시작점으로</button>
+            <div id="results-output">
+                <p>총 매수 체결금액: <span id="total-buy-execution-amount">0</span>원</p>
+                <p>총 매수 수량: <span id="total-buy-quantity">0</span></p>
+                <p>누적 매수 수수료: <span id="total-buy-fee">0</span>원</p>
+                <p>총 매도 체결금액: <span id="total-sell-execution-amount">0</span>원</p>
+                <p>총 매도 수량: <span id="total-sell-quantity">0</span></p>
+                <p>누적 매도 수수료: <span id="total-sell-fee">0</span>원</p>
+                <p>------------------------------------</p>
+                <p>현재 보유 수량: <span id="current-quantity">0</span></p>
+                <p>순수 평단가 (수수료 미반영): <span id="pure-avg-price">0</span>원</p>
+                <p>총 발생 수수료: <span id="total-accumulated-fee">0</span>원</p>
+                <p>실질 투자 원금 (회수 필요 금액): <span id="net-investment-with-fee">0</span>원</p>
+                <p><strong>원금 회복 필요 단가 (수수료 포함): <span id="breakeven-price-with-fee">계산 필요</span></strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

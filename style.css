@@ -1,0 +1,166 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-section, .transactions-section, .results-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    display: inline-block;
+    width: 80px;
+    margin-bottom: 5px;
+}
+
+.input-group input[type="text"],
+.input-group select {
+    width: calc(100% - 90px);
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    display: inline-block;
+    background: #5cb85c; /* 기본 녹색 */
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+button[onclick="resetCalculator()"] {
+    background: #d9534f; /* 초기화: 빨간색 */
+}
+button[onclick="resetCalculator()"]:hover {
+    background: #c9302c;
+}
+
+button#apply-new-start-btn {
+    background: #f0ad4e; /* 새 시작점: 주황색 */
+}
+button#apply-new-start-btn:hover {
+    background: #ec971f;
+}
+
+
+#transaction-list {
+    list-style: none;
+    padding: 0;
+}
+
+#transaction-list li {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; 
+}
+
+#transaction-list li .transaction-info {
+    flex-grow: 1; 
+    margin-right: 10px; /* 버튼과의 간격 */
+    word-break: break-all; /* 긴 텍스트 줄바꿈 */
+}
+
+
+#transaction-list li .action-buttons button {
+    background: #3498db; 
+    color: white;
+    border: none;
+    padding: 4px 8px; /* 버튼 크기 약간 조정 */
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.85em; /* 글자 크기 약간 조정 */
+    margin-left: 5px; 
+}
+#transaction-list li .action-buttons button.delete-btn {
+    background: #e74c3c; 
+}
+
+#transaction-list li .action-buttons button:hover {
+    opacity: 0.8;
+}
+
+
+#results-output p {
+    font-size: 1.1em;
+    margin: 8px 0;
+}
+
+#results-output span {
+    font-weight: bold;
+}
+
+#breakeven-price {
+    color: #d9534f; 
+}
+/* ... 이전 CSS 코드 ... */
+
+.settings-section { /* 수수료 설정 섹션 스타일 */
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.settings-section .input-group label {
+    width: 150px; /* 수수료 라벨 너비 조정 */
+}
+.settings-section .input-group input[type="text"] {
+    width: calc(100% - 160px);
+}
+
+/* 계산 결과 항목이 많아지므로 약간의 간격 조정 */
+#results-output p {
+    margin: 6px 0; 
+    font-size: 1em; /* 약간 작게 조절하여 공간 확보 */
+}
+#results-output strong {
+    font-size: 1.1em; /* 강조 항목은 좀 더 크게 */
+}
