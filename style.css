@@ -290,3 +290,118 @@ button:disabled,
     background-color: #e6ffe6; /* 연한 녹색 계열 (또는 #fff9c4 - 연한 노란색 등) */
     transition: background-color 0.3s ease-out; /* 배경색 변경 시 부드러운 전환 효과 */
 }
+
+/* =============================================
+   모바일 반응형 스타일 (예: 600px 이하 화면)
+   ============================================= */
+@media (max-width: 600px) {
+
+    /* 전체 컨테이너 여백 조정 (선택 사항) */
+    .container {
+        padding: 10px; /* 모바일에서는 좌우 여백 줄이기 */
+    }
+
+    /* 제목 폰트 크기 조정 (선택 사항) */
+    h1 {
+        font-size: 1.8em; /* 모바일에서 H1 약간 작게 */
+    }
+    .subtitle {
+        font-size: 0.8em; /* 부제목도 약간 작게 */
+        margin-bottom: 20px;
+    }
+    h2 {
+        font-size: 1.3em; /* 섹션 제목 약간 작게 */
+    }
+
+    /* 수수료 설정 섹션 입력 필드 크기 조정 */
+    .settings-section .input-group-inline input[type="text"] {
+        width: 60px; /* 수수료 입력칸 너비 (기존 값 유지 또는 약간 줄이기) */
+        padding: 8px 5px; /* 내부 여백 조정 */
+        font-size: 0.9em; /* 폰트 크기 */
+    }
+    .settings-section .input-group-inline label {
+        font-size: 0.85em; /* 레이블 폰트 크기 */
+    }
+    .fee-inputs-wrapper {
+        flex-direction: column; /* 수수료 매수/매도를 세로로 배치할 수도 있음 */
+        align-items: flex-start; /* 세로 배치 시 왼쪽 정렬 */
+    }
+    .fee-inputs-wrapper .input-group-inline {
+        margin-bottom: 8px; /* 세로 배치 시 항목 간 간격 */
+        width: 100%; /* 부모 너비 꽉 채우기 */
+    }
+     .fee-inputs-wrapper .input-group-inline input[type="text"] {
+        flex-grow: 1; /* 남은 공간 채우기 */
+    }
+
+
+    /* 거래 입력 섹션 레이블 및 입력 필드 조정 */
+    .input-section .input-group {
+        display: flex; /* 레이블과 입력 요소를 한 줄에 배치하되 유연하게 */
+        flex-direction: column; /* 모바일에서는 레이블을 입력칸 위로 */
+        align-items: flex-start; /* 왼쪽 정렬 */
+        margin-bottom: 12px;
+    }
+    .input-section .input-group label {
+        width: auto; /* 너비 자동 */
+        margin-bottom: 3px; /* 레이블과 입력칸 사이 간격 */
+        font-size: 0.9em;
+    }
+    .input-section .input-group input[type="text"],
+    .input-section .input-group select {
+        width: 100%;         /* 입력 필드 너비를 화면에 꽉 채움 */
+        padding: 10px 8px;   /* 터치 편의를 위해 내부 여백(높이) 늘리기 */
+        font-size: 1em;      /* 입력 폰트 크기 적절히 */
+        box-sizing: border-box; /* padding과 border가 width에 포함되도록 */
+    }
+    .input-section .input-group select { /* 구분(select) 박스 스타일 */
+        /* 기본 스타일을 최대한 활용하되, 필요시 높이 등 조정 */
+         height: auto; /* 내용에 맞게 자동 높이, padding으로 조절 */
+    }
+
+
+    /* 버튼 크기 및 폰트 조정 */
+    button {
+        padding: 12px 15px; /* 모바일에서 버튼 터치 영역 확보 */
+        font-size: 0.95em;
+        width: 100%; /* 버튼을 화면 너비에 꽉 채울 수도 있음 (선택 사항) */
+        margin-bottom: 8px; /* 버튼 간 간격 */
+    }
+    #add-transaction-button { /* 주요 액션 버튼은 개별적으로 크기 유지 가능 */
+        width: auto; /* 꽉 채우지 않으려면 auto */
+        padding: 12px 20px;
+    }
+    .results-section button { /* 결과 섹션 버튼들 */
+         width: calc(50% - 5px); /* 두 개씩 한 줄에 나오게 할 경우 (간격 고려) */
+         margin-right: 10px;
+    }
+    .results-section button:last-child {
+        margin-right: 0;
+    }
+
+
+    /* 거래 내역 리스트 아이템 */
+    #transaction-list li {
+        flex-direction: column; /* 정보와 버튼을 세로로 배치 */
+        align-items: flex-start;
+    }
+    #transaction-list li .transaction-info {
+        margin-bottom: 5px; /* 정보와 버튼 사이 간격 */
+        word-break: break-all; /* 긴 내용 자동 줄바꿈 */
+    }
+    #transaction-list li .action-buttons button {
+        padding: 5px 10px;
+        font-size: 0.8em;
+        margin-left: 0; /* 첫 버튼 왼쪽 여백 제거 */
+        margin-right: 5px; /* 버튼 간 오른쪽 여백 */
+    }
+
+    /* 계산 결과 폰트 크기 등 조정 */
+    #results-output p {
+        font-size: 0.9em;
+        margin: 5px 0;
+    }
+    #results-output #breakeven-price-with-fee {
+        font-size: 1.1em; /* 모바일에서도 핵심 결과는 강조 */
+    }
+}

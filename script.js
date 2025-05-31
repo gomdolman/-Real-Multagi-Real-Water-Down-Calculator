@@ -55,7 +55,7 @@ function handleFeeRateInput(inputElement) {
     }
 }
 
-// --- 입력 필드 하이라이트 함수 --- << 여기에 추가 >>
+// --- 입력 필드 하이라이트 함수 ---
 function highlightField(element) {
     if (!element) return;
     element.classList.add('input-highlight');
@@ -64,7 +64,7 @@ function highlightField(element) {
     }, 700); 
 }
 
-// --- 입력 필드 연동 및 실시간 시뮬레이션 --- << 이 함수 내용 수정 >>
+// --- 입력 필드 연동 및 실시간 시뮬레이션 ---
 function handleInputChange(changedField) {
     if (isCalculating) return; 
     isCalculating = true;
@@ -73,8 +73,6 @@ function handleInputChange(changedField) {
     const quantityInput = document.getElementById('quantity');
     const totalAmountInput = document.getElementById('total-amount');
 
-    // 사용자가 직접 변경한 필드에 대해 handleRawInput 호출 (HTML oninput에서 처리)
-    // 여기서는 다른 필드들의 값도 최신화하기 위해 모든 필드에 대해 호출 (중복 호출될 수 있으나 안전)
     handleRawInput(priceInput); 
     handleRawInput(quantityInput);
     handleRawInput(totalAmountInput);
@@ -88,32 +86,28 @@ function handleInputChange(changedField) {
     if (changedField === 'price' || changedField === 'quantity') {
         if (price > 0 && quantity > 0) {
             const newTotalAmount = price * quantity;
-            // 기존 값과 비교하여 실제로 변경될 때만 업데이트 및 하이라이트
             if (Math.abs(parseFormattedNumber(totalAmountInput.value) - newTotalAmount) > 0.00000001 || totalAmountInput.value === '') {
                 totalAmountInput.value = formatNumber(String(newTotalAmount), 2); 
                 totalAmountInput.dataset.raw_value = String(newTotalAmount); 
-                handleRawInput(totalAmountInput); // 포맷팅된 값을 화면에 다시 적용
+                handleRawInput(totalAmountInput); 
                 autoCalculatedField = totalAmountInput;
             }
         } else if (totalAmountInput.value !== '') { 
             totalAmountInput.value = ''; 
             delete totalAmountInput.dataset.raw_value;
-            // autoCalculatedField = totalAmountInput; // 비워지는 것도 하이라이트 하려면
         }
     } else if (changedField === 'total-amount') {
         if (price > 0 && totalAmount > 0) {
             const newQuantity = totalAmount / price;
-            // 기존 값과 비교
             if (Math.abs(parseFormattedNumber(quantityInput.value) - newQuantity) > 0.000000001 || quantityInput.value === '') {
                 quantityInput.value = formatNumber(String(newQuantity), 8);
                 quantityInput.dataset.raw_value = String(newQuantity);
-                handleRawInput(quantityInput); // 포맷팅된 값을 화면에 다시 적용
+                handleRawInput(quantityInput); 
                 autoCalculatedField = quantityInput;
             }
         } else if (quantityInput.value !== '') { 
              quantityInput.value = ''; 
              delete quantityInput.dataset.raw_value;
-            // autoCalculatedField = quantityInput; // 비워지는 것도 하이라이트 하려면
         }
     }
     
@@ -127,7 +121,6 @@ function handleInputChange(changedField) {
 
 function getNumericInputValue(elementId) {
     const inputElement = document.getElementById(elementId);
-    // dataset.raw_value가 있으면 그것을 우선 사용, 없으면 화면 값 파싱
     return parseFormattedNumber(inputElement.dataset.raw_value || inputElement.value);
 }
 
@@ -142,7 +135,7 @@ function runSimulation() {
         let fee = 0;
         if (type === 'buy') {
             fee = executionAmount * buyFeeRate;
-        } else { // sell
+        } else { 
             fee = executionAmount * sellFeeRate;
         }
         previewTransaction = { type, quantity, price, executionAmount, fee };
@@ -316,7 +309,12 @@ function calculateResults(previewTransaction, isFinalCalculation) {
         lastCalculatedCurrentQuantity = finalBuyQty - finalSellQty;
         if (lastCalculatedCurrentQuantity > 0) {
             const finalNetInvestmentWithFee = (finalBuyExecAmt + finalBuyFee) - (finalSellExecAmt - finalSellFee);
-            lastCalculatedBreakevenPriceWithFee = finalNetInvestmentWithFee / lastCalculatedCurrentQuantity;
+            // "새 시작점"을 위한 평단가는 이미 이익이 실현된 경우 0 또는 매우 낮은 값으로 처리할 수 있음
+            if (finalNetInvestmentWithFee < 0) {
+                lastCalculatedBreakevenPriceWithFee = 0; // 또는 다른 적절한 값
+            } else {
+                lastCalculatedBreakevenPriceWithFee = finalNetInvestmentWithFee / lastCalculatedCurrentQuantity;
+            }
         } else {
             lastCalculatedBreakevenPriceWithFee = null;
         }
@@ -346,29 +344,38 @@ function calculateResults(previewTransaction, isFinalCalculation) {
         }
     }
 
+    // ▼▼▼ 여기가 수정된 부분입니다 ▼▼▼
     if (currentQuantityForDisplay < 0) {
         breakevenEl.textContent = "오류: 매도량이 매수량보다 많습니다.";
         breakevenEl.style.color = "red";
     } else if (currentQuantityForDisplay > 0) {
-        const breakevenPriceVal = netInvestmentWithFee / currentQuantityForDisplay;
-        breakevenEl.textContent = formatNumber(String(breakevenPriceVal), 8) + "원";
-        breakevenEl.style.color = "#d9534f";
-    } else { 
+        // netInvestmentWithFee가 음수 = 이미 이익 실현된 상태에서 주식 보유 중
+        if (netInvestmentWithFee < 0) {
+            breakevenEl.textContent = `이미 ${formatNumber(String(Math.abs(netInvestmentWithFee)), 2)}원 이익! (남은 주식 평단가는 사실상 0 이하)`;
+            breakevenEl.style.color = "green"; // 이익이므로 초록색
+        } else { // netInvestmentWithFee >= 0 (본전 또는 아직 손실 회수 필요)
+            const breakevenPriceVal = netInvestmentWithFee / currentQuantityForDisplay;
+            breakevenEl.textContent = formatNumber(String(breakevenPriceVal), 8) + "원";
+            breakevenEl.style.color = "#d9534f"; // 손익분기점 단가 표시 색상
+        }
+    } else { // currentQuantityForDisplay === 0 (전량 매도 시)
         breakevenEl.textContent = "보유 주식 없음"; 
         if (netInvestmentWithFee < 0) { 
-            breakevenEl.textContent = `전량 매도 (최종 손실: ${formatNumber(String(Math.abs(netInvestmentWithFee)),2)}원)`;
-            breakevenEl.style.color = "blue";
+            breakevenEl.textContent = `전량 매도 (최종 이익: ${formatNumber(String(Math.abs(netInvestmentWithFee)),2)}원)`;
+            breakevenEl.style.color = "green"; 
         } else if (netInvestmentWithFee > 0) { 
-             breakevenEl.textContent = `전량 매도 (최종 이익: ${formatNumber(String(netInvestmentWithFee),2)}원)`;
-             breakevenEl.style.color = "green";
+             breakevenEl.textContent = `전량 매도 (최종 손실: ${formatNumber(String(netInvestmentWithFee),2)}원)`;
+             breakevenEl.style.color = "blue"; 
         } else { 
              breakevenEl.textContent = "전량 매도 (본전)";
-             breakevenEl.style.color = "black";
+             breakevenEl.style.color = "black"; 
         }
     }
+    // ▲▲▲ 여기가 수정된 부분입니다 ▲▲▲
 }
 
 function applyResultsAsNewStart() {
+    // lastCalculatedBreakevenPriceWithFee가 0인 경우(이미 이익 실현 후 새 시작점)도 유효하게 처리
     if (lastCalculatedCurrentQuantity <= 0 || lastCalculatedBreakevenPriceWithFee === null || isNaN(lastCalculatedBreakevenPriceWithFee)) {
         alert("새 시작점으로 적용할 유효한 보유 수량과 원금 회복 단가(수수료 포함)가 없습니다.");
         return;
@@ -376,8 +383,8 @@ function applyResultsAsNewStart() {
     const confirmation = confirm(
         `기존 모든 거래 내역이 삭제되고, 아래의 상태를 새로운 매수 내역으로 설정합니다:\n\n` +
         `수량: ${formatNumber(String(lastCalculatedCurrentQuantity),8)}\n` +
-        `단가 (수수료 포함된 실질 평단가): ${formatNumber(String(lastCalculatedBreakevenPriceWithFee),8)}원\n\n` +
-        `이 단가에는 이미 과거 수수료 비용이 반영되어 있습니다. 계속하시겠습니까?`
+        `단가 (실질 평단가): ${formatNumber(String(lastCalculatedBreakevenPriceWithFee),8)}원\n\n` +
+        `이 단가에는 이미 과거 수수료 비용이 반영되어 있습니다 (이미 이익 실현 시 0으로 표시될 수 있음). 계속하시겠습니까?`
     );
     if (confirmation) {
         transactions = [{
