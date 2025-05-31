@@ -35,7 +35,7 @@ h1, h2 {
 
 .input-group label {
     display: inline-block;
-    width: 80px;
+    width: 110px;
     margin-bottom: 5px;
 }
 
@@ -64,16 +64,13 @@ button:hover {
 }
 
 button:disabled {
-    background-color: #ccc;
+    background-color: #ccc !important; /* 기존 다른 버튼 색상보다 우선 적용되도록 */
+    color: #666 !important;           /* 글자색도 변경 (우선 적용) */
     cursor: not-allowed;
-}
-
-
-button[onclick="resetCalculator()"] {
-    background: #d9534f; /* 초기화: 빨간색 */
-}
-button[onclick="resetCalculator()"]:hover {
-    background: #c9302c;
+    box-shadow: none !important;       /* 활성화 시 그림자 효과가 있다면 제거 */
+    /* 만약 버튼에 border가 있다면, border-color도 변경 가능 */
+    /* border-color: #bbb !important; */
+    opacity: 0.6; /* 약간 투명하게 만들어 비활성화 느낌 강조 (선택 사항) */
 }
 
 button#apply-new-start-btn {
@@ -163,4 +160,133 @@ button#apply-new-start-btn:hover {
 }
 #results-output strong {
     font-size: 1.1em; /* 강조 항목은 좀 더 크게 */
+}
+
+/* 수수료 설정 한 줄 배치 스타일 */
+.settings-section {
+    padding-top: 10px; /* 위쪽 여백 줄이기 */
+    padding-bottom: 10px; /* 아래쪽 여백 줄이기 */
+}
+.settings-section h2 {
+    margin-top: 0; 
+    margin-bottom: 10px; 
+}
+.fee-inputs-wrapper {
+    display: flex; 
+    justify-content: space-around; /* 또는 flex-start, center 등 */
+    align-items: center;
+}
+.input-group-inline { /* 각 수수료 입력 그룹 */
+    display: flex;
+    align-items: center;
+    margin: 5px 0; /* 그룹 간 상하 여백 */
+}
+.input-group-inline label {
+    width: auto; 
+    margin-right: 5px;
+    font-size: 0.9em; 
+}
+.input-group-inline input[type="text"] {
+    width: 70px; /* 입력칸 너비 */
+    padding: 6px; 
+    font-size: 0.9em;
+}
+
+/* 원금 회복 필요 단가 강조 스타일 */
+#results-output #breakeven-price-with-fee { /* HTML에서 해당 span의 id를 사용 */
+    font-size: 1.2em; /* 다른 결과값보다 크게 */
+    /* font-weight: bold; */ /* strong 태그를 이미 사용 중이므로, 이 줄은 주석 처리하거나 삭제해도 됩니다. */
+    color: #B71C1C; /* 조금 더 어둡고 진한 빨간색으로 변경 예시 (기존 #D32F2F도 좋음) */
+}
+/* 계산 결과 섹션 내 구분선 스타일 */
+.results-divider {
+    border: none; /* 기본 hr 태그의 테두리 제거 */
+    border-top: 1px solid #e0e0e0; /* 위쪽에 1px 두께의 연한 회색 실선 생성 */
+    margin-top: 15px;    /* 구분선 위쪽 여백 */
+    margin-bottom: 15px; /* 구분선 아래쪽 여백 */
+    /* 필요에 따라 다른 스타일 추가 가능:
+       height: 1px;
+       background-color: #ccc; 
+       width: 80%; 
+       margin-left: auto; 
+       margin-right: auto; 
+    */
+}
+/* "거래 내역에 추가" 버튼 강조 스타일 */
+#add-transaction-button {
+    background-color: #4CAF50; /* 약간 더 밝거나 다른 톤의 녹색 (기존 #5cb85c도 좋음) */
+    padding: 12px 20px;       /* 내부 여백을 조금 더 줘서 버튼 크기 키우기 */
+    font-size: 1.05em;        /* 폰트 크기 약간 키우기 */
+    /* font-weight: bold; */  /* 필요하다면 굵게 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 은은한 그림자 효과 */
+    transition: background-color 0.2s ease, transform 0.1s ease; /* 부드러운 효과 */
+}
+
+#add-transaction-button:hover {
+    background-color: #45a049; /* 마우스 올렸을 때 색상 약간 어둡게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px); /* 살짝 위로 뜨는 효과 */
+}
+
+#add-transaction-button:active { /* 버튼 눌렀을 때 효과 */
+    background-color: #3e8e41;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateY(0px);
+}
+/* 일반 버튼 기본 스타일 (만약 이 부분이 녹색으로 되어 있다면, 초기화 버튼이 영향을 받을 수 있음) */
+button {
+    /* display: inline-block; */ /* 이전에 있었을 수 있는 기본 스타일 */
+    /* background: #5cb85c; */  /* 만약 여기가 녹색이라면, 아래 초기화 버튼 스타일이 우선 적용되도록 해야 함 */
+    /* color: #fff; */
+    /* padding: 10px 15px; */
+    /* ... 기타 일반 버튼 스타일 ... */
+}
+
+/* "거래 내역에 추가" 버튼 강조 스타일 */
+#add-transaction-button {
+    background-color: #4CAF50; /* 녹색 계열 */
+    /* ... 기타 강조 스타일 ... */
+}
+#add-transaction-button:hover { /* ... */ }
+#add-transaction-button:active { /* ... */ }
+
+
+/* "초기화" 버튼 스타일 - 빨간색으로 명확히 지정 */
+button[onclick="resetCalculator()"] {
+    background-color: #d9534f !important; /* 빨간색, 다른 일반 button 스타일보다 우선 적용 */
+    color: white !important;             /* 글자색 흰색 (우선 적용) */
+    /* padding, font-size 등은 다른 버튼들과 통일하거나 약간 작게 할 수 있음 */
+    padding: 10px 15px; /* 예시: 다른 보조 버튼들과 크기 맞춤 */
+}
+
+button[onclick="resetCalculator()"]:hover {
+    background-color: #c9302c !important; /* 마우스 오버 시 더 진한 빨간색 */
+}
+button[onclick="resetCalculator()"]:active {
+    background-color: #ac2925 !important; /* 클릭 시 더 어두운 빨간색 */
+}
+
+
+/* "현재 결과를 새 시작점으로" 버튼 기본 스타일 (활성화 시) */
+#apply-new-start-btn {
+    background-color: #f0ad4e; /* 주황색 */
+    /* ... 기타 스타일 ... */
+}
+#apply-new-start-btn:hover { /* ... */ }
+#apply-new-start-btn:active { /* ... */ }
+
+
+/* 비활성화된 버튼 스타일 */
+button:disabled,
+#apply-new-start-btn:disabled { /* 특정 ID 버튼의 disabled 상태도 명시 가능 */
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    opacity: 0.6;
+}
+/* 입력 필드 자동 계산 시 배경색 변경 효과 */
+.input-highlight {
+    background-color: #e6ffe6; /* 연한 녹색 계열 (또는 #fff9c4 - 연한 노란색 등) */
+    transition: background-color 0.3s ease-out; /* 배경색 변경 시 부드러운 전환 효과 */
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 브라우저 탭 제목 수정 -->
-    <title>물림 계산기 - 실시간 물타기 & 수수료 시뮬레이터</title> 
+    <title>물림 계산기 - 실시간 물타기 & 수수료 계산기</title> 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,16 +13,17 @@
         <h1>물림 계산기</h1>
         <!-- 부가 설명 추가 (예: h2 또는 p 태그 사용) -->
         <p class="subtitle">주식/코인 물타기 및 원금 회복 시뮬레이터 (수수료까지 정확하게!)</p>
-        
+
         <div class="settings-section"> <!-- 수수료 설정 섹션 추가 -->
-            <h2>수수료 설정</h2>
-            <div class="input-group">
-                <label for="buy-fee-rate">매수 수수료율 (%):</label>
-                <input type="text" id="buy-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
-            </div>
-            <div class="input-group">
-                <label for="sell-fee-rate">매도 수수료율 (%):</label>
-                <input type="text" id="sell-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
+            <h2>수수료 설정</h2> 
+            <div class="fee-inputs-wrapper"> <!-- 한 줄 배치를 위한 래퍼 -->
+                <div class="input-group-inline"> <!-- 매수 수수료 그룹 -->
+                    <label for="buy-fee-rate">매수(%):</label>
+                    <input type="text" id="buy-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
+                </div>
+                <div class="input-group-inline"> <!-- 매도 수수료 그룹 -->
+                    <label for="sell-fee-rate">매도(%):</label>
+                    <input type="text" id="sell-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
             </div>
         </div>
 
@@ -68,7 +69,7 @@
                 <p>총 매도 체결금액: <span id="total-sell-execution-amount">0</span>원</p>
                 <p>총 매도 수량: <span id="total-sell-quantity">0</span></p>
                 <p>누적 매도 수수료: <span id="total-sell-fee">0</span>원</p>
-                <p>------------------------------------</p>
+                 <hr class="results-divider"> 
                 <p>현재 보유 수량: <span id="current-quantity">0</span></p>
                 <p>순수 평단가 (수수료 미반영): <span id="pure-avg-price">0</span>원</p>
                 <p>총 발생 수수료: <span id="total-accumulated-fee">0</span>원</p>
