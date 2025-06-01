@@ -3,82 +3,1042 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 브라우저 탭 제목 수정 -->
-    <title>물림 계산기 - 실시간 물타기 & 수수료 계산기</title> 
-    <link rel="stylesheet" href="style.css">
+    <title>물림 계산기 (코인/주식)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .calculator-container {
+            max-width: 800px; 
+            margin: 30px auto;
+            padding: 24px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .input-table-container {
+            position: relative; 
+        }
+        .input-table th, .input-table td {
+            padding: 8px 4px;
+            text-align: center;
+            vertical-align: middle;
+            border-bottom-width: 1px; 
+            border-color: #e5e7eb; 
+        }
+        .input-table tbody tr:last-child td {
+            border-bottom-width: 0px; 
+        }
+        .input-table th {
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 0.875rem;
+            border-bottom-width: 2px;
+        }
+        .input-field, .select-field {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.875rem;
+        }
+        .input-field { text-align: right; }
+        .input-field:focus, .select-field:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .select-field { 
+            appearance: none; 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); 
+            background-repeat: no-repeat; 
+            background-position: right 0.5rem center; 
+            background-size: 1.5em 1.5em; 
+            padding-right: 2.5rem; 
+        }
+
+        .row-buy { background-color: rgba(254, 226, 226, 0.5); }
+        .row-sell { background-color: rgba(219, 234, 254, 0.5); }
+
+        .fee-input-field { width: 70px; padding: 6px; font-size: 0.8rem; }
+        .delete-btn { background-color: #EF4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .delete-btn:hover { background-color: #DC2626; }
+        
+        .button { padding: 0.5rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; font-weight: 500; text-align: center; cursor: pointer; transition: background-color 0.2s; }
+        .reset-btn { background-color: #6B7280; color: white; }
+        .reset-btn:hover { background-color: #4B5563; }
+        .new-start-btn { background-color: #F59E0B; color: white; }
+        .new-start-btn:hover { background-color: #D97706; }
+
+        .add-row-icon-btn { background-color: #10B981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s; margin-top: 0.5rem; margin-left: auto; }
+        .add-row-icon-btn:hover { background-color: #059669; }
+        .add-row-icon-btn:active { transform: scale(0.95); }
+
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
+        @media (min-width: 640px) { .result-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .result-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .result-item { background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
+        .result-label { font-size: 0.875rem; color: #4b5563; margin-bottom: 0.25rem; display: block; }
+        .result-value { font-size: 1.125rem; font-weight: 600; color: #1f2937; word-break: keep-all; }
+        .result-value-sub { font-size: 0.875rem; color: #6b7280; display: block; margin-top: 0.125rem; }
+        
+        .simulation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding: 1.25rem; border: 1px dashed #cbd5e1; border-radius: 0.5rem; background-color: #f8fafc; }
+        .simulation-title { font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 1rem; text-align: center; }
+        .simulation-input-group { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+        .simulation-input-row { display: flex; align-items: center; gap: 0.5rem; }
+        .simulation-input-row label { font-size: 0.875rem; color: #4b5563; min-width: 100px; text-align: right; } 
+        .simulation-input-row .input-field { max-width: 150px; }
+        .simulation-switch { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; font-size: 0.875rem; }
+        .simulation-switch input[type="radio"] { accent-color: #3B82F6; }
+        .simulation-result-group { margin-top:1rem; padding-top:1rem; border-top: 1px solid #e2e8f0;}
+        .simulation-result-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size:0.9rem; }
+        .simulation-result-item .label { color: #4b5563; }
+        .simulation-result-item .value { font-weight: 600; color: #1f2937; }
+        .simulation-avg-comparison { display: flex; justify-content: space-around; text-align:center; margin-top:0.5rem;}
+        .simulation-avg-comparison > div > span { display:block; }
+        .simulation-avg-comparison .avg-price { font-size:1.25rem; font-weight:bold; }
+        .simulation-avg-comparison .avg-pnl { font-size:0.8rem; }
+
+        .amount-slider-container { margin-top: 0.5rem; }
+        .unit-buttons button {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            background-color: white;
+            color: #374151;
+            margin-right: 0.25rem;
+            cursor: pointer;
+        }
+        .unit-buttons button.active {
+            background-color: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+        }
+        #simBuyAmountSlider { width: 100%; }
+
+
+        .liquidation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding-top: 1.25rem; padding-bottom: 1.25rem; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .liquidation-input { width: 120px; }
+
+        .info-section { margin-top: 30px; padding: 16px; background-color: #f9fafb; border-radius: 8px; font-size: 0.875rem; color: #374151; }
+        .info-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: #1f2937; }
+        .info-section ul { list-style-type: disc; padding-left: 20px; margin-top: 8px; }
+        .info-section li { margin-bottom: 4px; }
+        .info-section .disclaimer { margin-top: 1rem; font-weight: 500; color: #ef4444; } 
+        h1 { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px; color: #111827; }
+
+        .fee-group-container { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-bottom: 1rem; }
+        .fee-group-item { display: flex; align-items: center; gap: 0.5rem; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); width: 90%; max-width: 500px; text-align: left; }
+        .modal-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937; }
+        .modal-body p { margin-bottom: 0.5rem; color: #374151; font-size: 0.9rem; line-height: 1.6; }
+        .modal-body strong { color: #111827; }
+        .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+        @media (max-width: 768px) { 
+            .calculator-container { padding: 16px; margin: 16px; }
+            h1 { font-size: 1.25rem; }
+            .input-table th, .input-table td { font-size: 0.75rem; padding: 6px 2px; }
+            .input-field, .select-field { padding: 6px; font-size: 0.75rem; }
+            .fee-input-field { width: 60px; font-size: 0.75rem;}
+            .liquidation-input { width: 100px; }
+            .delete-btn { width: 20px; height: 20px; font-size: 0.75rem; }
+            
+            .controls-top-section { display: flex; flex-direction: column; gap: 1rem; }
+            .fee-group-container { flex-direction: column; gap: 0.75rem; align-items: stretch; }
+            .fee-group-item { justify-content: space-between; }
+
+            .liquidation-section .flex { flex-direction: column; align-items: flex-start; gap: 0.5rem;} 
+            .liquidation-section .flex > div { width: 100%; display: flex; justify-content: space-between; align-items: center;}
+            .liquidation-section .flex > div:last-child { justify-content: flex-start;} 
+            
+            .simulation-input-row { flex-direction: column; align-items: flex-start; }
+            .simulation-input-row label { min-width: auto; margin-bottom: 0.25rem; }
+            .simulation-input-row .input-field { max-width: 100%; }
+            .unit-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem; }
+
+
+            .button-group-container { margin-top: 1rem; }
+            .button-group { justify-content: space-around; width: 100%; flex-wrap: wrap; }
+            .button-group .button { margin-top: 4px; margin-bottom: 4px;}
+            .add-row-icon-btn { margin-right: 0; } 
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 페이지 내 메인 제목 수정 -->
-        <h1>물림 계산기</h1>
-        <!-- 부가 설명 추가 (예: h2 또는 p 태그 사용) -->
-        <p class="subtitle">주식/코인 물타기 및 원금 회복 시뮬레이터 (수수료까지 정확하게!)</p>
+    <div class="calculator-container">
+        <h1>물림 계산기 (코인/주식)</h1>
 
-        <div class="settings-section"> <!-- 수수료 설정 섹션 추가 -->
-            <h2>수수료 설정</h2> 
-            <div class="fee-inputs-wrapper"> <!-- 한 줄 배치를 위한 래퍼 -->
-                <div class="input-group-inline"> <!-- 매수 수수료 그룹 -->
-                    <label for="buy-fee-rate">매수(%):</label>
-                    <input type="text" id="buy-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
+        <div class="input-table-container">
+            <div class="overflow-x-auto">
+                <table class="w-full input-table">
+                    <thead>
+                        <tr>
+                            <th class="w-2/12">거래 유형</th>
+                            <th class="w-2/12">단가</th>
+                            <th class="w-1/12 text-xs"></th>
+                            <th class="w-2/12">수량</th>
+                            <th class="w-1/12 text-xs"></th>
+                            <th class="w-3/12">금액</th>
+                            <th class="w-1/12">삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inputRows">
+                        </tbody>
+                </table>
+            </div>
+            <button id="addRowBtn" class="add-row-icon-btn" title="행 추가">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+        
+        <div class="controls-top-section mt-4">
+            <div class="fee-group-container">
+                <div class="fee-group-item">
+                    <label for="buyFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매수 수수료(%):</label>
+                    <input type="text" inputmode="decimal" id="buyFeeRate" class="input-field fee-input-field" value="0.05">
                 </div>
-                <div class="input-group-inline"> <!-- 매도 수수료 그룹 -->
-                    <label for="sell-fee-rate">매도(%):</label>
-                    <input type="text" id="sell-fee-rate" value="0.05" oninput="handleFeeRateInput(this); runSimulation();">
+                <div class="fee-group-item">
+                    <label for="sellFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매도 수수료(%):</label>
+                    <input type="text" inputmode="decimal" id="sellFeeRate" class="input-field fee-input-field" value="0.05">
+                </div>
+            </div>
+
+            <div class="liquidation-section">
+                <div class="flex items-center justify-start gap-2 text-sm text-gray-700">
+                    <span>만약,</span>
+                    <input type="text" inputmode="decimal" id="liquidationPrice" class="input-field liquidation-input" placeholder="매도 가정 단가">
+                    <span>원에 전량 매도한다면?</span>
+                </div>
+                <div class="mt-2 text-sm">
+                    <span class="font-medium text-gray-800">예상 최종 손익: </span>
+                    <span id="estimatedOverallProfitLoss" class="font-semibold">0</span>
+                    <span id="estimatedOverallProfitLossKorean" class="text-gray-600">0원</span>
+                </div>
             </div>
         </div>
 
-        <div class="input-section">
-            <h2>거래 입력 (실시간 시뮬레이션)</h2>
-            <div class="input-group">
-                <label for="transaction-type">구분:</label>
-                <select id="transaction-type" onchange="handleInputChange()">
-                    <option value="buy">매수</option>
-                    <option value="sell">매도</option>
-                </select>
+        <div class="simulation-section">
+            <h3 class="simulation-title">추가 매수 시뮬레이션</h3>
+            <div class="simulation-input-group">
+                 <div class="simulation-input-row"> 
+                    <label for="simCurrentPrice">현재가(평가기준):</label>
+                    <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="현재 주가">
+                </div>
+                <div class="simulation-input-row">
+                    <label for="simBuyPrice">매수 단가:</label>
+                    <input type="text" inputmode="decimal" id="simBuyPrice" class="input-field" placeholder="추가 매수 단가">
+                </div>
             </div>
-            <div class="input-group">
-                <label for="price">단가 (체결가):</label>
-                <input type="text" id="price" placeholder="예: 10000" oninput="handleInputChange('price')">
+            <div class="simulation-switch">
+                <label><input type="radio" name="simType" value="amount" checked> 금액으로 추가 매수</label>
+                <label><input type="radio" name="simType" value="quantity"> 수량으로 추가 매수</label>
             </div>
-            <div class="input-group">
-                <label for="quantity">수량:</label>
-                <input type="text" id="quantity" placeholder="예: 10 또는 0.005" oninput="handleInputChange('quantity')">
+            <div class="simulation-input-group">
+                <div class="simulation-input-row" id="simAmountRow">
+                    <label for="simBuyAmount">매수 금액:</label>
+                    <input type="text" inputmode="decimal" id="simBuyAmount" class="input-field" placeholder="추가 매수 금액">
+                </div>
+                 <div id="simAmountSliderContainer" class="amount-slider-container">
+                    <div class="unit-buttons mb-2 flex flex-wrap gap-1 justify-center"> 
+                        <button data-max="100000" data-step="1000" class="sim-unit-btn">십만원</button>
+                        <button data-max="1000000" data-step="10000" class="sim-unit-btn active">백만원</button> 
+                        <button data-max="10000000" data-step="100000" class="sim-unit-btn">천만원</button>
+                        <button data-max="50000000" data-step="500000" class="sim-unit-btn">5천만원</button>
+                        <button data-max="100000000" data-step="1000000" class="sim-unit-btn">1억원</button>
+                    </div>
+                    <input type="range" id="simBuyAmountSlider" min="0" max="1000000" step="10000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                 </div>
+                <div class="simulation-input-row" id="simQuantityRow" style="display: none;">
+                    <label for="simBuyQuantity">매수 수량:</label>
+                    <input type="text" inputmode="decimal" id="simBuyQuantity" class="input-field" placeholder="추가 매수 수량">
+                </div>
             </div>
-            <div class="input-group">
-                <label for="total-amount">총 체결금액:</label>
-                <input type="text" id="total-amount" placeholder="예: 100000" oninput="handleInputChange('total-amount')">
+            <div class="simulation-result-group">
+                <div class="simulation-result-item">
+                    <span class="label">총 추가 매수 금액:</span>
+                    <span class="value" id="simTotalAdditionalAmount">0 원</span>
+                </div>
+                 <div class="simulation-avg-comparison">
+                    <div>
+                        <span>현재 평균</span>
+                        <span class="avg-price" id="simCurrentAvgPrice">0 원</span>
+                        <span class="avg-pnl" id="simCurrentPnl">- %</span>
+                    </div>
+                    <div class="text-2xl self-center text-gray-400">→</div>
+                    <div>
+                        <span>예상 평균</span>
+                        <span class="avg-price" id="simExpectedAvgPrice">0 원</span>
+                        <span class="avg-pnl" id="simExpectedPnl">- %</span>
+                    </div>
+                </div>
             </div>
-            <button onclick="addTransaction()" id="add-transaction-button">거래 내역에 추가</button>
+        </div>
+        
+        <div class="button-group-container flex gap-2 flex-wrap button-group justify-center mt-1"> 
+            <button id="setNewStartBtn" class="button new-start-btn">새 시작점으로</button>
+            <button id="resetBtn" class="button reset-btn">초기화</button>
         </div>
 
-        <div class="transactions-section">
-            <h2>거래 내역</h2>
-            <ul id="transaction-list">
-                <!-- 거래 내역이 여기에 추가됩니다 -->
+        <div id="resultsSection" class="result-grid">
+            <div class="result-item">
+                <span class="result-label" id="avgBuyPriceNoFeeLabel">매입 평균단가 (수수료 미반영)</span>
+                <span id="avgBuyPriceNoFee" class="result-value">0</span>
+                <span id="avgBuyPriceNoFeeKorean" class="result-value-sub">0원</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 매수 체결 금액</span>
+                <span id="totalBuyAmountGross" class="result-value text-red-600">0</span>
+                <span id="totalBuyAmountGrossKorean" class="result-value-sub">0원</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 매도 체결 금액</span>
+                <span id="totalSellAmountGross" class="result-value text-blue-600">0</span>
+                <span id="totalSellAmountGrossKorean" class="result-value-sub">0원</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">현재 보유 수량</span>
+                <span id="currentHoldingQuantity" class="result-value text-green-600">0</span>
+                <span id="currentHoldingQuantityKorean" class="result-value-sub">0개</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 매수 수량</span>
+                <span id="totalBuyQuantity" class="result-value">0</span>
+                <span id="totalBuyQuantityKorean" class="result-value-sub">0개</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 매도 수량</span>
+                <span id="totalSellQuantity" class="result-value">0</span>
+                <span id="totalSellQuantityKorean" class="result-value-sub">0개</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">누적 매수 수수료</span>
+                <span id="accumulatedBuyFee" class="result-value">0</span>
+                <span id="accumulatedBuyFeeKorean" class="result-value-sub">0원</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">누적 매도 수수료</span>
+                <span id="accumulatedSellFee" class="result-value">0</span>
+                <span id="accumulatedSellFeeKorean" class="result-value-sub">0원</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">총 발생 수수료</span>
+                <span id="totalFeesPaid" class="result-value">0</span>
+                <span id="totalFeesPaidKorean" class="result-value-sub">0원</span>
+            </div>
+
+            <div class="result-item">
+                <span id="netInvestmentStatusLabel" class="result-label">실질 투자 원금 (회수 필요 금액)</span>
+                <span id="netInvestmentStatus" class="result-value">0</span>
+                <span id="netInvestmentStatusKorean" class="result-value-sub">0원</span>
+            </div>
+            <div class="result-item" id="avgHoldingPriceItem"> 
+                <span class="result-label">현재 보유분 평단가 (수수료 포함)</span>
+                <span id="avgHoldingPriceWithFee" class="result-value">0</span>
+                <span id="avgHoldingPriceWithFeeKorean" class="result-value-sub">0원</span>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-sm text-gray-600">
+            <p>ⓘ 수수료율은 퍼센트(%) 값 그대로 입력하세요. (예: 0.05% → 0.05 입력)</p>
+        </div>
+
+        <div class="info-section">
+            <h3>사용법</h3>
+            <ul>
+                <li>매수/매도 수수료율을 입력합니다 (기본값 0.05%).</li>
+                <li>테이블 하단의 '+' 버튼으로 거래 내역(매수 또는 매도)을 추가합니다.</li>
+                <li>각 행에 거래 유형, 단가, 수량(또는 금액)을 입력합니다. 거래 유형에 따라 행 배경색이 변경됩니다.</li>
+                <li>상단의 '만약, [가격]원에 전량 매도한다면?'에 가격을 입력하여 예상 최종 손익을 확인할 수 있습니다.</li>
+                <li>"새 시작점으로" 버튼은 현재 계산된 '보유분 평단가(수수료포함)'와 '보유 수량'을 첫 행으로 설정합니다. (확인창 표시)</li>
             </ul>
+            <p class="disclaimer">본 계산기는 참고용으로만 사용해주시고, 투자 결정에 따른 법적 책임은 본인에게 있습니다.</p>
         </div>
+    </div>
 
-        <div class="results-section">
-            <h2>계산 결과 (미리보기 포함)</h2>
-            <button onclick="resetCalculator()">초기화</button>
-            <button onclick="applyResultsAsNewStart()" id="apply-new-start-btn">현재 결과를 새 시작점으로</button>
-            <div id="results-output">
-                <p>총 매수 체결금액: <span id="total-buy-execution-amount">0</span>원</p>
-                <p>총 매수 수량: <span id="total-buy-quantity">0</span></p>
-                <p>누적 매수 수수료: <span id="total-buy-fee">0</span>원</p>
-                <p>총 매도 체결금액: <span id="total-sell-execution-amount">0</span>원</p>
-                <p>총 매도 수량: <span id="total-sell-quantity">0</span></p>
-                <p>누적 매도 수수료: <span id="total-sell-fee">0</span>원</p>
-                 <hr class="results-divider"> 
-                <p>현재 보유 수량: <span id="current-quantity">0</span></p>
-                <p>순수 평단가 (수수료 미반영): <span id="pure-avg-price">0</span>원</p>
-                <p>총 발생 수수료: <span id="total-accumulated-fee">0</span>원</p>
-                <p>실질 투자 원금 (회수 필요 금액): <span id="net-investment-with-fee">0</span>원</p>
-                <p><strong>원금 회복 필요 단가 (수수료 포함): <span id="breakeven-price-with-fee">계산 필요</span></strong></p>
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">새 시작점으로 설정 확인</h2>
+            <div class="modal-body">
+                <p>기존 모든 거래 내역이 삭제되고, 아래의 상태를 새로운 매수 내역으로 설정합니다:</p>
+                <p><strong>수량:</strong> <span id="modalQuantity">0</span></p>
+                <p><strong>단가 (실질 평단가):</strong> <span id="modalAvgPrice">0</span>원</p>
+                <p class="text-xs mt-2">이 단가에는 이미 과거 수수료 비용이 반영되어 있습니다 (실현 후 보유 주식 평단가가 0원 이하이면 0으로 표시될 수 있음).</p>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmSetNewStart" class="button new-start-btn">확인</button>
+                <button id="cancelSetNewStart" class="button reset-btn">취소</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+
+    <script>
+        // --- DOM 요소들 (이전과 동일) ---
+        const inputRowsContainer = document.getElementById('inputRows');
+        const addRowBtn = document.getElementById('addRowBtn'); 
+        const resetBtn = document.getElementById('resetBtn');
+        const setNewStartBtn = document.getElementById('setNewStartBtn');
+        const buyFeeRateEl = document.getElementById('buyFeeRate');
+        const sellFeeRateEl = document.getElementById('sellFeeRate');
+        const liquidationPriceEl = document.getElementById('liquidationPrice'); 
+        const totalBuyAmountGrossEl = document.getElementById('totalBuyAmountGross');
+        const totalBuyAmountGrossKoreanEl = document.getElementById('totalBuyAmountGrossKorean');
+        const totalBuyQuantityEl = document.getElementById('totalBuyQuantity');
+        const totalBuyQuantityKoreanEl = document.getElementById('totalBuyQuantityKorean');
+        const accumulatedBuyFeeEl = document.getElementById('accumulatedBuyFee');
+        const accumulatedBuyFeeKoreanEl = document.getElementById('accumulatedBuyFeeKorean');
+        const totalSellAmountGrossEl = document.getElementById('totalSellAmountGross');
+        const totalSellAmountGrossKoreanEl = document.getElementById('totalSellAmountGrossKorean');
+        const totalSellQuantityEl = document.getElementById('totalSellQuantity');
+        const totalSellQuantityKoreanEl = document.getElementById('totalSellQuantityKorean');
+        const accumulatedSellFeeEl = document.getElementById('accumulatedSellFee');
+        const accumulatedSellFeeKoreanEl = document.getElementById('accumulatedSellFeeKorean');
+        const currentHoldingQuantityEl = document.getElementById('currentHoldingQuantity');
+        const currentHoldingQuantityKoreanEl = document.getElementById('currentHoldingQuantityKorean');
+        const avgBuyPriceNoFeeLabelEl = document.getElementById('avgBuyPriceNoFeeLabel'); 
+        const avgBuyPriceNoFeeEl = document.getElementById('avgBuyPriceNoFee');
+        const avgBuyPriceNoFeeKoreanEl = document.getElementById('avgBuyPriceNoFeeKorean');
+        const totalFeesPaidEl = document.getElementById('totalFeesPaid');
+        const totalFeesPaidKoreanEl = document.getElementById('totalFeesPaidKorean');
+        const netInvestmentStatusLabelEl = document.getElementById('netInvestmentStatusLabel'); 
+        const netInvestmentStatusEl = document.getElementById('netInvestmentStatus'); 
+        const netInvestmentStatusKoreanEl = document.getElementById('netInvestmentStatusKorean'); 
+        const avgHoldingPriceItemEl = document.getElementById('avgHoldingPriceItem'); 
+        const avgHoldingPriceWithFeeEl = document.getElementById('avgHoldingPriceWithFee');
+        const avgHoldingPriceWithFeeKoreanEl = document.getElementById('avgHoldingPriceWithFeeKorean');
+        const estimatedOverallProfitLossEl = document.getElementById('estimatedOverallProfitLoss'); 
+        const estimatedOverallProfitLossKoreanEl = document.getElementById('estimatedOverallProfitLossKorean'); 
+        const confirmationModalEl = document.getElementById('confirmationModal');
+        const modalQuantityEl = document.getElementById('modalQuantity');
+        const modalAvgPriceEl = document.getElementById('modalAvgPrice');
+        const confirmSetNewStartBtn = document.getElementById('confirmSetNewStart');
+        const cancelSetNewStartBtn = document.getElementById('cancelSetNewStart');
+        const simCurrentPriceEl = document.getElementById('simCurrentPrice'); 
+        const simTypeRadios = document.querySelectorAll('input[name="simType"]');
+        const simBuyPriceEl = document.getElementById('simBuyPrice');
+        const simBuyAmountEl = document.getElementById('simBuyAmount');
+        const simBuyQuantityEl = document.getElementById('simBuyQuantity');
+        const simAmountRowEl = document.getElementById('simAmountRow');
+        const simQuantityRowEl = document.getElementById('simQuantityRow');
+        const simAmountSliderContainerEl = document.getElementById('simAmountSliderContainer'); 
+        const simBuyAmountSliderEl = document.getElementById('simBuyAmountSlider'); 
+        const simUnitBtns = document.querySelectorAll('.sim-unit-btn'); 
+        const simTotalAdditionalAmountEl = document.getElementById('simTotalAdditionalAmount');
+        const simCurrentAvgPriceEl = document.getElementById('simCurrentAvgPrice');
+        const simCurrentPnlEl = document.getElementById('simCurrentPnl');
+        const simExpectedAvgPriceEl = document.getElementById('simExpectedAvgPrice');
+        const simExpectedPnlEl = document.getElementById('simExpectedPnl');
+
+        let rowCount = 0;
+        let lastCalculatedAvgHoldingPrice = 0; 
+        let lastCalculatedHoldingQuantity = 0;
+        let currentNetInvestmentOrRealizedProfit = 0; 
+        
+        // --- 함수들 (formatNumberInput, formatFeeInput, updateRowStyle, initializeRows, addNewRow, attachEventListenersToRow, handleRowInputChange, calculateAndDisplayResults, formatNumber, formatNumberToKorean, resetAll, openConfirmationModal, closeConfirmationModal, confirmAndSetNewStart, toggleSimInputFields, calculateSimulation) ---
+        // 이 함수들은 이전 버전과 거의 동일하거나, 사소한 UI 연동 부분만 수정됩니다.
+        // calculateSimulation 함수 내에서 슬라이더의 max와 step을 단위 버튼에 따라 동적으로 변경하는 로직이 중요합니다.
+
+        function formatNumberInput(inputElement, allowEmpty = false) { /* 이전과 동일 */
+            const rawValue = inputElement.value;
+            let cursorPosition = inputElement.selectionStart;
+            let nonDelimiterCharsBeforeCursor = 0;
+            for (let i = 0; i < cursorPosition; i++) {
+                if (rawValue[i] !== ',') nonDelimiterCharsBeforeCursor++;
+            }
+            let valueToFormat = rawValue.replace(/,/g, '');
+            valueToFormat = valueToFormat.replace(/[^\d.]/g, '');
+            const parts = valueToFormat.split('.');
+            if (parts.length > 2) valueToFormat = parts[0] + '.' + parts.slice(1).join('');
+            
+            let formattedValue = "";
+            if (valueToFormat === "" && allowEmpty) { 
+                formattedValue = "";
+            } else if (valueToFormat === "") {
+                 formattedValue = ""; 
+            } else if (valueToFormat === ".") {
+                formattedValue = "0.";
+            } else {
+                let [integerPart, decimalPart] = valueToFormat.split('.');
+                if (integerPart === undefined) integerPart = "";
+                if (integerPart === "" && decimalPart !== undefined) integerPart = "0";
+                
+                let formattedInteger = "";
+                if (integerPart !== "") {
+                    const numInt = parseFloat(integerPart); 
+                    if (!isNaN(numInt)) {
+                        formattedInteger = numInt.toLocaleString('en-US');
+                    } else { 
+                        formattedInteger = integerPart; 
+                    }
+                } else if (valueToFormat.startsWith('0') && decimalPart === undefined && integerPart === "0") {
+                    formattedInteger = "0";
+                }
+
+
+                formattedValue = formattedInteger;
+                if (decimalPart !== undefined) {
+                    formattedValue += '.' + decimalPart;
+                }
+            }
+            if (formattedValue.toLowerCase() === "nan") {
+                 formattedValue = decimalPart !== undefined ? "0." + decimalPart : "";
+            }
+             if (valueToFormat.startsWith(".") && !formattedValue.startsWith("0.")) {
+                if (formattedValue.startsWith(".")) formattedValue = "0" + formattedValue;
+                else if (formattedValue === "") formattedValue = "0.";
+            }
+            
+            inputElement.value = formattedValue;
+
+            if (valueToFormat === "" && !allowEmpty && inputElement !== simBuyAmountEl && inputElement !== simBuyQuantityEl && inputElement !== simBuyPriceEl && inputElement !== simCurrentPriceEl ) { 
+            } else {
+                let newCursorPos = 0;
+                let currentNonDelimiterChars = 0;
+                for (let i = 0; i < formattedValue.length; i++) {
+                    if (formattedValue[i] !== ',') currentNonDelimiterChars++;
+                    newCursorPos = i + 1;
+                    if (currentNonDelimiterChars >= nonDelimiterCharsBeforeCursor) break;
+                }
+                if (valueToFormat === "" || formattedValue === "") newCursorPos = 0;
+                else if (currentNonDelimiterChars < nonDelimiterCharsBeforeCursor) newCursorPos = formattedValue.length;
+                inputElement.selectionStart = inputElement.selectionEnd = newCursorPos;
+            }
+        }
+        function formatFeeInput(inputElement) { /* 이전과 동일 */
+            let value = inputElement.value;
+            value = value.replace(/[^\d.]/g, "");
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            inputElement.value = value;
+        }
+        function updateRowStyle(rowElement, transactionType) { /* 이전과 동일 */
+            rowElement.classList.remove('row-buy', 'row-sell');
+            if (transactionType === 'buy') {
+                rowElement.classList.add('row-buy');
+            } else if (transactionType === 'sell') {
+                rowElement.classList.add('row-sell');
+            }
+        }
+        function initializeRows() { 
+            inputRowsContainer.innerHTML = ''; 
+            rowCount = 0;
+            addNewRow(); 
+            calculateAndDisplayResults();
+        }
+        function addNewRow() { /* 이전과 동일 */
+            rowCount++;
+            const row = document.createElement('tr');
+            row.classList.add('input-row');
+            row.dataset.rowId = rowCount; 
+            row.innerHTML = `
+                <td>
+                    <select class="select-field type-select">
+                        <option value="buy" selected>매수</option>
+                        <option value="sell">매도</option>
+                    </select>
+                </td>
+                <td><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
+                <td class="text-xs text-gray-400">↔</td>
+                <td><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량"></td>
+                <td class="text-xs text-gray-400">=</td>
+                <td><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
+                <td><button class="delete-btn">X</button></td>
+            `;
+            inputRowsContainer.appendChild(row);
+            attachEventListenersToRow(row);
+            updateRowStyle(row, 'buy'); 
+            return row;
+        }
+        function attachEventListenersToRow(rowElement) { /* 이전과 동일 - calculateAndDisplayResults 호출 시 시뮬레이션도 업데이트 */
+            const typeSelect = rowElement.querySelector('.type-select');
+            const priceInput = rowElement.querySelector('.price-input');
+            const quantityInput = rowElement.querySelector('.quantity-input');
+            const amountInput = rowElement.querySelector('.amount-input');
+            const deleteButton = rowElement.querySelector('.delete-btn');
+            let lastEditedField = null; 
+
+            typeSelect.addEventListener('change', (event) => {
+                updateRowStyle(rowElement, event.target.value);
+                calculateAndDisplayResults();
+                calculateSimulation(); 
+            });
+            priceInput.addEventListener('input', () => { 
+                formatNumberInput(priceInput); lastEditedField = 'price';
+                handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField); 
+            });
+            quantityInput.addEventListener('input', () => {
+                formatNumberInput(quantityInput); lastEditedField = 'quantity';
+                handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
+            });
+            amountInput.addEventListener('input', () => {
+                formatNumberInput(amountInput); lastEditedField = 'amount';
+                handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
+            });
+            
+            deleteButton.addEventListener('click', () => {
+                rowElement.remove();
+                if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                    addNewRow();
+                }
+                calculateAndDisplayResults(); 
+                calculateSimulation();
+            });
+        }
+        function handleRowInputChange(priceEl, quantityEl, amountEl, editedField) { /* 이전과 동일 - calculateAndDisplayResults 호출 시 시뮬레이션도 업데이트 */
+            const price = parseFloat(priceEl.value.replace(/,/g, '')) || 0;
+            let quantity = parseFloat(quantityEl.value.replace(/,/g, '')) || 0;
+            let amount = parseFloat(amountEl.value.replace(/,/g, '')) || 0;
+
+            if (editedField === 'price' || editedField === 'quantity') {
+                if (price > 0 && quantity > 0) {
+                    amount = price * quantity;
+                    amountEl.value = amount.toFixed(2);
+                    formatNumberInput(amountEl); 
+                } else if ((editedField === 'quantity' && price > 0 && quantity <= 0) || (editedField === 'price' && price <=0 && quantity > 0)) {
+                     amountEl.value = ''; 
+                }
+            } else if (editedField === 'amount') {
+                if (price > 0 && amount > 0) {
+                    quantity = amount / price;
+                    quantityEl.value = quantity.toFixed(3); 
+                    formatNumberInput(quantityEl); 
+                } else if (price > 0 && amount <= 0) {
+                    quantityEl.value = ''; 
+                }
+            }
+            
+            if (priceEl.value && parseFloat(priceEl.value.replace(/,/g, '')) < 0) priceEl.value = '0';
+            if (quantityEl.value && parseFloat(quantityEl.value.replace(/,/g, '')) < 0) quantityEl.value = '0';
+            if (amountEl.value && parseFloat(amountEl.value.replace(/,/g, '')) < 0) amountEl.value = '0';
+            
+            calculateAndDisplayResults();
+            calculateSimulation();
+        }
+        function calculateAndDisplayResults() { /* 이전과 동일 */
+            let totalBuyAmountVal = 0;
+            let totalBuyQuantityVal = 0;
+            let totalBuyFeeVal = 0;
+            let totalSellAmountVal = 0;
+            let totalSellQuantityVal = 0;
+            let totalSellFeeVal = 0;
+            
+            const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+            const sellFeeRate = parseFloat(sellFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+
+            const uiRows = inputRowsContainer.querySelectorAll('.input-row');
+            uiRows.forEach(uiRow => {
+                const type = uiRow.querySelector('.type-select').value;
+                const price = parseFloat(uiRow.querySelector('.price-input').value.replace(/,/g, '')) || 0;
+                const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0;
+                
+                if (price > 0 && quantity > 0) {
+                    const amount = price * quantity;
+                    if (type === 'buy') {
+                        totalBuyAmountVal += amount;
+                        totalBuyQuantityVal += quantity;
+                        totalBuyFeeVal += amount * buyFeeRate;
+                    } else if (type === 'sell') {
+                        totalSellAmountVal += amount;
+                        totalSellQuantityVal += quantity;
+                        totalSellFeeVal += amount * sellFeeRate;
+                    }
+                }
+            });
+
+            const currentHoldingQuantityVal = totalBuyQuantityVal - totalSellQuantityVal;
+            const avgBuyPriceNoFeeVal = totalBuyQuantityVal > 0 ? totalBuyAmountVal / totalBuyQuantityVal : 0;
+            const totalFeesPaidVal = totalBuyFeeVal + totalSellFeeVal;
+
+            const totalGrossBuyWithFees = totalBuyAmountVal + totalBuyFeeVal;
+            const totalNetSellProceeds = totalSellAmountVal - totalSellFeeVal;
+            
+            currentNetInvestmentOrRealizedProfit = totalGrossBuyWithFees - totalNetSellProceeds; 
+            
+            let avgHoldingPriceWithFeeVal = 0;
+            if (currentHoldingQuantityVal > 0 && currentNetInvestmentOrRealizedProfit > 0) {
+                avgHoldingPriceWithFeeVal = currentNetInvestmentOrRealizedProfit / currentHoldingQuantityVal;
+            } else if (currentHoldingQuantityVal > 0 && currentNetInvestmentOrRealizedProfit <= 0) {
+                avgHoldingPriceWithFeeVal = 0; 
+            }
+            
+            const userLiquidationPrice = parseFloat(liquidationPriceEl.value.replace(/,/g, '')) || 0;
+            let estimatedOverallProfitLossVal = 0;
+            if (currentHoldingQuantityVal > 0 && userLiquidationPrice > 0) {
+                const grossValueOfHoldings = userLiquidationPrice * currentHoldingQuantityVal;
+                const sellFeeForLiquidation = grossValueOfHoldings * sellFeeRate;
+                const netProceedsFromLiquidation = grossValueOfHoldings - sellFeeForLiquidation;
+                estimatedOverallProfitLossVal = (totalNetSellProceeds + netProceedsFromLiquidation) - totalGrossBuyWithFees;
+            } else if (currentHoldingQuantityVal === 0) { 
+                 estimatedOverallProfitLossVal = totalNetSellProceeds - totalGrossBuyWithFees;
+            }
+
+            lastCalculatedAvgHoldingPrice = avgHoldingPriceWithFeeVal; 
+            lastCalculatedHoldingQuantity = currentHoldingQuantityVal;
+
+            totalBuyAmountGrossEl.textContent = formatNumber(totalBuyAmountVal, 2);
+            totalBuyAmountGrossKoreanEl.textContent = formatNumberToKorean(totalBuyAmountVal, 'amount');
+            totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 3);
+            totalBuyQuantityKoreanEl.textContent = formatNumberToKorean(totalBuyQuantityVal, 'quantity');
+            accumulatedBuyFeeEl.textContent = formatNumber(totalBuyFeeVal, 2);
+            accumulatedBuyFeeKoreanEl.textContent = formatNumberToKorean(totalBuyFeeVal, 'amount');
+
+            totalSellAmountGrossEl.textContent = formatNumber(totalSellAmountVal, 2);
+            totalSellAmountGrossKoreanEl.textContent = formatNumberToKorean(totalSellAmountVal, 'amount');
+            totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 3);
+            totalSellQuantityKoreanEl.textContent = formatNumberToKorean(totalSellQuantityVal, 'quantity');
+            accumulatedSellFeeEl.textContent = formatNumber(totalSellFeeVal, 2);
+            accumulatedSellFeeKoreanEl.textContent = formatNumberToKorean(totalSellFeeVal, 'amount');
+
+            currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 3);
+            currentHoldingQuantityKoreanEl.textContent = formatNumberToKorean(currentHoldingQuantityVal, 'quantity');
+            
+            avgBuyPriceNoFeeLabelEl.textContent = "매입 평균단가 (수수료 미반영)"; 
+            avgBuyPriceNoFeeEl.textContent = formatNumber(avgBuyPriceNoFeeVal, 2);
+            avgBuyPriceNoFeeKoreanEl.textContent = formatNumberToKorean(avgBuyPriceNoFeeVal, 'price');
+
+            totalFeesPaidEl.textContent = formatNumber(totalFeesPaidVal, 2);
+            totalFeesPaidKoreanEl.textContent = formatNumberToKorean(totalFeesPaidVal, 'amount');
+
+            if (currentNetInvestmentOrRealizedProfit > 0) {
+                netInvestmentStatusLabelEl.textContent = "실질 투자 원금 (회수 필요 금액)";
+                netInvestmentStatusEl.textContent = formatNumber(currentNetInvestmentOrRealizedProfit, 2);
+                netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(currentNetInvestmentOrRealizedProfit, 'amount');
+                netInvestmentStatusEl.className = 'result-value text-gray-800'; 
+                netInvestmentStatusKoreanEl.className = 'result-value-sub text-gray-500';
+            } else {
+                netInvestmentStatusLabelEl.textContent = "현재까지 누적 순이익";
+                const realizedProfit = Math.abs(currentNetInvestmentOrRealizedProfit);
+                netInvestmentStatusEl.textContent = formatNumber(realizedProfit, 2);
+                netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(realizedProfit, 'amount') + " 이익!";
+                netInvestmentStatusEl.className = 'result-value text-red-600'; 
+                netInvestmentStatusKoreanEl.className = 'result-value-sub text-red-600';
+            }
+            
+            avgHoldingPriceItemEl.classList.remove('bg-lime-50', 'bg-green-50', 'bg-red-50'); 
+            avgHoldingPriceWithFeeEl.classList.remove('text-red-500', 'text-gray-800');
+            avgHoldingPriceWithFeeKoreanEl.classList.remove('text-red-500', 'text-gray-500');
+
+            if (currentHoldingQuantityVal > 0) {
+                avgHoldingPriceWithFeeEl.textContent = formatNumber(avgHoldingPriceWithFeeVal, 2);
+                avgHoldingPriceWithFeeKoreanEl.textContent = formatNumberToKorean(avgHoldingPriceWithFeeVal, 'price');
+                if (currentNetInvestmentOrRealizedProfit <= 0) { 
+                    avgHoldingPriceWithFeeKoreanEl.textContent += " (이익 실현 중)";
+                    avgHoldingPriceWithFeeEl.classList.add('text-red-500');
+                    avgHoldingPriceWithFeeKoreanEl.classList.add('text-red-500');
+                    avgHoldingPriceItemEl.classList.add('bg-red-50'); 
+                } else {
+                    avgHoldingPriceWithFeeEl.classList.add('text-gray-800'); 
+                    avgHoldingPriceWithFeeKoreanEl.classList.add('text-gray-500');
+                    avgHoldingPriceItemEl.classList.add('bg-lime-50'); 
+                }
+            } else {
+                avgHoldingPriceWithFeeEl.textContent = "0";
+                avgHoldingPriceWithFeeKoreanEl.textContent = "0원";
+                avgHoldingPriceWithFeeEl.classList.add('text-gray-800');
+                avgHoldingPriceWithFeeKoreanEl.classList.add('text-gray-500');
+            }
+
+            totalBuyAmountGrossEl.classList.remove('text-red-600'); 
+            totalBuyAmountGrossEl.classList.add('text-red-600');
+
+            totalSellAmountGrossEl.classList.remove('text-blue-600'); 
+            totalSellAmountGrossEl.classList.add('text-blue-600');
+            
+            currentHoldingQuantityEl.classList.remove('text-green-600'); 
+            currentHoldingQuantityEl.classList.add('text-green-600');
+
+
+            estimatedOverallProfitLossEl.textContent = formatNumber(estimatedOverallProfitLossVal, 2);
+            estimatedOverallProfitLossKoreanEl.textContent = formatNumberToKorean(estimatedOverallProfitLossVal, 'amount');
+            if (estimatedOverallProfitLossVal >= 0) {
+                estimatedOverallProfitLossEl.className = 'font-semibold text-red-500'; 
+                estimatedOverallProfitLossKoreanEl.className = 'text-gray-600 text-red-500';
+            } else {
+                estimatedOverallProfitLossEl.className = 'font-semibold text-blue-500'; 
+                estimatedOverallProfitLossKoreanEl.className = 'text-gray-600 text-blue-500';
+            }
+        }
+        function formatNumber(num, decimalPlaces = 0) { /* 이전과 동일 */
+            if (isNaN(num) || !isFinite(num)) return '0';
+            return Number(num).toLocaleString('en-US', { 
+                minimumFractionDigits: decimalPlaces,
+                maximumFractionDigits: decimalPlaces
+            });
+        }
+        function formatNumberToKorean(num, type) { /* 이전과 동일 */
+            const n = parseFloat(num) || 0; 
+            if (isNaN(n)) return (type === 'quantity' ? '0개' : '0원');
+            const numForKorean = Math.floor(n); 
+            if (type === 'quantity') {
+                return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 3})}개`;
+            } else if (type === 'price' || type === 'amount') {
+                if (numForKorean === 0 && n !== 0 && n > -1 && n < 1) { 
+                     return n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits:2}) + '원';
+                }
+                if (numForKorean === 0) return '0원';
+                const units = ['', '만', '억', '조', '경'];
+                let result = '';
+                let tempNum = Math.abs(numForKorean); 
+                let parts = [];
+                if (tempNum === 0) return "0원"; 
+                let unitIndex = 0;
+                while (tempNum > 0) {
+                    const part = tempNum % 10000;
+                    if (part > 0) parts.push({value: part, unit: units[unitIndex]});
+                    tempNum = Math.floor(tempNum / 10000);
+                    unitIndex++;
+                }
+                result = (numForKorean < 0 ? "-" : "") + parts.reverse().map(p => `${p.value.toLocaleString('ko-KR')}${p.unit}`).join(' ') + '원';
+                return result.replace(/\s+/g, ' ').trim();
+            }
+            return n.toLocaleString('ko-KR');
+        }
+        function resetAll() { /* 시뮬레이션 필드 초기화 추가 */
+            buyFeeRateEl.value = '0.05'; 
+            sellFeeRateEl.value = '0.05';
+            liquidationPriceEl.value = ''; 
+            simCurrentPriceEl.value = ''; 
+            simBuyPriceEl.value = '';
+            simBuyAmountEl.value = '';
+            simBuyAmountSliderEl.value = 0;
+            simBuyQuantityEl.value = '';
+            document.querySelector('input[name="simType"][value="amount"]').checked = true;
+            simUnitBtns.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
+            simBuyAmountSliderEl.max = "1000000";
+            simBuyAmountSliderEl.step = "10000";
+            toggleSimInputFields();
+            initializeRows(); 
+            calculateSimulation(); 
+        }
+        function openConfirmationModal() { /* 이전과 동일 */
+            modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 3);
+            modalAvgPriceEl.textContent = formatNumber(lastCalculatedAvgHoldingPrice, 2);
+            confirmationModalEl.classList.add('active');
+        }
+        function closeConfirmationModal() { /* 이전과 동일 */
+            confirmationModalEl.classList.remove('active');
+        }
+        function confirmAndSetNewStart() { /* calculateSimulation 호출 추가 */
+            closeConfirmationModal();
+            const newStartPrice = lastCalculatedAvgHoldingPrice; 
+            const newStartQuantity = lastCalculatedHoldingQuantity; 
+
+            inputRowsContainer.innerHTML = '';
+            rowCount = 0;
+            liquidationPriceEl.value = ''; 
+            simCurrentPriceEl.value = ''; 
+
+            const firstRowElement = addNewRow(); 
+            if (firstRowElement) {
+                const typeSelect = firstRowElement.querySelector('.type-select');
+                const priceInput = firstRowElement.querySelector('.price-input');
+                const quantityInput = firstRowElement.querySelector('.quantity-input');
+                const amountInput = firstRowElement.querySelector('.amount-input');
+
+                typeSelect.value = 'buy'; 
+                updateRowStyle(firstRowElement, 'buy');
+
+                if (newStartPrice >= 0 && newStartQuantity > 0) { 
+                    priceInput.value = newStartPrice.toFixed(2);
+                    formatNumberInput(priceInput);
+                
+                    quantityInput.value = newStartQuantity.toFixed(3); 
+                    formatNumberInput(quantityInput);
+                
+                    handleRowInputChange(priceInput, quantityInput, amountInput, 'price'); 
+                } else { 
+                    priceInput.value = '';
+                    quantityInput.value = '';
+                    amountInput.value = '';
+                }
+            }
+            if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                 addNewRow();
+            }
+            calculateAndDisplayResults(); 
+            calculateSimulation();
+        }
+
+        // --- 추가 매수 시뮬레이션 함수 ---
+        function toggleSimInputFields() {
+            const selectedType = document.querySelector('input[name="simType"]:checked').value;
+            if (selectedType === 'amount') {
+                simAmountRowEl.style.display = 'flex';
+                simAmountSliderContainerEl.style.display = 'block'; 
+                simQuantityRowEl.style.display = 'none';
+                simBuyQuantityEl.value = ''; 
+            } else {
+                simAmountRowEl.style.display = 'none';
+                simAmountSliderContainerEl.style.display = 'none'; 
+                simQuantityRowEl.style.display = 'flex';
+                simBuyAmountEl.value = ''; 
+                simBuyAmountSliderEl.value = 0;
+            }
+            calculateSimulation(); 
+        }
+
+        function calculateSimulation() {
+            const currentPriceForPnl = parseFloat(simCurrentPriceEl.value.replace(/,/g, '')) || 0; 
+            const simPrice = parseFloat(simBuyPriceEl.value.replace(/,/g, '')) || 0;
+            const simType = document.querySelector('input[name="simType"]:checked').value;
+            const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+            
+            let simAdditionalAmount = 0;
+            let simAdditionalQuantity = 0;
+
+            if (simType === 'amount') {
+                simAdditionalAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+                if (simPrice > 0 && simAdditionalAmount > 0) {
+                    simAdditionalQuantity = simAdditionalAmount / simPrice;
+                }
+            } else { 
+                simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0;
+                if (simPrice > 0 && simAdditionalQuantity > 0) {
+                    simAdditionalAmount = simPrice * simAdditionalQuantity;
+                }
+            }
+            
+            simTotalAdditionalAmountEl.textContent = formatNumberToKorean(simAdditionalAmount, 'amount');
+
+            const currentHoldQty = lastCalculatedHoldingQuantity;
+            const currentAvgPrc = lastCalculatedAvgHoldingPrice; 
+
+            let currentPnlPercent = 0;
+            if (currentAvgPrc > 0 && currentPriceForPnl > 0 && currentHoldQty > 0) {
+                currentPnlPercent = ((currentPriceForPnl / currentAvgPrc) - 1) * 100;
+            } else if (currentNetInvestmentOrRealizedProfit <= 0 && currentHoldQty > 0 && currentPriceForPnl > 0) { // 이미 이익 상태
+                 currentPnlPercent = Infinity; // 또는 (currentPriceForPnl / (매우 작은 값 또는 1)) - 1) * 100 등으로 표현
+            }
+
+            simCurrentAvgPriceEl.textContent = formatNumberToKorean(currentAvgPrc, 'price');
+            simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(1)} %` : "이익 중";
+            simCurrentPnlEl.style.color = currentPnlPercent >= 0 || !isFinite(currentPnlPercent) ? '#DC2626' : '#3B82F6';
+
+
+            if (simPrice > 0 && (simAdditionalAmount > 0 || simAdditionalQuantity > 0)) {
+                const additionalBuyFee = simAdditionalAmount * buyFeeRate;
+                const baseCostForCalc = currentNetInvestmentOrRealizedProfit > 0 ? currentNetInvestmentOrRealizedProfit : 0;
+                const totalCostForSim = baseCostForCalc + simAdditionalAmount + additionalBuyFee;
+                const totalQuantityForSim = currentHoldQty + simAdditionalQuantity;
+                
+                const expectedAvgPrice = totalQuantityForSim > 0 ? totalCostForSim / totalQuantityForSim : 0;
+                
+                let expectedPnlPercent = 0;
+                if (expectedAvgPrice > 0 && currentPriceForPnl > 0 && totalQuantityForSim > 0) {
+                     expectedPnlPercent = ((currentPriceForPnl / expectedAvgPrice) - 1) * 100;
+                } else if (totalCostForSim <= 0 && totalQuantityForSim > 0 && currentPriceForPnl > 0) { 
+                    expectedPnlPercent = Infinity;
+                }
+
+                simExpectedAvgPriceEl.textContent = formatNumberToKorean(expectedAvgPrice, 'price');
+                simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(1)} %` : "이익 중";
+                simExpectedPnlEl.style.color = expectedPnlPercent >= 0 || !isFinite(expectedPnlPercent) ? '#DC2626' : '#3B82F6';
+
+            } else {
+                simExpectedAvgPriceEl.textContent = "- 원";
+                simExpectedPnlEl.textContent = "- %";
+                simExpectedPnlEl.style.color = '#6b7280';
+                simTotalAdditionalAmountEl.textContent = "0 원"; 
+            }
+        }
+        
+        // --- 이벤트 리스너 ---
+        buyFeeRateEl.addEventListener('input', () => { formatFeeInput(buyFeeRateEl); calculateAndDisplayResults(); calculateSimulation(); });
+        sellFeeRateEl.addEventListener('input', () => { formatFeeInput(sellFeeRateEl); calculateAndDisplayResults(); calculateSimulation(); });
+        liquidationPriceEl.addEventListener('input', () => { formatNumberInput(liquidationPriceEl); calculateAndDisplayResults(); }); 
+        addRowBtn.addEventListener('click', () => {
+            addNewRow();
+            const newRows = inputRowsContainer.querySelectorAll('.input-row');
+            if (newRows.length > 0) {
+                const lastRow = newRows[newRows.length - 1];
+                const priceInput = lastRow.querySelector('.price-input');
+                if (priceInput) { priceInput.focus(); }
+            }
+        });
+        resetBtn.addEventListener('click', resetAll);
+        setNewStartBtn.addEventListener('click', openConfirmationModal);
+        confirmSetNewStartBtn.addEventListener('click', confirmAndSetNewStart);
+        cancelSetNewStartBtn.addEventListener('click', closeConfirmationModal);
+        confirmationModalEl.addEventListener('click', (event) => {
+            if (event.target === confirmationModalEl) { closeConfirmationModal(); }
+        });
+
+        // 시뮬레이션 이벤트 리스너
+        simCurrentPriceEl.addEventListener('input', () => { formatNumberInput(simCurrentPriceEl, true); calculateSimulation(); }); 
+        simTypeRadios.forEach(radio => radio.addEventListener('change', toggleSimInputFields));
+        
+        simBuyPriceEl.addEventListener('input', () => { formatNumberInput(simBuyPriceEl, true); calculateSimulation(); });
+        
+        simBuyAmountEl.addEventListener('input', () => { 
+            formatNumberInput(simBuyAmountEl, true);
+            const amount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+            if (amount <= parseFloat(simBuyAmountSliderEl.max)) { 
+                 simBuyAmountSliderEl.value = amount; 
+            } else { 
+                simBuyAmountSliderEl.value = simBuyAmountSliderEl.max;
+                simBuyAmountEl.value = formatNumber(parseFloat(simBuyAmountSliderEl.max),0);
+                formatNumberInput(simBuyAmountEl, true);
+            }
+            calculateSimulation(); 
+        });
+        simBuyAmountSliderEl.addEventListener('input', () => {
+            simBuyAmountEl.value = simBuyAmountSliderEl.value;
+            formatNumberInput(simBuyAmountEl, true); 
+            calculateSimulation();
+        });
+
+        simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true); calculateSimulation(); });
+
+        simUnitBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                simUnitBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const newMax = parseInt(btn.dataset.max);
+                const newStep = parseInt(btn.dataset.step);
+                
+                simBuyAmountSliderEl.max = newMax;
+                simBuyAmountSliderEl.step = newStep;
+                
+                let currentAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+                if (currentAmount > newMax) { // 현재 금액이 새 최대값을 넘으면 최대값으로 조정
+                    currentAmount = newMax;
+                } else { // 새 step에 맞게 반올림 (선택적)
+                    // currentAmount = Math.round(currentAmount / newStep) * newStep;
+                }
+                
+                simBuyAmountEl.value = formatNumber(currentAmount,0); 
+                formatNumberInput(simBuyAmountEl, true); 
+                simBuyAmountSliderEl.value = currentAmount; 
+
+                calculateSimulation();
+            });
+        });
+
+
+        window.onload = () => {
+            buyFeeRateEl.value = '0.05'; 
+            sellFeeRateEl.value = '0.05';
+            document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
+            simBuyAmountSliderEl.max = "1000000"; // 기본 백만원
+            simBuyAmountSliderEl.step = "10000"; // 기본 만원 단위
+            initializeRows();
+            calculateSimulation(); 
+        };
+    </script>
 </body>
 </html>
