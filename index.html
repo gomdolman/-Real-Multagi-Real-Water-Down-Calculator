@@ -58,7 +58,7 @@
             background-repeat: no-repeat; 
             background-position: right 0.5rem center; 
             background-size: 1.5em 1.5em; 
-            padding-right: 2.5rem; 
+            padding-right: 2.5rem; /* 화살표 공간 확보 */
         }
 
         .row-buy { background-color: rgba(254, 226, 226, 0.5); }
@@ -136,10 +136,12 @@
             h1 { font-size: 1.25rem; }
             
             .input-table thead {
-                display: none; /* Hide table headers on mobile */
+                display: none; 
             }
-            .input-table tr.input-row { /* Target only data rows */
-                display: block;
+            .input-table tr.input-row {
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 0.75rem; 
                 margin-bottom: 1rem; 
                 border: 1px solid #e5e7eb;
                 border-radius: 0.375rem;
@@ -147,44 +149,52 @@
             }
             .input-table td {
                 display: flex; 
-                justify-content: space-between; 
-                align-items: center;
-                padding: 0.5rem 0; 
-                border-bottom: 1px dotted #eee;
-                font-size: 0.875rem; /* Ensure consistent font size */
-            }
-            .input-table tr.input-row td:last-child { /* Last td in a data row */
+                flex-direction: column; 
+                align-items: stretch; 
+                text-align: left; 
+                padding: 0; 
                 border-bottom: none; 
             }
             .input-table td::before {
                 content: attr(data-label);
                 font-weight: 600;
                 color: #4b5563;
-                margin-right: 0.5rem; 
-                min-width: 70px; /* Ensure label has some width */
-                text-align: left;
+                margin-bottom: 0.25rem; 
+                font-size: 0.8rem;
             }
-            .input-table td.symbol-cell { /* Hide symbol cells on mobile */
+            .input-table td[data-label="거래 유형"] {
+                grid-column: 1 / -1; 
+            }
+            .input-table td[data-label="단가"] {
+                grid-column: 1 / 2;
+            }
+            .input-table td[data-label="수량"] {
+                grid-column: 2 / 3;
+            }
+            .input-table td[data-label="금액"] {
+                grid-column: 1 / 2;
+            }
+            .input-table td[data-label="삭제"] {
+                grid-column: 2 / 3;
+                justify-self: end; 
+                align-items: flex-end; 
+            }
+             .input-table td[data-label="삭제"]::before {
+                content: ""; 
+                display: none;
+            }
+            .input-table td.symbol-cell { 
                 display: none;
             }
             .input-table td .input-field, 
             .input-table td .select-field {
-                flex-grow: 1; 
-                min-width: 100px; 
+                width: 100%; 
                 padding: 6px; 
                 font-size: 0.875rem;
             }
-            .input-table td.delete-cell {
-                justify-content: flex-end; 
+            .input-table td.delete-cell .delete-btn { 
+                margin-top: auto; 
             }
-            .input-table td.delete-cell::before {
-                content: ""; 
-            }
-            .input-table td.delete-cell .delete-btn {
-                width: 28px; /* Slightly larger delete button */
-                height: 28px;
-            }
-
 
             .fee-input-field { width: 60px; font-size: 0.75rem;}
             .liquidation-input { width: 100px; }
@@ -198,15 +208,14 @@
             .liquidation-section .flex > div:last-child { justify-content: flex-start;} 
             
             .simulation-input-row { flex-direction: column; align-items: flex-start; }
-            .simulation-input-row label { min-width: auto; margin-bottom: 0.25rem; text-align: left; } /* Label alignment for mobile */
+            .simulation-input-row label { min-width: auto; margin-bottom: 0.25rem; text-align: left; } 
             .simulation-input-row .input-field { max-width: 100%; }
             .unit-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem; justify-content: center; }
-
 
             .button-group-container { margin-top: 1rem; }
             .button-group { justify-content: space-around; width: 100%; flex-wrap: wrap; }
             .button-group .button { margin-top: 4px; margin-bottom: 4px;}
-            .add-row-icon-btn { margin-right: 0; margin-left:auto; /* Ensure it stays right on mobile within its container */ } 
+            .add-row-icon-btn { margin-right: 0; margin-left:auto; } 
         }
     </style>
 </head>
@@ -219,11 +228,12 @@
                 <table class="w-full input-table">
                     <thead>
                         <tr>
-                            <th class="w-2/12 sm:w-auto">거래 유형</th> <th class="w-2/12 sm:w-auto">단가</th>
-                            <th class="w-1/12 sm:table-cell symbol-cell"></th> <th class="w-2/12 sm:w-auto">수량</th>
-                            <th class="w-1/12 sm:table-cell symbol-cell"></th>
-                            <th class="w-3/12 sm:w-auto">금액</th>
-                            <th class="w-1/12 sm:w-auto">삭제</th>
+                            <th class="w-1/4 md:w-1/5">거래 유형</th> 
+                            <th class="w-1/4 md:w-1/5">단가</th>
+                            <th class="w-auto md:w-[5%] symbol-cell"></th> 
+                            <th class="w-1/4 md:w-1/5">수량</th>
+                            <th class="w-auto md:w-[5%] symbol-cell"></th>
+                            <th class="w-1/3 md:w-1/4">금액</th> <th class="w-auto md:w-1/12">삭제</th>
                         </tr>
                     </thead>
                     <tbody id="inputRows">
