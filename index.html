@@ -105,23 +105,9 @@
         .simulation-avg-comparison .avg-pnl { font-size:0.8rem; }
 
         .amount-slider-container { margin-top: 0.5rem; }
-        .unit-buttons button {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            border: 1px solid #D1D5DB;
-            border-radius: 0.375rem;
-            background-color: white;
-            color: #374151;
-            margin-right: 0.25rem;
-            cursor: pointer;
-        }
-        .unit-buttons button.active {
-            background-color: #3B82F6;
-            color: white;
-            border-color: #3B82F6;
-        }
+        .unit-buttons button { padding: 0.25rem 0.75rem; font-size: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; background-color: white; color: #374151; margin-right: 0.25rem; cursor: pointer; }
+        .unit-buttons button.active { background-color: #3B82F6; color: white; border-color: #3B82F6; }
         #simBuyAmountSlider { width: 100%; }
-
 
         .liquidation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding-top: 1.25rem; padding-bottom: 1.25rem; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
         .liquidation-input { width: 120px; }
@@ -144,14 +130,64 @@
         .modal-body strong { color: #111827; }
         .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
 
-        @media (max-width: 768px) { 
+        /* Mobile Responsive Table Styles */
+        @media (max-width: 640px) { 
             .calculator-container { padding: 16px; margin: 16px; }
             h1 { font-size: 1.25rem; }
-            .input-table th, .input-table td { font-size: 0.75rem; padding: 6px 2px; }
-            .input-field, .select-field { padding: 6px; font-size: 0.75rem; }
+            
+            .input-table thead {
+                display: none; /* Hide table headers on mobile */
+            }
+            .input-table tr.input-row { /* Target only data rows */
+                display: block;
+                margin-bottom: 1rem; 
+                border: 1px solid #e5e7eb;
+                border-radius: 0.375rem;
+                padding: 0.75rem;
+            }
+            .input-table td {
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center;
+                padding: 0.5rem 0; 
+                border-bottom: 1px dotted #eee;
+                font-size: 0.875rem; /* Ensure consistent font size */
+            }
+            .input-table tr.input-row td:last-child { /* Last td in a data row */
+                border-bottom: none; 
+            }
+            .input-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #4b5563;
+                margin-right: 0.5rem; 
+                min-width: 70px; /* Ensure label has some width */
+                text-align: left;
+            }
+            .input-table td.symbol-cell { /* Hide symbol cells on mobile */
+                display: none;
+            }
+            .input-table td .input-field, 
+            .input-table td .select-field {
+                flex-grow: 1; 
+                min-width: 100px; 
+                padding: 6px; 
+                font-size: 0.875rem;
+            }
+            .input-table td.delete-cell {
+                justify-content: flex-end; 
+            }
+            .input-table td.delete-cell::before {
+                content: ""; 
+            }
+            .input-table td.delete-cell .delete-btn {
+                width: 28px; /* Slightly larger delete button */
+                height: 28px;
+            }
+
+
             .fee-input-field { width: 60px; font-size: 0.75rem;}
             .liquidation-input { width: 100px; }
-            .delete-btn { width: 20px; height: 20px; font-size: 0.75rem; }
             
             .controls-top-section { display: flex; flex-direction: column; gap: 1rem; }
             .fee-group-container { flex-direction: column; gap: 0.75rem; align-items: stretch; }
@@ -162,15 +198,15 @@
             .liquidation-section .flex > div:last-child { justify-content: flex-start;} 
             
             .simulation-input-row { flex-direction: column; align-items: flex-start; }
-            .simulation-input-row label { min-width: auto; margin-bottom: 0.25rem; }
+            .simulation-input-row label { min-width: auto; margin-bottom: 0.25rem; text-align: left; } /* Label alignment for mobile */
             .simulation-input-row .input-field { max-width: 100%; }
-            .unit-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem; }
+            .unit-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem; justify-content: center; }
 
 
             .button-group-container { margin-top: 1rem; }
             .button-group { justify-content: space-around; width: 100%; flex-wrap: wrap; }
             .button-group .button { margin-top: 4px; margin-bottom: 4px;}
-            .add-row-icon-btn { margin-right: 0; } 
+            .add-row-icon-btn { margin-right: 0; margin-left:auto; /* Ensure it stays right on mobile within its container */ } 
         }
     </style>
 </head>
@@ -183,13 +219,11 @@
                 <table class="w-full input-table">
                     <thead>
                         <tr>
-                            <th class="w-2/12">거래 유형</th>
-                            <th class="w-2/12">단가</th>
-                            <th class="w-1/12 text-xs"></th>
-                            <th class="w-2/12">수량</th>
-                            <th class="w-1/12 text-xs"></th>
-                            <th class="w-3/12">금액</th>
-                            <th class="w-1/12">삭제</th>
+                            <th class="w-2/12 sm:w-auto">거래 유형</th> <th class="w-2/12 sm:w-auto">단가</th>
+                            <th class="w-1/12 sm:table-cell symbol-cell"></th> <th class="w-2/12 sm:w-auto">수량</th>
+                            <th class="w-1/12 sm:table-cell symbol-cell"></th>
+                            <th class="w-3/12 sm:w-auto">금액</th>
+                            <th class="w-1/12 sm:w-auto">삭제</th>
                         </tr>
                     </thead>
                     <tbody id="inputRows">
@@ -446,10 +480,6 @@
         let lastCalculatedHoldingQuantity = 0;
         let currentNetInvestmentOrRealizedProfit = 0; 
         
-        // --- 함수들 (formatNumberInput, formatFeeInput, updateRowStyle, initializeRows, addNewRow, attachEventListenersToRow, handleRowInputChange, calculateAndDisplayResults, formatNumber, formatNumberToKorean, resetAll, openConfirmationModal, closeConfirmationModal, confirmAndSetNewStart, toggleSimInputFields, calculateSimulation) ---
-        // 이 함수들은 이전 버전과 거의 동일하거나, 사소한 UI 연동 부분만 수정됩니다.
-        // calculateSimulation 함수 내에서 슬라이더의 max와 step을 단위 버튼에 따라 동적으로 변경하는 로직이 중요합니다.
-
         function formatNumberInput(inputElement, allowEmpty = false) { /* 이전과 동일 */
             const rawValue = inputElement.value;
             let cursorPosition = inputElement.selectionStart;
@@ -545,18 +575,18 @@
             row.classList.add('input-row');
             row.dataset.rowId = rowCount; 
             row.innerHTML = `
-                <td>
+                <td data-label="거래 유형">
                     <select class="select-field type-select">
                         <option value="buy" selected>매수</option>
                         <option value="sell">매도</option>
                     </select>
                 </td>
-                <td><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
-                <td class="text-xs text-gray-400">↔</td>
-                <td><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량"></td>
-                <td class="text-xs text-gray-400">=</td>
-                <td><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
-                <td><button class="delete-btn">X</button></td>
+                <td data-label="단가"><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
+                <td class="symbol-cell text-xs text-gray-400">↔</td>
+                <td data-label="수량"><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량"></td>
+                <td class="symbol-cell text-xs text-gray-400">=</td>
+                <td data-label="금액"><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
+                <td data-label="삭제"><button class="delete-btn">X</button></td>
             `;
             inputRowsContainer.appendChild(row);
             attachEventListenersToRow(row);
@@ -921,8 +951,8 @@
             let currentPnlPercent = 0;
             if (currentAvgPrc > 0 && currentPriceForPnl > 0 && currentHoldQty > 0) {
                 currentPnlPercent = ((currentPriceForPnl / currentAvgPrc) - 1) * 100;
-            } else if (currentNetInvestmentOrRealizedProfit <= 0 && currentHoldQty > 0 && currentPriceForPnl > 0) { // 이미 이익 상태
-                 currentPnlPercent = Infinity; // 또는 (currentPriceForPnl / (매우 작은 값 또는 1)) - 1) * 100 등으로 표현
+            } else if (currentNetInvestmentOrRealizedProfit <= 0 && currentHoldQty > 0 && currentPriceForPnl > 0) {
+                 currentPnlPercent = Infinity; 
             }
 
             simCurrentAvgPriceEl.textContent = formatNumberToKorean(currentAvgPrc, 'price');
@@ -1015,11 +1045,9 @@
                 simBuyAmountSliderEl.step = newStep;
                 
                 let currentAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-                if (currentAmount > newMax) { // 현재 금액이 새 최대값을 넘으면 최대값으로 조정
+                if (currentAmount > newMax) { 
                     currentAmount = newMax;
-                } else { // 새 step에 맞게 반올림 (선택적)
-                    // currentAmount = Math.round(currentAmount / newStep) * newStep;
-                }
+                } 
                 
                 simBuyAmountEl.value = formatNumber(currentAmount,0); 
                 formatNumberInput(simBuyAmountEl, true); 
@@ -1034,8 +1062,8 @@
             buyFeeRateEl.value = '0.05'; 
             sellFeeRateEl.value = '0.05';
             document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
-            simBuyAmountSliderEl.max = "1000000"; // 기본 백만원
-            simBuyAmountSliderEl.step = "10000"; // 기본 만원 단위
+            simBuyAmountSliderEl.max = "1000000"; 
+            simBuyAmountSliderEl.step = "10000"; 
             initializeRows();
             calculateSimulation(); 
         };
