@@ -58,7 +58,7 @@
             background-repeat: no-repeat; 
             background-position: right 0.5rem center; 
             background-size: 1.5em 1.5em; 
-            padding-right: 2.5rem; /* 화살표 공간 확보 */
+            padding-right: 2.5rem; 
         }
 
         .row-buy { background-color: rgba(254, 226, 226, 0.5); }
@@ -233,7 +233,8 @@
                             <th class="w-auto md:w-[5%] symbol-cell"></th> 
                             <th class="w-1/4 md:w-1/5">수량</th>
                             <th class="w-auto md:w-[5%] symbol-cell"></th>
-                            <th class="w-1/3 md:w-1/4">금액</th> <th class="w-auto md:w-1/12">삭제</th>
+                            <th class="w-1/3 md:w-1/4">금액</th> 
+                            <th class="w-auto md:w-1/12">삭제</th>
                         </tr>
                     </thead>
                     <tbody id="inputRows">
@@ -965,8 +966,8 @@
                  currentPnlPercent = Infinity; 
             }
 
-            simCurrentAvgPriceEl.textContent = formatNumberToKorean(currentAvgPrc, 'price');
-            simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(1)} %` : "이익 중";
+            simCurrentAvgPriceEl.textContent = formatNumber(currentAvgPrc, 2) + " 원"; // 소수점 2자리로 변경
+            simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(2)} %` : "이익 중"; // 소수점 2자리로 변경
             simCurrentPnlEl.style.color = currentPnlPercent >= 0 || !isFinite(currentPnlPercent) ? '#DC2626' : '#3B82F6';
 
 
@@ -985,8 +986,8 @@
                     expectedPnlPercent = Infinity;
                 }
 
-                simExpectedAvgPriceEl.textContent = formatNumberToKorean(expectedAvgPrice, 'price');
-                simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(1)} %` : "이익 중";
+                simExpectedAvgPriceEl.textContent = formatNumber(expectedAvgPrice, 2) + " 원"; // 소수점 2자리로 변경
+                simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(2)} %` : "이익 중"; // 소수점 2자리로 변경
                 simExpectedPnlEl.style.color = expectedPnlPercent >= 0 || !isFinite(expectedPnlPercent) ? '#DC2626' : '#3B82F6';
 
             } else {
