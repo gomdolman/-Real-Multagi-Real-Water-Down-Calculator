@@ -202,12 +202,12 @@
 </head>
 <body>
     <div class="calculator-container">
-        <h1>물림 계산기 (코인/주식)</h1>
+        <h1>물림 계산기 (코인/주식 - 소수점 8자리 지원)</h1>
 
         <div class="header-inputs">
             <div>
                 <label for="tradeTitle">거래 제목 (선택)</label>
-                <input type="text" id="tradeTitle" class="input-field" placeholder="예: 삼성전자 물타기">
+                <input type="text" id="tradeTitle" class="input-field" placeholder="예: 비트코인 물타기">
             </div>
             <div>
                 <label for="tradeDate">거래 기준일 (선택)</label>
@@ -269,7 +269,7 @@
             <div class="simulation-input-group">
                  <div class="simulation-input-row"> 
                     <label for="simCurrentPrice">현재가(평가기준):</label>
-                    <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="현재 주가">
+                    <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="현재 자산 가격">
                 </div>
                 <div class="simulation-input-row">
                     <label for="simBuyPrice">매수 단가:</label>
@@ -297,7 +297,7 @@
                  </div>
                 <div class="simulation-input-row" id="simQuantityRow" style="display: none;">
                     <label for="simBuyQuantity">매수 수량:</label>
-                    <input type="text" inputmode="decimal" id="simBuyQuantity" class="input-field" placeholder="추가 매수 수량">
+                    <input type="text" inputmode="decimal" id="simBuyQuantity" class="input-field" placeholder="추가 매수 수량 (최대 8자리)">
                 </div>
             </div>
             <div class="simulation-result-group">
@@ -394,6 +394,7 @@
         
         <div class="mt-4 text-sm text-gray-600">
             <p>ⓘ 수수료율은 퍼센트(%) 값 그대로 입력하세요. (예: 0.05% → 0.05 입력)</p>
+            <p>ⓘ 수량은 소수점 8자리까지 입력 가능합니다.</p>
         </div>
 
         <div class="info-section">
@@ -401,12 +402,12 @@
             <ul>
                 <li>매수/매도 수수료율을 입력합니다 (기본값 0.05%).</li>
                 <li>테이블 하단의 '+' 버튼으로 거래 내역(매수 또는 매도)을 추가합니다.</li>
-                <li>각 행에 거래 유형, 단가, 수량(또는 금액)을 입력합니다. 거래 유형에 따라 행 배경색이 변경됩니다.</li>
+                <li>각 행에 거래 유형, 단가, 수량(또는 금액)을 입력합니다. 수량은 소수점 8자리까지 입력 가능합니다.</li>
                 <li>상단의 '만약, [가격]원에 전량 매도한다면?'에 가격을 입력하여 예상 최종 손익을 확인할 수 있습니다.</li>
-                <li>"새 시작점으로" 버튼은 현재 계산된 '보유분 평단가(수수료포함)'와 '보유 수량'을 첫 행으로 설정합니다. (확인창 표시)</li>
+                <li>"새 시작점으로" 버튼은 현재 계산된 '보유분 평단가(수수료포함)'와 '보유 수량'을 첫 행으로 설정합니다.</li>
                 <li>"내역 복사" 버튼으로 현재 입력 및 계산된 내용을 텍스트로 복사할 수 있습니다.</li>
                 <li>"파일 저장"으로 현재 내역을 JSON 파일로 저장하고, "파일 불러오기"로 이전에 저장한 파일을 불러올 수 있습니다.</li>
-                <li>"공유 링크" 버튼으로 현재 상태를 URL로 만들어 공유할 수 있습니다. (주의: 데이터가 많으면 URL이 매우 길어질 수 있습니다.)</li>
+                <li>"공유 링크" 버튼으로 현재 상태를 URL로 만들어 공유할 수 있습니다.</li>
             </ul>
             <p class="disclaimer">본 계산기는 참고용으로만 사용해주시고, 투자 결정에 따른 법적 책임은 본인에게 있습니다.</p>
         </div>
@@ -419,7 +420,7 @@
                 <p>기존 모든 거래 내역이 삭제되고, 아래의 상태를 새로운 매수 내역으로 설정합니다:</p>
                 <p><strong>수량:</strong> <span id="modalQuantity">0</span></p>
                 <p><strong>단가 (실질 평단가):</strong> <span id="modalAvgPrice">0</span>원</p>
-                <p class="text-xs mt-2">이 단가에는 이미 과거 수수료 비용이 반영되어 있습니다 (실현 후 보유 주식 평단가가 0원 이하이면 0으로 표시될 수 있음).</p>
+                <p class="text-xs mt-2">이 단가에는 이미 과거 수수료 비용이 반영되어 있습니다.</p>
             </div>
             <div class="modal-actions">
                 <button id="confirmSetNewStart" class="button new-start-btn">확인</button>
@@ -501,7 +502,8 @@
         let lastCalculatedHoldingQuantity = 0;
         let currentNetInvestmentOrRealizedProfit = 0; 
         
-        function formatNumberInput(inputElement, allowEmpty = false) { /* 이전과 동일 */
+        // 입력 필드 숫자 포맷팅 함수 (쉼표 추가 및 소수점 처리)
+        function formatNumberInput(inputElement, allowEmpty = false, decimalPlaces = -1) { 
             const rawValue = inputElement.value;
             let cursorPosition = inputElement.selectionStart;
             let nonDelimiterCharsBeforeCursor = 0;
@@ -509,9 +511,9 @@
                 if (rawValue[i] !== ',') nonDelimiterCharsBeforeCursor++;
             }
             let valueToFormat = rawValue.replace(/,/g, '');
-            valueToFormat = valueToFormat.replace(/[^\d.]/g, '');
+            valueToFormat = valueToFormat.replace(/[^\d.]/g, ''); // 숫자와 점 이외의 문자 제거
             const parts = valueToFormat.split('.');
-            if (parts.length > 2) valueToFormat = parts[0] + '.' + parts.slice(1).join('');
+            if (parts.length > 2) valueToFormat = parts[0] + '.' + parts.slice(1).join(''); // 점이 여러 개일 경우 첫 번째 점만 인정
             
             let formattedValue = "";
             if (valueToFormat === "" && allowEmpty) { 
@@ -527,6 +529,11 @@
                 
                 let formattedInteger = "";
                 if (integerPart !== "") {
+                    // 0으로 시작하는 정수 부분 처리 (예: 0123 -> 123)
+                    if (integerPart.length > 1 && integerPart.startsWith('0')) {
+                        integerPart = integerPart.replace(/^0+/, '');
+                        if (integerPart === '') integerPart = '0'; // 모두 0이었을 경우 (예: 000)
+                    }
                     const numInt = parseFloat(integerPart); 
                     if (!isNaN(numInt)) {
                         formattedInteger = numInt.toLocaleString('en-US');
@@ -540,12 +547,17 @@
 
                 formattedValue = formattedInteger;
                 if (decimalPart !== undefined) {
+                    // decimalPlaces가 지정된 경우 해당 자릿수까지 자름
+                    if (decimalPlaces !== -1 && decimalPart.length > decimalPlaces) {
+                        decimalPart = decimalPart.substring(0, decimalPlaces);
+                    }
                     formattedValue += '.' + decimalPart;
                 }
             }
-            if (formattedValue.toLowerCase() === "nan") {
+            if (formattedValue.toLowerCase() === "nan") { // NaN 방지
                  formattedValue = decimalPart !== undefined ? "0." + decimalPart : "";
             }
+             // . 으로 시작하는 경우 앞에 0 추가 (예: .5 -> 0.5)
              if (valueToFormat.startsWith(".") && !formattedValue.startsWith("0.")) {
                 if (formattedValue.startsWith(".")) formattedValue = "0" + formattedValue;
                 else if (formattedValue === "") formattedValue = "0.";
@@ -553,7 +565,9 @@
             
             inputElement.value = formattedValue;
 
+            // 커서 위치 조정
             if (valueToFormat === "" && !allowEmpty && inputElement !== simBuyAmountEl && inputElement !== simBuyQuantityEl && inputElement !== simBuyPriceEl && inputElement !== simCurrentPriceEl ) { 
+                // 특정 시뮬레이션 입력이 아닌 경우, 비어있으면 0으로 처리하지 않음
             } else {
                 let newCursorPos = 0;
                 let currentNonDelimiterChars = 0;
@@ -567,16 +581,20 @@
                 inputElement.selectionStart = inputElement.selectionEnd = newCursorPos;
             }
         }
-        function formatFeeInput(inputElement) { /* 이전과 동일 */
+        
+        // 수수료 입력 필드 포맷팅 함수
+        function formatFeeInput(inputElement) { 
             let value = inputElement.value;
-            value = value.replace(/[^\d.]/g, "");
+            value = value.replace(/[^\d.]/g, ""); // 숫자와 점 이외의 문자 제거
             const parts = value.split('.');
-            if (parts.length > 2) {
+            if (parts.length > 2) { // 점이 여러 개일 경우 첫 번째 점만 인정
                 value = parts[0] + '.' + parts.slice(1).join('');
             }
             inputElement.value = value;
         }
-        function updateRowStyle(rowElement, transactionType) { /* 이전과 동일 */
+
+        // 행 스타일 업데이트 (매수/매도에 따라 배경색 변경)
+        function updateRowStyle(rowElement, transactionType) { 
             rowElement.classList.remove('row-buy', 'row-sell');
             if (transactionType === 'buy') {
                 rowElement.classList.add('row-buy');
@@ -584,13 +602,17 @@
                 rowElement.classList.add('row-sell');
             }
         }
+
+        // 입력 행 초기화 (기본 한 줄 추가)
         function initializeRows() { 
             inputRowsContainer.innerHTML = ''; 
             rowCount = 0;
             addNewRow(); 
             calculateAndDisplayResults();
         }
-        function addNewRow() { /* 이전과 동일 */
+
+        // 새 입력 행 추가 함수
+        function addNewRow() { 
             rowCount++;
             const row = document.createElement('tr');
             row.classList.add('input-row');
@@ -604,7 +626,7 @@
                 </td>
                 <td data-label="단가"><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
                 <td class="symbol-cell text-xs text-gray-400">↔</td>
-                <td data-label="수량"><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량"></td>
+                <td data-label="수량"><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량 (최대 8자리)"></td>
                 <td class="symbol-cell text-xs text-gray-400">=</td>
                 <td data-label="금액"><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
                 <td data-label="삭제"><button class="delete-btn">X</button></td>
@@ -614,13 +636,15 @@
             updateRowStyle(row, 'buy'); 
             return row;
         }
-        function attachEventListenersToRow(rowElement) { /* 이전과 동일 - calculateAndDisplayResults 호출 시 시뮬레이션도 업데이트 */
+
+        // 각 행의 입력 필드에 이벤트 리스너 연결
+        function attachEventListenersToRow(rowElement) { 
             const typeSelect = rowElement.querySelector('.type-select');
             const priceInput = rowElement.querySelector('.price-input');
             const quantityInput = rowElement.querySelector('.quantity-input');
             const amountInput = rowElement.querySelector('.amount-input');
             const deleteButton = rowElement.querySelector('.delete-btn');
-            let lastEditedField = null; 
+            let lastEditedField = null; // 마지막으로 수정된 필드 추적 (단가, 수량, 금액 간 자동 계산용)
 
             typeSelect.addEventListener('change', (event) => {
                 updateRowStyle(rowElement, event.target.value);
@@ -632,7 +656,7 @@
                 handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField); 
             });
             quantityInput.addEventListener('input', () => {
-                formatNumberInput(quantityInput); lastEditedField = 'quantity';
+                formatNumberInput(quantityInput, false, 8); lastEditedField = 'quantity'; // 수량은 소수점 8자리까지 포맷팅
                 handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
             });
             amountInput.addEventListener('input', () => {
@@ -642,36 +666,40 @@
             
             deleteButton.addEventListener('click', () => {
                 rowElement.remove();
-                if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                if (inputRowsContainer.querySelectorAll('.input-row').length === 0) { // 모든 행이 삭제되면 새 행 추가
                     addNewRow();
                 }
                 calculateAndDisplayResults(); 
                 calculateSimulation();
             });
         }
-        function handleRowInputChange(priceEl, quantityEl, amountEl, editedField) { /* 이전과 동일 - calculateAndDisplayResults 호출 시 시뮬레이션도 업데이트 */
+
+        // 행 입력 변경 시 자동 계산 처리 (단가, 수량, 금액)
+        function handleRowInputChange(priceEl, quantityEl, amountEl, editedField) { 
             const price = parseFloat(priceEl.value.replace(/,/g, '')) || 0;
-            let quantity = parseFloat(quantityEl.value.replace(/,/g, '')) || 0;
+            // 수량을 파싱할 때는 8자리 정밀도를 유지하기 위해 toFixed를 아직 적용하지 않음
+            let quantity = parseFloat(quantityEl.value.replace(/,/g, '')) || 0; 
             let amount = parseFloat(amountEl.value.replace(/,/g, '')) || 0;
 
-            if (editedField === 'price' || editedField === 'quantity') {
+            if (editedField === 'price' || editedField === 'quantity') { // 단가 또는 수량 변경 시
                 if (price > 0 && quantity > 0) {
                     amount = price * quantity;
-                    amountEl.value = amount.toFixed(2);
+                    amountEl.value = amount.toFixed(2); // 금액은 소수점 2자리로 고정
                     formatNumberInput(amountEl); 
                 } else if ((editedField === 'quantity' && price > 0 && quantity <= 0) || (editedField === 'price' && price <=0 && quantity > 0)) {
-                     amountEl.value = ''; 
+                     amountEl.value = ''; // 유효하지 않은 입력 시 금액 필드 비움
                 }
-            } else if (editedField === 'amount') {
+            } else if (editedField === 'amount') { // 금액 변경 시
                 if (price > 0 && amount > 0) {
                     quantity = amount / price;
-                    quantityEl.value = quantity.toFixed(3); 
-                    formatNumberInput(quantityEl); 
+                    quantityEl.value = quantity.toFixed(8); // 수량은 소수점 8자리로 고정
+                    formatNumberInput(quantityEl, false, 8); 
                 } else if (price > 0 && amount <= 0) {
-                    quantityEl.value = ''; 
+                    quantityEl.value = ''; // 유효하지 않은 입력 시 수량 필드 비움
                 }
             }
             
+            // 음수 입력 방지
             if (priceEl.value && parseFloat(priceEl.value.replace(/,/g, '')) < 0) priceEl.value = '0';
             if (quantityEl.value && parseFloat(quantityEl.value.replace(/,/g, '')) < 0) quantityEl.value = '0';
             if (amountEl.value && parseFloat(amountEl.value.replace(/,/g, '')) < 0) amountEl.value = '0';
@@ -679,7 +707,9 @@
             calculateAndDisplayResults();
             calculateSimulation();
         }
-        function calculateAndDisplayResults() { /* 이전과 동일 */
+
+        // 전체 결과 계산 및 화면 표시
+        function calculateAndDisplayResults() { 
             let totalBuyAmountVal = 0;
             let totalBuyQuantityVal = 0;
             let totalBuyFeeVal = 0;
@@ -694,10 +724,11 @@
             uiRows.forEach(uiRow => {
                 const type = uiRow.querySelector('.type-select').value;
                 const price = parseFloat(uiRow.querySelector('.price-input').value.replace(/,/g, '')) || 0;
-                const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0;
+                // 수량은 toFixed(8) 등으로 이미 포맷팅 되어 있을 수 있으므로, 다시 파싱하여 사용
+                const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0; 
                 
                 if (price > 0 && quantity > 0) {
-                    const amount = price * quantity;
+                    const amount = price * quantity; // 정확한 amount 계산 (소수점 8자리 quantity 사용)
                     if (type === 'buy') {
                         totalBuyAmountVal += amount;
                         totalBuyQuantityVal += quantity;
@@ -740,21 +771,22 @@
             lastCalculatedAvgHoldingPrice = avgHoldingPriceWithFeeVal; 
             lastCalculatedHoldingQuantity = currentHoldingQuantityVal;
 
+            // 결과 표시 (수량은 8자리, 금액은 2자리)
             totalBuyAmountGrossEl.textContent = formatNumber(totalBuyAmountVal, 2);
             totalBuyAmountGrossKoreanEl.textContent = formatNumberToKorean(totalBuyAmountVal, 'amount');
-            totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 3);
+            totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 8); // 수량 8자리
             totalBuyQuantityKoreanEl.textContent = formatNumberToKorean(totalBuyQuantityVal, 'quantity');
             accumulatedBuyFeeEl.textContent = formatNumber(totalBuyFeeVal, 2);
             accumulatedBuyFeeKoreanEl.textContent = formatNumberToKorean(totalBuyFeeVal, 'amount');
 
             totalSellAmountGrossEl.textContent = formatNumber(totalSellAmountVal, 2);
             totalSellAmountGrossKoreanEl.textContent = formatNumberToKorean(totalSellAmountVal, 'amount');
-            totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 3);
+            totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 8); // 수량 8자리
             totalSellQuantityKoreanEl.textContent = formatNumberToKorean(totalSellQuantityVal, 'quantity');
             accumulatedSellFeeEl.textContent = formatNumber(totalSellFeeVal, 2);
             accumulatedSellFeeKoreanEl.textContent = formatNumberToKorean(totalSellFeeVal, 'amount');
 
-            currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 3);
+            currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 8); // 수량 8자리
             currentHoldingQuantityKoreanEl.textContent = formatNumberToKorean(currentHoldingQuantityVal, 'quantity');
             
             avgBuyPriceNoFeeLabelEl.textContent = "매입 평균단가 (수수료 미반영)"; 
@@ -823,20 +855,33 @@
                 estimatedOverallProfitLossKoreanEl.className = 'text-gray-600 text-blue-500';
             }
         }
-        function formatNumber(num, decimalPlaces = 0) { /* 이전과 동일 */
+
+        // 숫자 포맷팅 (쉼표 및 소수점 자릿수 지정)
+        function formatNumber(num, decimalPlaces = 0) { 
             if (isNaN(num) || !isFinite(num)) return '0';
+            // 수량이 0이고 소수점 이하자리가 있을때 0.00000000 처럼 표시되도록 수정
+            if (num === 0 && decimalPlaces > 0) {
+                return Number(num).toLocaleString('en-US', { 
+                    minimumFractionDigits: decimalPlaces,
+                    maximumFractionDigits: decimalPlaces 
+                });
+            }
             return Number(num).toLocaleString('en-US', { 
                 minimumFractionDigits: decimalPlaces,
-                maximumFractionDigits: decimalPlaces
+                maximumFractionDigits: decimalPlaces // 수량의 경우 최대 8자리까지 표시
             });
         }
-        function formatNumberToKorean(num, type) { /* 이전과 동일 */
+
+        // 숫자를 한글 단위로 포맷팅 (원, 개)
+        function formatNumberToKorean(num, type) { 
             const n = parseFloat(num) || 0; 
             if (isNaN(n)) return (type === 'quantity' ? '0개' : '0원');
-            const numForKorean = Math.floor(n); 
+            
             if (type === 'quantity') {
-                return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 3})}개`;
+                // 수량은 toLocaleString('ko-KR')을 사용하여 소수점 8자리까지 표현
+                return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 8})}개`;
             } else if (type === 'price' || type === 'amount') {
+                const numForKorean = Math.floor(n); 
                 if (numForKorean === 0 && n !== 0 && n > -1 && n < 1) { 
                      return n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits:2}) + '원';
                 }
@@ -859,6 +904,7 @@
             return n.toLocaleString('ko-KR');
         }
         
+        // 토스트 메시지 표시
         function showToast(message) {
             toastMessageEl.textContent = message;
             toastMessageEl.classList.add('show');
@@ -867,7 +913,8 @@
             }, 2000); 
         }
 
-        function generateReportText() { /* 이전과 동일 - 거래 제목/날짜 포함 */
+        // 복사할 텍스트 생성
+        function generateReportText() { 
             let report = "물림 계산기 내역\n";
             const title = tradeTitleEl.value.trim();
             const date = tradeDateEl.value;
@@ -892,10 +939,12 @@
                 uiRows.forEach((row, index) => {
                     const type = row.querySelector('.type-select').value === 'buy' ? '매수' : '매도';
                     const price = row.querySelector('.price-input').value || '0';
-                    const quantity = row.querySelector('.quantity-input').value || '0';
+                    const quantityRaw = row.querySelector('.quantity-input').value || '0';
+                    // 복사 시 수량은 8자리까지 표시
+                    const quantityFormatted = formatNumber(parseFloat(quantityRaw.replace(/,/g, '')), 8); 
                     const amount = row.querySelector('.amount-input').value || '0';
-                    if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantity.replace(/,/g, '')) > 0) {
-                         report += `  ${index + 1}. ${type}: ${quantity} @ ${price} = ${amount}원\n`;
+                    if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantityRaw.replace(/,/g, '')) > 0) {
+                         report += `  ${index + 1}. ${type}: ${quantityFormatted} @ ${price} = ${amount}원\n`;
                     }
                 });
             }
@@ -911,7 +960,7 @@
             if (simType === '금액') {
                 report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}원\n`;
             } else {
-                report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`;
+                report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`; // 수량은 8자리로 표시될 수 있도록
             }
             report += `  총 추가 매수 금액: ${simTotalAdditionalAmountEl.textContent}\n`;
             report += `  현재 평균: ${simCurrentAvgPriceEl.textContent} (${simCurrentPnlEl.textContent})\n`;
@@ -929,6 +978,7 @@
             return report;
         }
 
+        // 클립보드에 텍스트 복사
         function copyToClipboard(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -951,7 +1001,8 @@
             }
             document.body.removeChild(textArea);
         }
-
+        
+        // 현재 데이터를 JSON 파일로 저장
         function saveDataToFile() {
             const data = collectDataForFile();
             const jsonData = JSON.stringify(data, null, 2); 
@@ -1001,6 +1052,7 @@
             showToast('파일이 저장되었습니다!');
         }
 
+        // 파일에서 데이터 불러오기
         function loadDataFromFile(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1020,12 +1072,13 @@
             }
         }
         
+        // 파일 저장을 위한 데이터 수집
         function collectDataForFile() {
             const transactions = [];
             inputRowsContainer.querySelectorAll('.input-row').forEach(row => {
                 const type = row.querySelector('.type-select').value;
                 const price = row.querySelector('.price-input').value;
-                const quantity = row.querySelector('.quantity-input').value;
+                const quantity = row.querySelector('.quantity-input').value; // 수량은 8자리까지 저장될 수 있도록
                 const amount = row.querySelector('.amount-input').value;
                 if (price || quantity || amount) { 
                      transactions.push({ type, price, quantity, amount });
@@ -1048,6 +1101,7 @@
             };
         }
 
+        // 파일 또는 URL에서 상태 복원
         function restoreStateFromFile(data) {
             tradeTitleEl.value = data.tradeTitle || '';
             tradeDateEl.value = data.tradeDate || '';
@@ -1067,7 +1121,7 @@
             simBuyAmountEl.value = data.simBuyAmount || '';
             formatNumberInput(simBuyAmountEl, true);
             simBuyQuantityEl.value = data.simBuyQuantity || '';
-            formatNumberInput(simBuyQuantityEl, true);
+            formatNumberInput(simBuyQuantityEl, true, 8); // 수량 복원 시 8자리 포맷팅
 
             if (data.simActiveUnitMax) {
                 simUnitBtns.forEach(btn => btn.classList.remove('active'));
@@ -1090,7 +1144,7 @@
                     newRow.querySelector('.price-input').value = trx.price;
                     formatNumberInput(newRow.querySelector('.price-input'), true);
                     newRow.querySelector('.quantity-input').value = trx.quantity;
-                    formatNumberInput(newRow.querySelector('.quantity-input'), true);
+                    formatNumberInput(newRow.querySelector('.quantity-input'), true, 8); // 수량 복원 시 8자리 포맷팅
                     newRow.querySelector('.amount-input').value = trx.amount;
                     formatNumberInput(newRow.querySelector('.amount-input'), true);
                     updateRowStyle(newRow, trx.type);
@@ -1104,20 +1158,21 @@
             calculateSimulation();
         }
 
+        // 공유 링크 생성
         function generateShareLink() {
             const data = collectDataForFile();
             try {
                 const jsonString = JSON.stringify(data);
                 const base64Data = btoa(encodeURIComponent(jsonString)); 
                 const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Data}`;
-                copyToClipboard(shareUrl); // 여기서 copyToClipboard는 내부의 textarea를 사용
-                // showToast는 copyToClipboard 내부에서 호출됨
+                copyToClipboard(shareUrl); 
             } catch (error) {
                 console.error("Error generating share link:", error);
                 showToast('공유 링크 생성 중 오류 발생');
             }
         }
 
+        // URL에서 상태 불러오기
         function loadStateFromURL() {
             if (window.location.hash && window.location.hash.length > 1) {
                 try {
@@ -1126,7 +1181,8 @@
                     const data = JSON.parse(jsonString);
                     restoreStateFromFile(data);
                     showToast('공유된 내역을 불러왔습니다!');
-                    window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    // URL에서 해시 제거하여 새로고침 시 다시 로드되지 않도록 함
+                    window.history.replaceState(null, null, window.location.pathname + window.location.search); 
                 } catch (error) {
                     console.error("Error loading state from URL:", error);
                     showToast('공유 링크를 불러오는 중 오류가 발생했습니다.');
@@ -1135,6 +1191,7 @@
         }
 
 
+        // 모든 입력 초기화
         function resetAll() { 
             tradeTitleEl.value = ''; 
             tradeDateEl.value = '';  
@@ -1155,14 +1212,20 @@
             initializeRows(); 
             calculateSimulation(); 
         }
+
+        // 새 시작점으로 설정 확인 모달 열기
         function openConfirmationModal() { 
-            modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 3);
+            modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 8); // 수량 8자리
             modalAvgPriceEl.textContent = formatNumber(lastCalculatedAvgHoldingPrice, 2);
             confirmationModalEl.classList.add('active');
         }
+
+        // 새 시작점으로 설정 확인 모달 닫기
         function closeConfirmationModal() { 
             confirmationModalEl.classList.remove('active');
         }
+
+        // 새 시작점으로 설정 확정 및 실행
         function confirmAndSetNewStart() { 
             closeConfirmationModal();
             const newStartPrice = lastCalculatedAvgHoldingPrice; 
@@ -1172,7 +1235,6 @@
             rowCount = 0;
             liquidationPriceEl.value = ''; 
             simCurrentPriceEl.value = ''; 
-            // 거래 제목, 날짜는 유지
 
             const firstRowElement = addNewRow(); 
             if (firstRowElement) {
@@ -1188,8 +1250,8 @@
                     priceInput.value = newStartPrice.toFixed(2);
                     formatNumberInput(priceInput);
                 
-                    quantityInput.value = newStartQuantity.toFixed(3); 
-                    formatNumberInput(quantityInput);
+                    quantityInput.value = newStartQuantity.toFixed(8); // 수량 8자리
+                    formatNumberInput(quantityInput, false, 8);
                 
                     handleRowInputChange(priceInput, quantityInput, amountInput, 'price'); 
                 } else { 
@@ -1204,7 +1266,8 @@
             calculateAndDisplayResults(); 
             calculateSimulation();
         }
-
+        
+        // 추가 매수 시뮬레이션 입력 필드 토글 (금액/수량)
         function toggleSimInputFields() {
             const selectedType = document.querySelector('input[name="simType"]:checked').value;
             if (selectedType === 'amount') {
@@ -1222,6 +1285,7 @@
             calculateSimulation(); 
         }
 
+        // 추가 매수 시뮬레이션 계산
         function calculateSimulation() {
             const currentPriceForPnl = parseFloat(simCurrentPriceEl.value.replace(/,/g, '')) || 0; 
             const simPrice = parseFloat(simBuyPriceEl.value.replace(/,/g, '')) || 0;
@@ -1234,10 +1298,10 @@
             if (simType === 'amount') {
                 simAdditionalAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
                 if (simPrice > 0 && simAdditionalAmount > 0) {
-                    simAdditionalQuantity = simAdditionalAmount / simPrice;
+                    simAdditionalQuantity = simAdditionalAmount / simPrice; // 정밀도 유지
                 }
             } else { 
-                simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0;
+                simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0; // 8자리 수량
                 if (simPrice > 0 && simAdditionalQuantity > 0) {
                     simAdditionalAmount = simPrice * simAdditionalQuantity;
                 }
@@ -1245,7 +1309,7 @@
             
             simTotalAdditionalAmountEl.textContent = formatNumberToKorean(simAdditionalAmount, 'amount');
 
-            const currentHoldQty = lastCalculatedHoldingQuantity;
+            const currentHoldQty = lastCalculatedHoldingQuantity; // 8자리 수량일 수 있음
             const currentAvgPrc = lastCalculatedAvgHoldingPrice; 
 
             let currentPnlPercent = 0;
@@ -1264,7 +1328,7 @@
                 const additionalBuyFee = simAdditionalAmount * buyFeeRate;
                 const baseCostForCalc = currentNetInvestmentOrRealizedProfit > 0 ? currentNetInvestmentOrRealizedProfit : 0;
                 const totalCostForSim = baseCostForCalc + simAdditionalAmount + additionalBuyFee;
-                const totalQuantityForSim = currentHoldQty + simAdditionalQuantity;
+                const totalQuantityForSim = currentHoldQty + simAdditionalQuantity; // 8자리 수량 + 8자리 수량
                 
                 const expectedAvgPrice = totalQuantityForSim > 0 ? totalCostForSim / totalQuantityForSim : 0;
                 
@@ -1309,7 +1373,7 @@
         });
         saveToFileBtn.addEventListener('click', saveDataToFile);
         loadFileInput.addEventListener('change', loadDataFromFile);
-        createShareLinkBtn.addEventListener('click', generateShareLink); // 공유 링크 버튼 리스너
+        createShareLinkBtn.addEventListener('click', generateShareLink);
 
 
         confirmSetNewStartBtn.addEventListener('click', confirmAndSetNewStart);
@@ -1342,7 +1406,7 @@
             calculateSimulation();
         });
 
-        simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true); calculateSimulation(); });
+        simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true, 8); calculateSimulation(); }); // 수량 8자리 포맷팅
 
         simUnitBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1368,6 +1432,7 @@
         });
 
 
+        // 페이지 로드 시 초기화
         window.onload = () => {
             buyFeeRateEl.value = '0.05'; 
             sellFeeRateEl.value = '0.05';
@@ -1375,7 +1440,7 @@
             simBuyAmountSliderEl.max = "1000000"; 
             simBuyAmountSliderEl.step = "10000"; 
             initializeRows();
-            loadStateFromURL(); // 페이지 로드 시 URL에서 데이터 불러오기 시도
+            loadStateFromURL(); 
             calculateSimulation(); 
         };
     </script>
