@@ -93,6 +93,8 @@
         .new-start-btn:hover { background-color: #D97706; }
         .copy-btn { background-color: #06b6d4; color: white; } 
         .copy-btn:hover { background-color: #0891b2; }
+        .file-btn { background-color: #4f46e5; color: white; } /* Indigo */
+        .file-btn:hover { background-color: #4338ca; }
 
 
         .add-row-icon-btn { background-color: #10B981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s; margin-top: 0.5rem; margin-left: auto; }
@@ -189,8 +191,8 @@
             .simulation-input-row .input-field { max-width: 100%; }
             .unit-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem; justify-content: center; }
 
-            .button-group-container { margin-top: 1rem; }
-            .button-group { justify-content: space-around; width: 100%; flex-wrap: wrap; }
+            .button-group-container { margin-top: 1rem; flex-wrap: wrap; } /* 버튼 그룹 줄바꿈 허용 */
+            .button-group { justify-content: space-around; width: 100%; }
             .button-group .button { margin-top: 4px; margin-bottom: 4px;}
             .add-row-icon-btn { margin-right: 0; margin-left:auto; } 
         }
@@ -320,6 +322,9 @@
         <div class="button-group-container flex gap-2 flex-wrap button-group justify-center mt-1"> 
             <button id="setNewStartBtn" class="button new-start-btn">새 시작점으로</button>
             <button id="copyDetailsBtn" class="button copy-btn">내역 복사</button> 
+            <button id="saveToFileBtn" class="button file-btn">파일 저장</button>
+            <label for="loadFile" class="button file-btn cursor-pointer">파일 불러오기</label>
+            <input type="file" id="loadFile" class="hidden" accept=".json,.txt">
             <button id="resetBtn" class="button reset-btn">초기화</button>
         </div>
 
@@ -397,6 +402,8 @@
                 <li>상단의 '만약, [가격]원에 전량 매도한다면?'에 가격을 입력하여 예상 최종 손익을 확인할 수 있습니다.</li>
                 <li>"새 시작점으로" 버튼은 현재 계산된 '보유분 평단가(수수료포함)'와 '보유 수량'을 첫 행으로 설정합니다. (확인창 표시)</li>
                 <li>"내역 복사" 버튼으로 현재 입력 및 계산된 내용을 텍스트로 복사할 수 있습니다.</li>
+                <li>"파일 저장"으로 현재 내역을 JSON 파일로 저장하고, "파일 불러오기"로 이전에 저장한 파일을 불러올 수 있습니다.</li>
+                <li>"공유 링크" 버튼으로 현재 상태를 URL로 만들어 공유할 수 있습니다. (주의: 데이터가 많으면 URL이 매우 길어질 수 있습니다.)</li>
             </ul>
             <p class="disclaimer">본 계산기는 참고용으로만 사용해주시고, 투자 결정에 따른 법적 책임은 본인에게 있습니다.</p>
         </div>
@@ -421,7 +428,7 @@
 
 
     <script>
-        // --- DOM 요소들 (이전과 동일) ---
+        // --- DOM 요소들 ---
         const tradeTitleEl = document.getElementById('tradeTitle'); 
         const tradeDateEl = document.getElementById('tradeDate');   
         const inputRowsContainer = document.getElementById('inputRows');
@@ -429,6 +436,11 @@
         const resetBtn = document.getElementById('resetBtn');
         const setNewStartBtn = document.getElementById('setNewStartBtn');
         const copyDetailsBtn = document.getElementById('copyDetailsBtn'); 
+        const saveToFileBtn = document.getElementById('saveToFileBtn'); // 파일 저장 버튼
+        const loadFileInput = document.getElementById('loadFile');     // 파일 불러오기 input
+        // const createShareLinkBtn = document.getElementById('createShareLinkBtn'); // 공유 링크 버튼 (추후 추가 시)
+
+
         const buyFeeRateEl = document.getElementById('buyFeeRate');
         const sellFeeRateEl = document.getElementById('sellFeeRate');
         const liquidationPriceEl = document.getElementById('liquidationPrice'); 
@@ -849,7 +861,7 @@
             toastMessageEl.classList.add('show');
             setTimeout(() => {
                 toastMessageEl.classList.remove('show');
-            }, 2000); // 2초 후 숨김
+            }, 2000); 
         }
 
         function generateReportText() {
