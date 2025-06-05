@@ -95,7 +95,7 @@
         .copy-btn:hover { background-color: #0891b2; }
         .file-btn { background-color: #4f46e5; color: white; } 
         .file-btn:hover { background-color: #4338ca; }
-        .share-link-btn { background-color: #8b5cf6; color:white; } /* Violet for share link */
+        .share-link-btn { background-color: #8b5cf6; color:white; } 
         .share-link-btn:hover { background-color: #7c3aed; }
 
 
@@ -327,7 +327,7 @@
             <button id="saveToFileBtn" class="button file-btn">파일 저장</button>
             <label for="loadFile" class="button file-btn cursor-pointer">파일 불러오기</label>
             <input type="file" id="loadFile" class="hidden" accept=".json,.txt">
-            <button id="createShareLinkBtn" class="button share-link-btn">공유 링크</button> <!-- 공유 링크 버튼 추가 -->
+            <button id="createShareLinkBtn" class="button share-link-btn">공유 링크</button>
             <button id="resetBtn" class="button reset-btn">초기화</button>
         </div>
 
@@ -441,7 +441,7 @@
         const copyDetailsBtn = document.getElementById('copyDetailsBtn'); 
         const saveToFileBtn = document.getElementById('saveToFileBtn');
         const loadFileInput = document.getElementById('loadFile');    
-        const createShareLinkBtn = document.getElementById('createShareLinkBtn'); // 공유 링크 버튼 DOM
+        const createShareLinkBtn = document.getElementById('createShareLinkBtn');
 
 
         const buyFeeRateEl = document.getElementById('buyFeeRate');
@@ -959,11 +959,41 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             const today = new Date();
-            const dateString = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-            const fileName = prompt("저장할 파일 이름을 입력하세요:", `물림계산내역_${data.tradeTitle || dateString}.json`) || `물림계산내역_${dateString}.json`;
+            const year = String(today.getFullYear()).slice(-2); 
+            const month = String(today.getMonth() + 1).padStart(2, '0'); 
+            const day = String(today.getDate()).padStart(2, '0'); 
+            const fileCreationDate = `${year}${month}${day}`; 
+
+            const tradeTitleInput = tradeTitleEl.value.trim();
+            const tradeDateInput = tradeDateEl.value;
+
+            let baseFileName = "물림계산내역";
+            let titlePart = "";
+            let tradeDatePart = "";
+            const creationDatePart = `_파일생성일자(${fileCreationDate})`;
+
+            if (tradeTitleInput && tradeDateInput) {
+                const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
+                tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
+                titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`; 
+                baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
+            } else if (tradeTitleInput && !tradeDateInput) {
+                titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`;
+                baseFileName += `${titlePart}${creationDatePart}`;
+            } else if (!tradeTitleInput && tradeDateInput) {
+                const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
+                tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
+                titlePart = "_제목없음";
+                baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
+            } else {
+                baseFileName += creationDatePart;
+            }
+            
+            const defaultFileName = `${baseFileName}.json`;
+            const fileName = prompt("저장할 파일 이름을 입력하세요:", defaultFileName) || defaultFileName;
             
             a.href = url;
-            a.download = fileName.endsWith('.json') ? fileName : `${fileName}.json`;
+            a.download = fileName.endsWith('.json') ? fileName : `${fileName}.json`; 
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -997,7 +1027,7 @@
                 const price = row.querySelector('.price-input').value;
                 const quantity = row.querySelector('.quantity-input').value;
                 const amount = row.querySelector('.amount-input').value;
-                if (price || quantity || amount) {
+                if (price || quantity || amount) { 
                      transactions.push({ type, price, quantity, amount });
                 }
             });
@@ -1078,10 +1108,10 @@
             const data = collectDataForFile();
             try {
                 const jsonString = JSON.stringify(data);
-                const base64Data = btoa(encodeURIComponent(jsonString)); // UTF-8 문자열을 위해 encodeURIComponent 후 btoa
+                const base64Data = btoa(encodeURIComponent(jsonString)); 
                 const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Data}`;
-                copyToClipboard(shareUrl);
-                showToast('공유 링크가 클립보드에 복사되었습니다!');
+                copyToClipboard(shareUrl); // 여기서 copyToClipboard는 내부의 textarea를 사용
+                // showToast는 copyToClipboard 내부에서 호출됨
             } catch (error) {
                 console.error("Error generating share link:", error);
                 showToast('공유 링크 생성 중 오류 발생');
@@ -1092,12 +1122,11 @@
             if (window.location.hash && window.location.hash.length > 1) {
                 try {
                     const base64Data = window.location.hash.substring(1);
-                    const jsonString = decodeURIComponent(atob(base64Data)); // btoa의 반대는 atob, decodeURIComponent
+                    const jsonString = decodeURIComponent(atob(base64Data)); 
                     const data = JSON.parse(jsonString);
                     restoreStateFromFile(data);
                     showToast('공유된 내역을 불러왔습니다!');
-                    // URL에서 해시 제거 (선택적: 새로고침 시 다시 로드 방지)
-                    // window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    window.history.replaceState(null, null, window.location.pathname + window.location.search);
                 } catch (error) {
                     console.error("Error loading state from URL:", error);
                     showToast('공유 링크를 불러오는 중 오류가 발생했습니다.');
@@ -1280,9 +1309,7 @@
         });
         saveToFileBtn.addEventListener('click', saveDataToFile);
         loadFileInput.addEventListener('change', loadDataFromFile);
-        if(createShareLinkBtn) { // 공유 링크 버튼이 있다면 이벤트 리스너 추가
-            createShareLinkBtn.addEventListener('click', generateShareLink);
-        }
+        createShareLinkBtn.addEventListener('click', generateShareLink); // 공유 링크 버튼 리스너
 
 
         confirmSetNewStartBtn.addEventListener('click', confirmAndSetNewStart);
