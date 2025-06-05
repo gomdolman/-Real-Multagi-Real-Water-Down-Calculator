@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>물림 계산기 (코인/주식)</title>
+    <title>물림 계산기 (코인/주식 - 소수점 8자리 지원)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -260,6 +260,7 @@
                     <span class="font-medium text-gray-800">예상 최종 손익: </span>
                     <span id="estimatedOverallProfitLoss" class="font-semibold">0</span>
                     <span id="estimatedOverallProfitLossKorean" class="text-gray-600">0원</span>
+                    <span id="estimatedOverallProfitLossPercent" class="ml-1 text-xs"></span>
                 </div>
             </div>
         </div>
@@ -474,7 +475,8 @@
         const avgHoldingPriceWithFeeEl = document.getElementById('avgHoldingPriceWithFee');
         const avgHoldingPriceWithFeeKoreanEl = document.getElementById('avgHoldingPriceWithFeeKorean');
         const estimatedOverallProfitLossEl = document.getElementById('estimatedOverallProfitLoss'); 
-        const estimatedOverallProfitLossKoreanEl = document.getElementById('estimatedOverallProfitLossKorean'); 
+        const estimatedOverallProfitLossKoreanEl = document.getElementById('estimatedOverallProfitLossKorean');
+        const estimatedOverallProfitLossPercentEl = document.getElementById('estimatedOverallProfitLossPercent'); // 손익 퍼센트 DOM 요소 추가
         const confirmationModalEl = document.getElementById('confirmationModal');
         const modalQuantityEl = document.getElementById('modalQuantity');
         const modalAvgPriceEl = document.getElementById('modalAvgPrice');
@@ -719,16 +721,16 @@
             
             const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
             const sellFeeRate = parseFloat(sellFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+            const userLiquidationPrice = parseFloat(liquidationPriceEl.value.replace(/,/g, '')) || 0; // 이 줄을 위로 이동
 
             const uiRows = inputRowsContainer.querySelectorAll('.input-row');
             uiRows.forEach(uiRow => {
                 const type = uiRow.querySelector('.type-select').value;
                 const price = parseFloat(uiRow.querySelector('.price-input').value.replace(/,/g, '')) || 0;
-                // 수량은 toFixed(8) 등으로 이미 포맷팅 되어 있을 수 있으므로, 다시 파싱하여 사용
                 const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0; 
                 
                 if (price > 0 && quantity > 0) {
-                    const amount = price * quantity; // 정확한 amount 계산 (소수점 8자리 quantity 사용)
+                    const amount = price * quantity; 
                     if (type === 'buy') {
                         totalBuyAmountVal += amount;
                         totalBuyQuantityVal += quantity;
@@ -757,7 +759,6 @@
                 avgHoldingPriceWithFeeVal = 0; 
             }
             
-            const userLiquidationPrice = parseFloat(liquidationPriceEl.value.replace(/,/g, '')) || 0;
             let estimatedOverallProfitLossVal = 0;
             if (currentHoldingQuantityVal > 0 && userLiquidationPrice > 0) {
                 const grossValueOfHoldings = userLiquidationPrice * currentHoldingQuantityVal;
@@ -774,19 +775,19 @@
             // 결과 표시 (수량은 8자리, 금액은 2자리)
             totalBuyAmountGrossEl.textContent = formatNumber(totalBuyAmountVal, 2);
             totalBuyAmountGrossKoreanEl.textContent = formatNumberToKorean(totalBuyAmountVal, 'amount');
-            totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 8); // 수량 8자리
+            totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 8); 
             totalBuyQuantityKoreanEl.textContent = formatNumberToKorean(totalBuyQuantityVal, 'quantity');
             accumulatedBuyFeeEl.textContent = formatNumber(totalBuyFeeVal, 2);
             accumulatedBuyFeeKoreanEl.textContent = formatNumberToKorean(totalBuyFeeVal, 'amount');
 
             totalSellAmountGrossEl.textContent = formatNumber(totalSellAmountVal, 2);
             totalSellAmountGrossKoreanEl.textContent = formatNumberToKorean(totalSellAmountVal, 'amount');
-            totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 8); // 수량 8자리
+            totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 8); 
             totalSellQuantityKoreanEl.textContent = formatNumberToKorean(totalSellQuantityVal, 'quantity');
             accumulatedSellFeeEl.textContent = formatNumber(totalSellFeeVal, 2);
             accumulatedSellFeeKoreanEl.textContent = formatNumberToKorean(totalSellFeeVal, 'amount');
 
-            currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 8); // 수량 8자리
+            currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 8); 
             currentHoldingQuantityKoreanEl.textContent = formatNumberToKorean(currentHoldingQuantityVal, 'quantity');
             
             avgBuyPriceNoFeeLabelEl.textContent = "매입 평균단가 (수수료 미반영)"; 
@@ -844,22 +845,55 @@
             currentHoldingQuantityEl.classList.remove('text-green-600'); 
             currentHoldingQuantityEl.classList.add('text-green-600');
 
-
+            // 예상 최종 손익 및 퍼센트 표시 로직 수정
             estimatedOverallProfitLossEl.textContent = formatNumber(estimatedOverallProfitLossVal, 2);
             estimatedOverallProfitLossKoreanEl.textContent = formatNumberToKorean(estimatedOverallProfitLossVal, 'amount');
-            if (estimatedOverallProfitLossVal >= 0) {
-                estimatedOverallProfitLossEl.className = 'font-semibold text-red-500'; 
-                estimatedOverallProfitLossKoreanEl.className = 'text-gray-600 text-red-500';
-            } else {
-                estimatedOverallProfitLossEl.className = 'font-semibold text-blue-500'; 
-                estimatedOverallProfitLossKoreanEl.className = 'text-gray-600 text-blue-500';
+
+            let percentageString = "";
+            const canCalculatePercentage = totalGrossBuyWithFees > 0 || estimatedOverallProfitLossVal !== 0;
+
+            if (canCalculatePercentage) {
+                if (totalGrossBuyWithFees > 0) {
+                    const percentageValue = (estimatedOverallProfitLossVal / totalGrossBuyWithFees) * 100;
+                    percentageString = `(${percentageValue.toFixed(2)}%)`;
+                } else { 
+                    percentageString = estimatedOverallProfitLossVal > 0 ? "(+∞%)" : "(-∞%)";
+                }
+            } else { 
+                percentageString = "(0.00%)";
+            }
+            
+            const displayPercentage = (userLiquidationPrice > 0 && currentHoldingQuantityVal > 0) ||
+                                      (currentHoldingQuantityVal === 0 && (totalGrossBuyWithFees > 0 || estimatedOverallProfitLossVal !== 0)) ||
+                                      (totalGrossBuyWithFees === 0 && estimatedOverallProfitLossVal === 0) ;
+
+            estimatedOverallProfitLossPercentEl.textContent = displayPercentage ? percentageString : "";
+
+            let textColorClass = "text-gray-700"; 
+            let percentColorSuffix = "gray-500";
+
+            if (estimatedOverallProfitLossVal > 0) {
+                textColorClass = "text-red-500";
+                percentColorSuffix = "red-500";
+            } else if (estimatedOverallProfitLossVal < 0) {
+                textColorClass = "text-blue-500";
+                percentColorSuffix = "blue-500";
+            }
+
+            estimatedOverallProfitLossEl.className = `font-semibold ${textColorClass}`;
+            estimatedOverallProfitLossKoreanEl.className = `text-gray-600 ${textColorClass}`;
+            estimatedOverallProfitLossPercentEl.className = `ml-1 text-xs text-${percentColorSuffix}`;
+
+            if (!displayPercentage) {
+                estimatedOverallProfitLossPercentEl.className = 'ml-1 text-xs'; 
+            } else if (estimatedOverallProfitLossVal === 0 && percentageString === "(0.00%)") { 
+                estimatedOverallProfitLossPercentEl.className = `ml-1 text-xs text-gray-500`;
             }
         }
 
         // 숫자 포맷팅 (쉼표 및 소수점 자릿수 지정)
         function formatNumber(num, decimalPlaces = 0) { 
             if (isNaN(num) || !isFinite(num)) return '0';
-            // 수량이 0이고 소수점 이하자리가 있을때 0.00000000 처럼 표시되도록 수정
             if (num === 0 && decimalPlaces > 0) {
                 return Number(num).toLocaleString('en-US', { 
                     minimumFractionDigits: decimalPlaces,
@@ -868,7 +902,7 @@
             }
             return Number(num).toLocaleString('en-US', { 
                 minimumFractionDigits: decimalPlaces,
-                maximumFractionDigits: decimalPlaces // 수량의 경우 최대 8자리까지 표시
+                maximumFractionDigits: decimalPlaces 
             });
         }
 
@@ -878,7 +912,6 @@
             if (isNaN(n)) return (type === 'quantity' ? '0개' : '0원');
             
             if (type === 'quantity') {
-                // 수량은 toLocaleString('ko-KR')을 사용하여 소수점 8자리까지 표현
                 return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 8})}개`;
             } else if (type === 'price' || type === 'amount') {
                 const numForKorean = Math.floor(n); 
@@ -940,7 +973,6 @@
                     const type = row.querySelector('.type-select').value === 'buy' ? '매수' : '매도';
                     const price = row.querySelector('.price-input').value || '0';
                     const quantityRaw = row.querySelector('.quantity-input').value || '0';
-                    // 복사 시 수량은 8자리까지 표시
                     const quantityFormatted = formatNumber(parseFloat(quantityRaw.replace(/,/g, '')), 8); 
                     const amount = row.querySelector('.amount-input').value || '0';
                     if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantityRaw.replace(/,/g, '')) > 0) {
@@ -951,7 +983,7 @@
             report += "------------------------------------\n";
             report += "전량 매도 가정:\n";
             report += `  만약, ${liquidationPriceEl.value || '0'}원에 전량 매도한다면?\n`;
-            report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} (${estimatedOverallProfitLossKoreanEl.textContent})\n`;
+            report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} ${estimatedOverallProfitLossKoreanEl.textContent} ${estimatedOverallProfitLossPercentEl.textContent}\n`; // 퍼센트 추가
             report += "------------------------------------\n";
             report += "추가 매수 시뮬레이션:\n";
             report += `  현재가(평가기준): ${simCurrentPriceEl.value || '미입력'}\n`;
@@ -960,7 +992,7 @@
             if (simType === '금액') {
                 report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}원\n`;
             } else {
-                report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`; // 수량은 8자리로 표시될 수 있도록
+                report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`; 
             }
             report += `  총 추가 매수 금액: ${simTotalAdditionalAmountEl.textContent}\n`;
             report += `  현재 평균: ${simCurrentAvgPriceEl.textContent} (${simCurrentPnlEl.textContent})\n`;
@@ -1078,7 +1110,7 @@
             inputRowsContainer.querySelectorAll('.input-row').forEach(row => {
                 const type = row.querySelector('.type-select').value;
                 const price = row.querySelector('.price-input').value;
-                const quantity = row.querySelector('.quantity-input').value; // 수량은 8자리까지 저장될 수 있도록
+                const quantity = row.querySelector('.quantity-input').value; 
                 const amount = row.querySelector('.amount-input').value;
                 if (price || quantity || amount) { 
                      transactions.push({ type, price, quantity, amount });
@@ -1121,7 +1153,7 @@
             simBuyAmountEl.value = data.simBuyAmount || '';
             formatNumberInput(simBuyAmountEl, true);
             simBuyQuantityEl.value = data.simBuyQuantity || '';
-            formatNumberInput(simBuyQuantityEl, true, 8); // 수량 복원 시 8자리 포맷팅
+            formatNumberInput(simBuyQuantityEl, true, 8); 
 
             if (data.simActiveUnitMax) {
                 simUnitBtns.forEach(btn => btn.classList.remove('active'));
@@ -1144,7 +1176,7 @@
                     newRow.querySelector('.price-input').value = trx.price;
                     formatNumberInput(newRow.querySelector('.price-input'), true);
                     newRow.querySelector('.quantity-input').value = trx.quantity;
-                    formatNumberInput(newRow.querySelector('.quantity-input'), true, 8); // 수량 복원 시 8자리 포맷팅
+                    formatNumberInput(newRow.querySelector('.quantity-input'), true, 8); 
                     newRow.querySelector('.amount-input').value = trx.amount;
                     formatNumberInput(newRow.querySelector('.amount-input'), true);
                     updateRowStyle(newRow, trx.type);
@@ -1181,7 +1213,6 @@
                     const data = JSON.parse(jsonString);
                     restoreStateFromFile(data);
                     showToast('공유된 내역을 불러왔습니다!');
-                    // URL에서 해시 제거하여 새로고침 시 다시 로드되지 않도록 함
                     window.history.replaceState(null, null, window.location.pathname + window.location.search); 
                 } catch (error) {
                     console.error("Error loading state from URL:", error);
@@ -1215,7 +1246,7 @@
 
         // 새 시작점으로 설정 확인 모달 열기
         function openConfirmationModal() { 
-            modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 8); // 수량 8자리
+            modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 8); 
             modalAvgPriceEl.textContent = formatNumber(lastCalculatedAvgHoldingPrice, 2);
             confirmationModalEl.classList.add('active');
         }
@@ -1250,7 +1281,7 @@
                     priceInput.value = newStartPrice.toFixed(2);
                     formatNumberInput(priceInput);
                 
-                    quantityInput.value = newStartQuantity.toFixed(8); // 수량 8자리
+                    quantityInput.value = newStartQuantity.toFixed(8); 
                     formatNumberInput(quantityInput, false, 8);
                 
                     handleRowInputChange(priceInput, quantityInput, amountInput, 'price'); 
@@ -1298,10 +1329,10 @@
             if (simType === 'amount') {
                 simAdditionalAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
                 if (simPrice > 0 && simAdditionalAmount > 0) {
-                    simAdditionalQuantity = simAdditionalAmount / simPrice; // 정밀도 유지
+                    simAdditionalQuantity = simAdditionalAmount / simPrice; 
                 }
             } else { 
-                simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0; // 8자리 수량
+                simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0; 
                 if (simPrice > 0 && simAdditionalQuantity > 0) {
                     simAdditionalAmount = simPrice * simAdditionalQuantity;
                 }
@@ -1309,7 +1340,7 @@
             
             simTotalAdditionalAmountEl.textContent = formatNumberToKorean(simAdditionalAmount, 'amount');
 
-            const currentHoldQty = lastCalculatedHoldingQuantity; // 8자리 수량일 수 있음
+            const currentHoldQty = lastCalculatedHoldingQuantity; 
             const currentAvgPrc = lastCalculatedAvgHoldingPrice; 
 
             let currentPnlPercent = 0;
@@ -1328,7 +1359,7 @@
                 const additionalBuyFee = simAdditionalAmount * buyFeeRate;
                 const baseCostForCalc = currentNetInvestmentOrRealizedProfit > 0 ? currentNetInvestmentOrRealizedProfit : 0;
                 const totalCostForSim = baseCostForCalc + simAdditionalAmount + additionalBuyFee;
-                const totalQuantityForSim = currentHoldQty + simAdditionalQuantity; // 8자리 수량 + 8자리 수량
+                const totalQuantityForSim = currentHoldQty + simAdditionalQuantity; 
                 
                 const expectedAvgPrice = totalQuantityForSim > 0 ? totalCostForSim / totalQuantityForSim : 0;
                 
@@ -1406,7 +1437,7 @@
             calculateSimulation();
         });
 
-        simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true, 8); calculateSimulation(); }); // 수량 8자리 포맷팅
+        simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true, 8); calculateSimulation(); }); 
 
         simUnitBtns.forEach(btn => {
             btn.addEventListener('click', () => {
