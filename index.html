@@ -19,6 +19,24 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
+        .header-inputs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .header-inputs > div {
+            flex-grow: 1;
+        }
+        .header-inputs label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
         .input-table-container {
             position: relative; 
         }
@@ -38,7 +56,7 @@
             font-size: 0.875rem;
             border-bottom-width: 2px;
         }
-        .input-field, .select-field {
+        .input-field, .select-field, .date-input {
             width: 100%;
             padding: 8px;
             border: 1px solid #D1D5DB;
@@ -47,7 +65,7 @@
             font-size: 0.875rem;
         }
         .input-field { text-align: right; }
-        .input-field:focus, .select-field:focus {
+        .input-field:focus, .select-field:focus, .date-input:focus {
             outline: none;
             border-color: #3B82F6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
@@ -133,27 +151,8 @@
         .modal-body strong { color: #111827; }
         .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
 
-        /* Toast Message */
-        .toast-message {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #22c55e; /* green-500 */
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
-            font-size: 0.875rem;
-        }
-        .toast-message.show {
-            opacity: 1;
-            bottom: 40px;
-        }
-
+        .toast-message { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 100; opacity: 0; transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out; font-size: 0.875rem; }
+        .toast-message.show { opacity: 1; bottom: 40px; }
 
         @media (max-width: 640px) { 
             .calculator-container { padding: 16px; margin: 16px; }
@@ -200,6 +199,17 @@
 <body>
     <div class="calculator-container">
         <h1>물림 계산기 (코인/주식)</h1>
+
+        <div class="header-inputs">
+            <div>
+                <label for="tradeTitle">거래 제목 (선택)</label>
+                <input type="text" id="tradeTitle" class="input-field" placeholder="예: 삼성전자 물타기">
+            </div>
+            <div>
+                <label for="tradeDate">거래 기준일 (선택)</label>
+                <input type="date" id="tradeDate" class="date-input">
+            </div>
+        </div>
 
         <div class="input-table-container">
             <div class="overflow-x-auto">
@@ -411,7 +421,9 @@
 
 
     <script>
-        // --- DOM 요소들 ---
+        // --- DOM 요소들 (이전과 동일) ---
+        const tradeTitleEl = document.getElementById('tradeTitle'); 
+        const tradeDateEl = document.getElementById('tradeDate');   
         const inputRowsContainer = document.getElementById('inputRows');
         const addRowBtn = document.getElementById('addRowBtn'); 
         const resetBtn = document.getElementById('resetBtn');
@@ -842,7 +854,18 @@
 
         function generateReportText() {
             let report = "물림 계산기 내역\n";
-            report += "====================================\n";
+            const title = tradeTitleEl.value.trim();
+            const date = tradeDateEl.value;
+            if (title) {
+                report += `제목: ${title}\n`;
+            }
+            if (date) {
+                const [year, month, day] = date.split('-');
+                report += `거래 기준일: ${year}년 ${month}월 ${day}일\n`;
+            }
+            if (title || date) {
+                report += "------------------------------------\n";
+            }
             report += `매수 수수료: ${buyFeeRateEl.value}%\n`;
             report += `매도 수수료: ${sellFeeRateEl.value}%\n`;
             report += "------------------------------------\n";
@@ -916,6 +939,8 @@
 
 
         function resetAll() { 
+            tradeTitleEl.value = ''; 
+            tradeDateEl.value = '';  
             buyFeeRateEl.value = '0.05'; 
             sellFeeRateEl.value = '0.05';
             liquidationPriceEl.value = ''; 
@@ -950,6 +975,7 @@
             rowCount = 0;
             liquidationPriceEl.value = ''; 
             simCurrentPriceEl.value = ''; 
+            // 거래 제목, 날짜는 유지
 
             const firstRowElement = addNewRow(); 
             if (firstRowElement) {
@@ -1080,7 +1106,6 @@
         resetBtn.addEventListener('click', resetAll);
         setNewStartBtn.addEventListener('click', openConfirmationModal);
         
-        // "내역 복사" 버튼 이벤트 리스너 추가
         copyDetailsBtn.addEventListener('click', () => {
             const reportText = generateReportText();
             copyToClipboard(reportText);
