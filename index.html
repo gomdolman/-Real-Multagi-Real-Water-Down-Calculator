@@ -73,6 +73,9 @@
         .reset-btn:hover { background-color: #4B5563; }
         .new-start-btn { background-color: #F59E0B; color: white; }
         .new-start-btn:hover { background-color: #D97706; }
+        .copy-btn { background-color: #06b6d4; color: white; } 
+        .copy-btn:hover { background-color: #0891b2; }
+
 
         .add-row-icon-btn { background-color: #10B981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s; margin-top: 0.5rem; margin-left: auto; }
         .add-row-icon-btn:hover { background-color: #059669; }
@@ -130,71 +133,46 @@
         .modal-body strong { color: #111827; }
         .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
 
-        /* Mobile Responsive Table Styles */
+        /* Toast Message */
+        .toast-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
+            font-size: 0.875rem;
+        }
+        .toast-message.show {
+            opacity: 1;
+            bottom: 40px;
+        }
+
+
         @media (max-width: 640px) { 
             .calculator-container { padding: 16px; margin: 16px; }
             h1 { font-size: 1.25rem; }
             
-            .input-table thead {
-                display: none; 
-            }
-            .input-table tr.input-row {
-                display: grid; 
-                grid-template-columns: 1fr 1fr; 
-                gap: 0.75rem; 
-                margin-bottom: 1rem; 
-                border: 1px solid #e5e7eb;
-                border-radius: 0.375rem;
-                padding: 0.75rem;
-            }
-            .input-table td {
-                display: flex; 
-                flex-direction: column; 
-                align-items: stretch; 
-                text-align: left; 
-                padding: 0; 
-                border-bottom: none; 
-            }
-            .input-table td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #4b5563;
-                margin-bottom: 0.25rem; 
-                font-size: 0.8rem;
-            }
-            .input-table td[data-label="거래 유형"] {
-                grid-column: 1 / -1; 
-            }
-            .input-table td[data-label="단가"] {
-                grid-column: 1 / 2;
-            }
-            .input-table td[data-label="수량"] {
-                grid-column: 2 / 3;
-            }
-            .input-table td[data-label="금액"] {
-                grid-column: 1 / 2;
-            }
-            .input-table td[data-label="삭제"] {
-                grid-column: 2 / 3;
-                justify-self: end; 
-                align-items: flex-end; 
-            }
-             .input-table td[data-label="삭제"]::before {
-                content: ""; 
-                display: none;
-            }
-            .input-table td.symbol-cell { 
-                display: none;
-            }
+            .input-table thead { display: none; }
+            .input-table tr.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;}
+            .input-table td { display: flex; flex-direction: column; align-items: stretch; text-align: left; padding: 0; border-bottom: none; }
+            .input-table td::before { content: attr(data-label); font-weight: 600; color: #4b5563; margin-bottom: 0.25rem; font-size: 0.8rem;}
+            .input-table td[data-label="거래 유형"] { grid-column: 1 / -1; }
+            .input-table td[data-label="단가"] { grid-column: 1 / 2; }
+            .input-table td[data-label="수량"] { grid-column: 2 / 3; }
+            .input-table td[data-label="금액"] { grid-column: 1 / 2; }
+            .input-table td[data-label="삭제"] { grid-column: 2 / 3; justify-self: end; align-items: flex-end; }
+            .input-table td[data-label="삭제"]::before { content: ""; display: none; }
+            .input-table td.symbol-cell { display: none; }
             .input-table td .input-field, 
-            .input-table td .select-field {
-                width: 100%; 
-                padding: 6px; 
-                font-size: 0.875rem;
-            }
-            .input-table td.delete-cell .delete-btn { 
-                margin-top: auto; 
-            }
+            .input-table td .select-field { width: 100%; padding: 6px; font-size: 0.875rem; }
+            .input-table td.delete-cell .delete-btn { margin-top: auto; }
 
             .fee-input-field { width: 60px; font-size: 0.75rem;}
             .liquidation-input { width: 100px; }
@@ -331,6 +309,7 @@
         
         <div class="button-group-container flex gap-2 flex-wrap button-group justify-center mt-1"> 
             <button id="setNewStartBtn" class="button new-start-btn">새 시작점으로</button>
+            <button id="copyDetailsBtn" class="button copy-btn">내역 복사</button> 
             <button id="resetBtn" class="button reset-btn">초기화</button>
         </div>
 
@@ -407,6 +386,7 @@
                 <li>각 행에 거래 유형, 단가, 수량(또는 금액)을 입력합니다. 거래 유형에 따라 행 배경색이 변경됩니다.</li>
                 <li>상단의 '만약, [가격]원에 전량 매도한다면?'에 가격을 입력하여 예상 최종 손익을 확인할 수 있습니다.</li>
                 <li>"새 시작점으로" 버튼은 현재 계산된 '보유분 평단가(수수료포함)'와 '보유 수량'을 첫 행으로 설정합니다. (확인창 표시)</li>
+                <li>"내역 복사" 버튼으로 현재 입력 및 계산된 내용을 텍스트로 복사할 수 있습니다.</li>
             </ul>
             <p class="disclaimer">본 계산기는 참고용으로만 사용해주시고, 투자 결정에 따른 법적 책임은 본인에게 있습니다.</p>
         </div>
@@ -427,14 +407,16 @@
             </div>
         </div>
     </div>
+    <div id="toastMessage" class="toast-message"></div>
 
 
     <script>
-        // --- DOM 요소들 (이전과 동일) ---
+        // --- DOM 요소들 ---
         const inputRowsContainer = document.getElementById('inputRows');
         const addRowBtn = document.getElementById('addRowBtn'); 
         const resetBtn = document.getElementById('resetBtn');
         const setNewStartBtn = document.getElementById('setNewStartBtn');
+        const copyDetailsBtn = document.getElementById('copyDetailsBtn'); 
         const buyFeeRateEl = document.getElementById('buyFeeRate');
         const sellFeeRateEl = document.getElementById('sellFeeRate');
         const liquidationPriceEl = document.getElementById('liquidationPrice'); 
@@ -485,6 +467,7 @@
         const simCurrentPnlEl = document.getElementById('simCurrentPnl');
         const simExpectedAvgPriceEl = document.getElementById('simExpectedAvgPrice');
         const simExpectedPnlEl = document.getElementById('simExpectedPnl');
+        const toastMessageEl = document.getElementById('toastMessage');
 
         let rowCount = 0;
         let lastCalculatedAvgHoldingPrice = 0; 
@@ -848,7 +831,91 @@
             }
             return n.toLocaleString('ko-KR');
         }
-        function resetAll() { /* 시뮬레이션 필드 초기화 추가 */
+        
+        function showToast(message) {
+            toastMessageEl.textContent = message;
+            toastMessageEl.classList.add('show');
+            setTimeout(() => {
+                toastMessageEl.classList.remove('show');
+            }, 2000); // 2초 후 숨김
+        }
+
+        function generateReportText() {
+            let report = "물림 계산기 내역\n";
+            report += "====================================\n";
+            report += `매수 수수료: ${buyFeeRateEl.value}%\n`;
+            report += `매도 수수료: ${sellFeeRateEl.value}%\n`;
+            report += "------------------------------------\n";
+            report += "거래 내역:\n";
+            const uiRows = inputRowsContainer.querySelectorAll('.input-row');
+            if (uiRows.length === 0 || (uiRows.length === 1 && !uiRows[0].querySelector('.price-input').value && !uiRows[0].querySelector('.quantity-input').value)) {
+                report += "  (입력된 거래 내역 없음)\n";
+            } else {
+                uiRows.forEach((row, index) => {
+                    const type = row.querySelector('.type-select').value === 'buy' ? '매수' : '매도';
+                    const price = row.querySelector('.price-input').value || '0';
+                    const quantity = row.querySelector('.quantity-input').value || '0';
+                    const amount = row.querySelector('.amount-input').value || '0';
+                    if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantity.replace(/,/g, '')) > 0) {
+                         report += `  ${index + 1}. ${type}: ${quantity} @ ${price} = ${amount}원\n`;
+                    }
+                });
+            }
+            report += "------------------------------------\n";
+            report += "전량 매도 가정:\n";
+            report += `  만약, ${liquidationPriceEl.value || '0'}원에 전량 매도한다면?\n`;
+            report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} (${estimatedOverallProfitLossKoreanEl.textContent})\n`;
+            report += "------------------------------------\n";
+            report += "추가 매수 시뮬레이션:\n";
+            report += `  현재가(평가기준): ${simCurrentPriceEl.value || '미입력'}\n`;
+            report += `  추가 매수 단가: ${simBuyPriceEl.value || '미입력'}\n`;
+            const simType = document.querySelector('input[name="simType"]:checked').value === 'amount' ? '금액' : '수량';
+            if (simType === '금액') {
+                report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}원\n`;
+            } else {
+                report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`;
+            }
+            report += `  총 추가 매수 금액: ${simTotalAdditionalAmountEl.textContent}\n`;
+            report += `  현재 평균: ${simCurrentAvgPriceEl.textContent} (${simCurrentPnlEl.textContent})\n`;
+            report += `  예상 평균: ${simExpectedAvgPriceEl.textContent} (${simExpectedPnlEl.textContent})\n`;
+            report += "====================================\n";
+            report += "계산 결과:\n";
+            document.querySelectorAll('#resultsSection .result-item').forEach(item => {
+                const label = item.querySelector('.result-label').textContent.trim();
+                const value = item.querySelector('.result-value').textContent.trim();
+                const sub = item.querySelector('.result-value-sub').textContent.trim();
+                report += `  ${label}: ${value} (${sub})\n`;
+            });
+            report += "====================================\n";
+            report += "본 계산기는 참고용이며, 투자 결정에 따른 법적 책임은 사용자 본인에게 있습니다.";
+            return report;
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; 
+            textArea.style.left = "-9999px";
+            textArea.style.top = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('내역이 클립보드에 복사되었습니다!');
+                } else {
+                    showToast('복사 실패. 브라우저 설정을 확인해주세요.');
+                }
+            } catch (err) {
+                showToast('복사 중 오류가 발생했습니다.');
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+
+        function resetAll() { 
             buyFeeRateEl.value = '0.05'; 
             sellFeeRateEl.value = '0.05';
             liquidationPriceEl.value = ''; 
@@ -866,15 +933,15 @@
             initializeRows(); 
             calculateSimulation(); 
         }
-        function openConfirmationModal() { /* 이전과 동일 */
+        function openConfirmationModal() { 
             modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 3);
             modalAvgPriceEl.textContent = formatNumber(lastCalculatedAvgHoldingPrice, 2);
             confirmationModalEl.classList.add('active');
         }
-        function closeConfirmationModal() { /* 이전과 동일 */
+        function closeConfirmationModal() { 
             confirmationModalEl.classList.remove('active');
         }
-        function confirmAndSetNewStart() { /* calculateSimulation 호출 추가 */
+        function confirmAndSetNewStart() { 
             closeConfirmationModal();
             const newStartPrice = lastCalculatedAvgHoldingPrice; 
             const newStartQuantity = lastCalculatedHoldingQuantity; 
@@ -915,7 +982,6 @@
             calculateSimulation();
         }
 
-        // --- 추가 매수 시뮬레이션 함수 ---
         function toggleSimInputFields() {
             const selectedType = document.querySelector('input[name="simType"]:checked').value;
             if (selectedType === 'amount') {
@@ -966,8 +1032,8 @@
                  currentPnlPercent = Infinity; 
             }
 
-            simCurrentAvgPriceEl.textContent = formatNumber(currentAvgPrc, 2) + " 원"; // 소수점 2자리로 변경
-            simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(2)} %` : "이익 중"; // 소수점 2자리로 변경
+            simCurrentAvgPriceEl.textContent = formatNumber(currentAvgPrc, 2) + " 원"; 
+            simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(2)} %` : "이익 중"; 
             simCurrentPnlEl.style.color = currentPnlPercent >= 0 || !isFinite(currentPnlPercent) ? '#DC2626' : '#3B82F6';
 
 
@@ -986,8 +1052,8 @@
                     expectedPnlPercent = Infinity;
                 }
 
-                simExpectedAvgPriceEl.textContent = formatNumber(expectedAvgPrice, 2) + " 원"; // 소수점 2자리로 변경
-                simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(2)} %` : "이익 중"; // 소수점 2자리로 변경
+                simExpectedAvgPriceEl.textContent = formatNumber(expectedAvgPrice, 2) + " 원"; 
+                simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(2)} %` : "이익 중"; 
                 simExpectedPnlEl.style.color = expectedPnlPercent >= 0 || !isFinite(expectedPnlPercent) ? '#DC2626' : '#3B82F6';
 
             } else {
@@ -1013,6 +1079,13 @@
         });
         resetBtn.addEventListener('click', resetAll);
         setNewStartBtn.addEventListener('click', openConfirmationModal);
+        
+        // "내역 복사" 버튼 이벤트 리스너 추가
+        copyDetailsBtn.addEventListener('click', () => {
+            const reportText = generateReportText();
+            copyToClipboard(reportText);
+        });
+
         confirmSetNewStartBtn.addEventListener('click', confirmAndSetNewStart);
         cancelSetNewStartBtn.addEventListener('click', closeConfirmationModal);
         confirmationModalEl.addEventListener('click', (event) => {
