@@ -3,89 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>물림 계산기 (코인/주식 - 소수점 8자리 지원)</title>
+    <title>물림 계산기 & 실시간 차트 (코인/주식)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery and TradingView Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
+        /* Finnhub Ticker Bar Styles */
+        .finnhub-ticker-bar {
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            border-bottom: 2px solid #374151;
+            position: sticky; /* 상단 고정 */
+            top: 0;
+            z-index: 1000;
+        }
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .ticker-symbol {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        .ticker-price {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #f9fafb;
+            min-width: 80px;
+            text-align: right;
+        }
+        .ticker-change {
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            min-width: 120px;
+        }
+        .text-green-400 { color: #4ade80; }
+        .text-red-400 { color: #f87171; }
+
         .calculator-container {
-            max-width: 800px; 
+            max-width: 960px; /* 너비 조정 */
             margin: 30px auto;
             padding: 24px;
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .header-inputs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .header-inputs > div {
-            flex-grow: 1;
-        }
-        .header-inputs label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 0.25rem;
-        }
-        .input-table-container {
-            position: relative; 
-        }
-        .input-table th, .input-table td {
-            padding: 8px 4px;
-            text-align: center;
-            vertical-align: middle;
-            border-bottom-width: 1px; 
-            border-color: #e5e7eb; 
-        }
-        .input-table tbody tr:last-child td {
-            border-bottom-width: 0px; 
-        }
-        .input-table th {
-            font-weight: 600;
-            color: #4b5563;
-            font-size: 0.875rem;
-            border-bottom-width: 2px;
-        }
-        .input-field, .select-field, .date-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #D1D5DB;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 0.875rem;
-        }
+        .header-inputs { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
+        .header-inputs > div { flex-grow: 1; }
+        .header-inputs label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
+        .input-table-container { position: relative; }
+        .input-table th, .input-table td { padding: 8px 4px; text-align: center; vertical-align: middle; border-bottom-width: 1px; border-color: #e5e7eb; }
+        .input-table tbody tr:last-child td { border-bottom-width: 0px; }
+        .input-table th { font-weight: 600; color: #4b5563; font-size: 0.875rem; border-bottom-width: 2px; }
+        .input-field, .select-field, .date-input { width: 100%; padding: 8px; border: 1px solid #D1D5DB; border-radius: 6px; box-sizing: border-box; font-size: 0.875rem; }
         .input-field { text-align: right; }
-        .input-field:focus, .select-field:focus, .date-input:focus {
-            outline: none;
-            border-color: #3B82F6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-        .select-field { 
-            appearance: none; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); 
-            background-repeat: no-repeat; 
-            background-position: right 0.5rem center; 
-            background-size: 1.5em 1.5em; 
-            padding-right: 2.5rem; 
-        }
-
+        .input-field:focus, .select-field:focus, .date-input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        .select-field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
         .row-buy { background-color: rgba(254, 226, 226, 0.5); }
         .row-sell { background-color: rgba(219, 234, 254, 0.5); }
-
         .fee-input-field { width: 70px; padding: 6px; font-size: 0.8rem; }
+        .liquidation-input { width: 120px; }
         .delete-btn { background-color: #EF4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
         .delete-btn:hover { background-color: #DC2626; }
-        
         .button { padding: 0.5rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; font-weight: 500; text-align: center; cursor: pointer; transition: background-color 0.2s; }
         .reset-btn { background-color: #6B7280; color: white; }
         .reset-btn:hover { background-color: #4B5563; }
@@ -97,112 +93,109 @@
         .file-btn:hover { background-color: #4338ca; }
         .share-link-btn { background-color: #8b5cf6; color:white; } 
         .share-link-btn:hover { background-color: #7c3aed; }
-
-
         .add-row-icon-btn { background-color: #10B981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s; margin-top: 0.5rem; margin-left: auto; }
         .add-row-icon-btn:hover { background-color: #059669; }
         .add-row-icon-btn:active { transform: scale(0.95); }
-
         .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
-        @media (min-width: 640px) { .result-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { .result-grid { grid-template-columns: repeat(3, 1fr); } }
-
         .result-item { background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
         .result-label { font-size: 0.875rem; color: #4b5563; margin-bottom: 0.25rem; display: block; }
         .result-value { font-size: 1.125rem; font-weight: 600; color: #1f2937; word-break: keep-all; }
         .result-value-sub { font-size: 0.875rem; color: #6b7280; display: block; margin-top: 0.125rem; }
         
-        .simulation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding: 1.25rem; border: 1px dashed #cbd5e1; border-radius: 0.5rem; background-color: #f8fafc; }
-        .simulation-title { font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 1rem; text-align: center; }
-        .simulation-input-group { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-        .simulation-input-row { display: flex; align-items: center; gap: 0.5rem; }
-        .simulation-input-row label { font-size: 0.875rem; color: #4b5563; min-width: 100px; text-align: right; } 
-        .simulation-input-row .input-field { max-width: 150px; }
-        .simulation-switch { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; font-size: 0.875rem; }
-        .simulation-switch input[type="radio"] { accent-color: #3B82F6; }
-        .simulation-result-group { margin-top:1rem; padding-top:1rem; border-top: 1px solid #e2e8f0;}
-        .simulation-result-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size:0.9rem; }
-        .simulation-result-item .label { color: #4b5563; }
-        .simulation-result-item .value { font-weight: 600; color: #1f2937; }
-        .simulation-avg-comparison { display: flex; justify-content: space-around; text-align:center; margin-top:0.5rem;}
-        .simulation-avg-comparison > div > span { display:block; }
-        .simulation-avg-comparison .avg-price { font-size:1.25rem; font-weight:bold; }
-        .simulation-avg-comparison .avg-pnl { font-size:0.8rem; }
-
-        .amount-slider-container { margin-top: 0.5rem; }
-        .unit-buttons button { padding: 0.25rem 0.75rem; font-size: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; background-color: white; color: #374151; margin-right: 0.25rem; cursor: pointer; }
-        .unit-buttons button.active { background-color: #3B82F6; color: white; border-color: #3B82F6; }
-        #simBuyAmountSlider { width: 100%; }
-
-        .liquidation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding-top: 1.25rem; padding-bottom: 1.25rem; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
-        .liquidation-input { width: 120px; }
-
+        .simulation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding: 1.5rem; border: 1px dashed #cbd5e1; border-radius: 0.75rem; background-color: #f8fafc; }
+        .simulation-title { font-size: 1.25rem; font-weight: 700; color: #374151; margin-bottom: 1.5rem; text-align: center; }
+        .sim-input-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        @media (min-width: 768px) { .sim-input-grid { grid-template-columns: repeat(2, 1fr); } }
+        .sim-input-group label { display: block; font-size: 0.875rem; font-weight: 500; color: #4b5563; margin-bottom: 0.25rem; }
+        .sim-method-switch { display: flex; justify-content: center; gap: 0.5rem; background-color: #e5e7eb; border-radius: 0.5rem; padding: 0.25rem; margin-bottom: 1.5rem; }
+        .sim-method-switch label { flex: 1; text-align: center; padding: 0.5rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; color: #4b5563; }
+        .sim-method-switch input:checked + label { background-color: white; color: #3B82F6; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .sim-method-switch input { display: none; }
+        .sim-unit-btn { padding: 0.25rem 0.75rem; font-size: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; background-color: white; color: #374151; cursor: pointer; transition: all 0.2s ease-in-out; }
+        .sim-unit-btn.active { background-color: #3B82F6; color: white; border-color: #3B82F6; font-weight: 600; }
+        .sim-result-group { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
+        .sim-result-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-size: 1rem; }
+        .sim-result-item .label { color: #4b5563; font-weight: 500;}
+        .sim-result-item .value { font-weight: 700; color: #1f2937; }
+        .sim-avg-comparison { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; text-align:center; }
+        .sim-avg-comparison > div > span { display:block; }
+        .sim-avg-comparison .avg-title { font-size: 0.9rem; color: #6b7280; font-weight: 500; margin-bottom: 0.25rem; }
+        .sim-avg-comparison .avg-price { font-size: 1.5rem; font-weight:bold; color: #1f2937; }
+        .sim-avg-comparison .avg-pnl { font-size:0.9rem; font-weight: 600; }
+        
+        .liquidation-section { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
         .info-section { margin-top: 30px; padding: 16px; background-color: #f9fafb; border-radius: 8px; font-size: 0.875rem; color: #374151; }
         .info-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: #1f2937; }
         .info-section ul { list-style-type: disc; padding-left: 20px; margin-top: 8px; }
         .info-section li { margin-bottom: 4px; }
         .info-section .disclaimer { margin-top: 1rem; font-weight: 500; color: #ef4444; } 
         h1 { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px; color: #111827; }
-
-        .fee-group-container { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-bottom: 1rem; }
-        .fee-group-item { display: flex; align-items: center; gap: 0.5rem; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content { background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); width: 90%; max-width: 500px; text-align: left; }
         .modal-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937; }
         .modal-body p { margin-bottom: 0.5rem; color: #374151; font-size: 0.9rem; line-height: 1.6; }
         .modal-body strong { color: #111827; }
         .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
-
         .toast-message { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 0.75rem 1.5rem; border-radius: 0.375rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 100; opacity: 0; transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out; font-size: 0.875rem; }
         .toast-message.show { opacity: 1; bottom: 40px; }
 
-        @media (max-width: 640px) { 
-            .calculator-container { padding: 16px; margin: 16px; }
-            h1 { font-size: 1.25rem; }
-            
+        .tv-widget-section { margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e5e7eb; }
+        .tv-widget-container { margin-top: 1rem; padding: 1rem; background-color: #f9fafb; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        @media (max-width: 768px) {
             .input-table thead { display: none; }
-            .input-table tr.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.75rem;}
-            .input-table td { display: flex; flex-direction: column; align-items: stretch; text-align: left; padding: 0; border-bottom: none; }
-            .input-table td::before { content: attr(data-label); font-weight: 600; color: #4b5563; margin-bottom: 0.25rem; font-size: 0.8rem;}
-            .input-table td[data-label="거래 유형"] { grid-column: 1 / -1; }
-            .input-table td[data-label="단가"] { grid-column: 1 / 2; }
-            .input-table td[data-label="수량"] { grid-column: 2 / 3; }
-            .input-table td[data-label="금액"] { grid-column: 1 / 2; }
-            .input-table td[data-label="삭제"] { grid-column: 2 / 3; justify-self: end; align-items: flex-end; }
-            .input-table td[data-label="삭제"]::before { content: ""; display: none; }
-            .input-table td.symbol-cell { display: none; }
-            .input-table td .input-field, 
-            .input-table td .select-field { width: 100%; padding: 6px; font-size: 0.875rem; }
-            .input-table td.delete-cell .delete-btn { margin-top: auto; }
-
-            .fee-input-field { width: 60px; font-size: 0.75rem;}
-            .liquidation-input { width: 100px; }
-            
-            .controls-top-section { display: flex; flex-direction: column; gap: 1rem; }
-            .fee-group-container { flex-direction: column; gap: 0.75rem; align-items: stretch; }
-            .fee-group-item { justify-content: space-between; }
-
-            .liquidation-section .flex { flex-direction: column; align-items: flex-start; gap: 0.5rem;} 
-            .liquidation-section .flex > div { width: 100%; display: flex; justify-content: space-between; align-items: center;}
-            .liquidation-section .flex > div:last-child { justify-content: flex-start;} 
-            
-            .simulation-input-row { flex-direction: column; align-items: flex-start; }
-            .simulation-input-row label { min-width: auto; margin-bottom: 0.25rem; text-align: left; } 
-            .simulation-input-row .input-field { max-width: 100%; }
-            .unit-buttons { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem; justify-content: center; }
-
-            .button-group-container { margin-top: 1rem; flex-wrap: wrap; } 
-            .button-group { justify-content: space-around; width: 100%; }
-            .button-group .button { margin-top: 4px; margin-bottom: 4px;}
-            .add-row-icon-btn { margin-right: 0; margin-left:auto; } 
+            .input-table tr.input-row {
+                display: grid;
+                grid-template-areas:
+                    "type qty"
+                    "price amount"
+                    "delete delete";
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                position: relative;
+            }
+            .input-table td {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                padding: 0;
+                border: none;
+            }
+            .input-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #4b5563;
+                margin-bottom: 0.25rem;
+                font-size: 0.8rem;
+            }
+            .input-table td[data-label="거래 유형"] { grid-area: type; }
+            .input-table td[data-label="수량"] { grid-area: qty; }
+            .input-table td[data-label="단가"] { grid-area: price; }
+            .input-table td[data-label="금액"] { grid-area: amount; }
+            .input-table td[data-label="삭제"] {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+            .input-table td[data-label="삭제"]::before { display: none; }
+            .input-table td .input-field,
+            .input-table td .select-field {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="finnhub-ticker-bar">
+    </div>
+
     <div class="calculator-container">
-        <h1>물림 계산기 (코인/주식 - 소수점 8자리 지원)</h1>
+        <h1>물림 계산기 & 실시간 차트</h1>
 
         <div class="header-inputs">
             <div>
@@ -218,7 +211,7 @@
         <div class="input-table-container">
             <div class="overflow-x-auto">
                 <table class="w-full input-table">
-                    <thead>
+                     <thead>
                         <tr>
                             <th class="w-1/4 md:w-1/5">거래 유형</th> 
                             <th class="w-1/4 md:w-1/5">단가</th>
@@ -229,8 +222,7 @@
                             <th class="w-auto md:w-1/12">삭제</th>
                         </tr>
                     </thead>
-                    <tbody id="inputRows">
-                        </tbody>
+                    <tbody id="inputRows"></tbody>
                 </table>
             </div>
             <button id="addRowBtn" class="add-row-icon-btn" title="행 추가">
@@ -239,12 +231,12 @@
         </div>
         
         <div class="controls-top-section mt-4">
-            <div class="fee-group-container">
-                <div class="fee-group-item">
+            <div class="fee-group-container flex flex-wrap gap-4 justify-center mb-4">
+                <div class="fee-group-item flex items-center gap-2">
                     <label for="buyFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매수 수수료(%):</label>
                     <input type="text" inputmode="decimal" id="buyFeeRate" class="input-field fee-input-field" value="0.05">
                 </div>
-                <div class="fee-group-item">
+                <div class="fee-group-item flex items-center gap-2">
                     <label for="sellFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매도 수수료(%):</label>
                     <input type="text" inputmode="decimal" id="sellFeeRate" class="input-field fee-input-field" value="0.05">
                 </div>
@@ -265,56 +257,97 @@
             </div>
         </div>
 
+        <div class="tv-widget-section">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">실시간 차트 정보</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">업비트 BTC/KRW</h3>
+                    <div id="tradingview_btckrw" style="height:400px;"></div>
+                </div>
+                 <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">바이낸스 BTC/USD</h3>
+                    <div id="tradingview_btcusd" style="height:400px;"></div>
+                </div>
+                <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">원/달러 환율</h3>
+                    <div id="tradingview_usdkrw" style="height:400px;"></div>
+                </div>
+                <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">나스닥 100 선물</h3>
+                    <div id="tradingview_nasdaq" style="height:400px;"></div>
+                </div>
+                <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">업비트 김프 프리미엄 (%)</h3>
+                    <div id="tradingview_kimp" style="height:400px;"></div>
+                </div>
+                <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">BTC 롱 포지션</h3>
+                    <div id="tradingview_btclongs" style="height:400px;"></div>
+                </div>
+                 <div class="tv-widget-container">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">BTC 숏 포지션</h3>
+                    <div id="tradingview_btcshorts" style="height:400px;"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="simulation-section">
             <h3 class="simulation-title">추가 매수 시뮬레이션</h3>
-            <div class="simulation-input-group">
-                 <div class="simulation-input-row"> 
-                    <label for="simCurrentPrice">현재가(평가기준):</label>
-                    <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="현재 자산 가격">
+            
+            <div class="sim-input-grid">
+                <div class="sim-input-group">
+                    <label for="simCurrentPrice">현재가 (평가 기준)</label>
+                    <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="현재 자산 가격 입력">
                 </div>
-                <div class="simulation-input-row">
-                    <label for="simBuyPrice">매수 단가:</label>
-                    <input type="text" inputmode="decimal" id="simBuyPrice" class="input-field" placeholder="추가 매수 단가">
+                <div class="sim-input-group">
+                    <label for="simBuyPrice">추가 매수 단가</label>
+                    <input type="text" inputmode="decimal" id="simBuyPrice" class="input-field" placeholder="물탈 가격 입력">
                 </div>
             </div>
-            <div class="simulation-switch">
-                <label><input type="radio" name="simType" value="amount" checked> 금액으로 추가 매수</label>
-                <label><input type="radio" name="simType" value="quantity"> 수량으로 추가 매수</label>
+
+            <div class="sim-method-switch">
+                <input type="radio" name="simType" value="amount" id="simTypeAmount" checked>
+                <label for="simTypeAmount">금액으로</label>
+                <input type="radio" name="simType" value="quantity" id="simTypeQuantity">
+                <label for="simTypeQuantity">수량으로</label>
             </div>
-            <div class="simulation-input-group">
-                <div class="simulation-input-row" id="simAmountRow">
-                    <label for="simBuyAmount">매수 금액:</label>
-                    <input type="text" inputmode="decimal" id="simBuyAmount" class="input-field" placeholder="추가 매수 금액">
-                </div>
-                 <div id="simAmountSliderContainer" class="amount-slider-container">
-                    <div class="unit-buttons mb-2 flex flex-wrap gap-1 justify-center"> 
+            
+            <div id="simAmountSection">
+                <div class="sim-input-group">
+                    <label for="simBuyAmount" class="mb-2">추가 매수 금액</label>
+                    <input type="text" inputmode="decimal" id="simBuyAmount" class="input-field mb-3" placeholder="추가 매수할 금액">
+                    <input type="range" id="simBuyAmountSlider" min="0" max="1000000" step="10000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mb-3">
+                    <div class="flex flex-wrap gap-2 justify-center">
                         <button data-max="100000" data-step="1000" class="sim-unit-btn">십만원</button>
-                        <button data-max="1000000" data-step="10000" class="sim-unit-btn active">백만원</button> 
+                        <button data-max="1000000" data-step="10000" class="sim-unit-btn active">백만원</button>
                         <button data-max="10000000" data-step="100000" class="sim-unit-btn">천만원</button>
-                        <button data-max="50000000" data-step="500000" class="sim-unit-btn">5천만원</button>
-                        <button data-max="100000000" data-step="1000000" class="sim-unit-btn">1억원</button>
+                        <button data-max="50000000" data-step="500000" class="sim-unit-btn">오천만원</button>
+                        <button data-max="100000000" data-step="1000000" class="sim-unit-btn">일억원</button>
                     </div>
-                    <input type="range" id="simBuyAmountSlider" min="0" max="1000000" step="10000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                 </div>
-                <div class="simulation-input-row" id="simQuantityRow" style="display: none;">
-                    <label for="simBuyQuantity">매수 수량:</label>
-                    <input type="text" inputmode="decimal" id="simBuyQuantity" class="input-field" placeholder="추가 매수 수량 (최대 8자리)">
                 </div>
             </div>
-            <div class="simulation-result-group">
-                <div class="simulation-result-item">
+
+            <div id="simQuantitySection" style="display: none;">
+                <div class="sim-input-group">
+                    <label for="simBuyQuantity">추가 매수 수량</label>
+                    <input type="text" inputmode="decimal" id="simBuyQuantity" class="input-field" placeholder="추가 매수할 수량 (최대 8자리)">
+                </div>
+            </div>
+
+            <div class="sim-result-group">
+                <div class="sim-result-item">
                     <span class="label">총 추가 매수 금액:</span>
                     <span class="value" id="simTotalAdditionalAmount">0 원</span>
                 </div>
-                 <div class="simulation-avg-comparison">
+                <div class="sim-avg-comparison">
                     <div>
-                        <span>현재 평균</span>
+                        <span class="avg-title">현재 평단</span>
                         <span class="avg-price" id="simCurrentAvgPrice">0 원</span>
                         <span class="avg-pnl" id="simCurrentPnl">- %</span>
                     </div>
-                    <div class="text-2xl self-center text-gray-400">→</div>
+                    <div class="text-2xl self-center text-gray-400 font-sans">→</div>
                     <div>
-                        <span>예상 평균</span>
+                        <span class="avg-title">예상 평단</span>
                         <span class="avg-price" id="simExpectedAvgPrice">0 원</span>
                         <span class="avg-pnl" id="simExpectedPnl">- %</span>
                     </div>
@@ -348,7 +381,6 @@
                 <span id="totalSellAmountGross" class="result-value text-blue-600">0</span>
                 <span id="totalSellAmountGrossKorean" class="result-value-sub">0원</span>
             </div>
-
             <div class="result-item">
                 <span class="result-label">현재 보유 수량</span>
                 <span id="currentHoldingQuantity" class="result-value text-green-600">0</span>
@@ -364,7 +396,6 @@
                 <span id="totalSellQuantity" class="result-value">0</span>
                 <span id="totalSellQuantityKorean" class="result-value-sub">0개</span>
             </div>
-            
             <div class="result-item">
                 <span class="result-label">누적 매수 수수료</span>
                 <span id="accumulatedBuyFee" class="result-value">0</span>
@@ -380,7 +411,6 @@
                 <span id="totalFeesPaid" class="result-value">0</span>
                 <span id="totalFeesPaidKorean" class="result-value-sub">0원</span>
             </div>
-
             <div class="result-item">
                 <span id="netInvestmentStatusLabel" class="result-label">실질 투자 원금 (회수 필요 금액)</span>
                 <span id="netInvestmentStatus" class="result-value">0</span>
@@ -431,1040 +461,938 @@
     </div>
     <div id="toastMessage" class="toast-message"></div>
 
-
     <script>
-        // --- DOM 요소들 ---
-        const tradeTitleEl = document.getElementById('tradeTitle'); 
-        const tradeDateEl = document.getElementById('tradeDate');   
-        const inputRowsContainer = document.getElementById('inputRows');
-        const addRowBtn = document.getElementById('addRowBtn'); 
-        const resetBtn = document.getElementById('resetBtn');
-        const setNewStartBtn = document.getElementById('setNewStartBtn');
-        const copyDetailsBtn = document.getElementById('copyDetailsBtn'); 
-        const saveToFileBtn = document.getElementById('saveToFileBtn');
-        const loadFileInput = document.getElementById('loadFile');    
-        const createShareLinkBtn = document.getElementById('createShareLinkBtn');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calculator Script
+            const tradeTitleEl = document.getElementById('tradeTitle'); 
+            const tradeDateEl = document.getElementById('tradeDate');   
+            const inputRowsContainer = document.getElementById('inputRows');
+            const addRowBtn = document.getElementById('addRowBtn'); 
+            const resetBtn = document.getElementById('resetBtn');
+            const setNewStartBtn = document.getElementById('setNewStartBtn');
+            const copyDetailsBtn = document.getElementById('copyDetailsBtn'); 
+            const saveToFileBtn = document.getElementById('saveToFileBtn');
+            const loadFileInput = document.getElementById('loadFile');    
+            const createShareLinkBtn = document.getElementById('createShareLinkBtn');
+            const buyFeeRateEl = document.getElementById('buyFeeRate');
+            const sellFeeRateEl = document.getElementById('sellFeeRate');
+            const liquidationPriceEl = document.getElementById('liquidationPrice'); 
+            const totalBuyAmountGrossEl = document.getElementById('totalBuyAmountGross');
+            const totalBuyAmountGrossKoreanEl = document.getElementById('totalBuyAmountGrossKorean');
+            const totalBuyQuantityEl = document.getElementById('totalBuyQuantity');
+            const totalBuyQuantityKoreanEl = document.getElementById('totalBuyQuantityKorean');
+            const accumulatedBuyFeeEl = document.getElementById('accumulatedBuyFee');
+            const accumulatedBuyFeeKoreanEl = document.getElementById('accumulatedBuyFeeKorean');
+            const totalSellAmountGrossEl = document.getElementById('totalSellAmountGross');
+            const totalSellAmountGrossKoreanEl = document.getElementById('totalSellAmountGrossKorean');
+            const totalSellQuantityEl = document.getElementById('totalSellQuantity');
+            const totalSellQuantityKoreanEl = document.getElementById('totalSellQuantityKorean');
+            const accumulatedSellFeeEl = document.getElementById('accumulatedSellFee');
+            const accumulatedSellFeeKoreanEl = document.getElementById('accumulatedSellFeeKorean');
+            const currentHoldingQuantityEl = document.getElementById('currentHoldingQuantity');
+            const currentHoldingQuantityKoreanEl = document.getElementById('currentHoldingQuantityKorean');
+            const avgBuyPriceNoFeeLabelEl = document.getElementById('avgBuyPriceNoFeeLabel'); 
+            const avgBuyPriceNoFeeEl = document.getElementById('avgBuyPriceNoFee');
+            const avgBuyPriceNoFeeKoreanEl = document.getElementById('avgBuyPriceNoFeeKorean');
+            const totalFeesPaidEl = document.getElementById('totalFeesPaid');
+            const totalFeesPaidKoreanEl = document.getElementById('totalFeesPaidKorean');
+            const netInvestmentStatusLabelEl = document.getElementById('netInvestmentStatusLabel'); 
+            const netInvestmentStatusEl = document.getElementById('netInvestmentStatus'); 
+            const netInvestmentStatusKoreanEl = document.getElementById('netInvestmentStatusKorean'); 
+            const avgHoldingPriceItemEl = document.getElementById('avgHoldingPriceItem'); 
+            const avgHoldingPriceWithFeeEl = document.getElementById('avgHoldingPriceWithFee');
+            const avgHoldingPriceWithFeeKoreanEl = document.getElementById('avgHoldingPriceWithFeeKorean');
+            const estimatedOverallProfitLossEl = document.getElementById('estimatedOverallProfitLoss'); 
+            const estimatedOverallProfitLossKoreanEl = document.getElementById('estimatedOverallProfitLossKorean');
+            const estimatedOverallProfitLossPercentEl = document.getElementById('estimatedOverallProfitLossPercent');
+            const confirmationModalEl = document.getElementById('confirmationModal');
+            const modalQuantityEl = document.getElementById('modalQuantity');
+            const modalAvgPriceEl = document.getElementById('modalAvgPrice');
+            const confirmSetNewStartBtn = document.getElementById('confirmSetNewStart');
+            const cancelSetNewStartBtn = document.getElementById('cancelSetNewStart');
+            const toastMessageEl = document.getElementById('toastMessage');
 
+            const simCurrentPriceEl = document.getElementById('simCurrentPrice'); 
+            const simTypeRadios = document.querySelectorAll('input[name="simType"]');
+            const simBuyPriceEl = document.getElementById('simBuyPrice');
+            const simBuyAmountEl = document.getElementById('simBuyAmount');
+            const simBuyQuantityEl = document.getElementById('simBuyQuantity');
+            const simAmountSectionEl = document.getElementById('simAmountSection');
+            const simQuantitySectionEl = document.getElementById('simQuantitySection');
+            const simBuyAmountSliderEl = document.getElementById('simBuyAmountSlider'); 
+            const simUnitBtns = document.querySelectorAll('.sim-unit-btn'); 
+            const simTotalAdditionalAmountEl = document.getElementById('simTotalAdditionalAmount');
+            const simCurrentAvgPriceEl = document.getElementById('simCurrentAvgPrice');
+            const simCurrentPnlEl = document.getElementById('simCurrentPnl');
+            const simExpectedAvgPriceEl = document.getElementById('simExpectedAvgPrice');
+            const simExpectedPnlEl = document.getElementById('simExpectedPnl');
 
-        const buyFeeRateEl = document.getElementById('buyFeeRate');
-        const sellFeeRateEl = document.getElementById('sellFeeRate');
-        const liquidationPriceEl = document.getElementById('liquidationPrice'); 
-        const totalBuyAmountGrossEl = document.getElementById('totalBuyAmountGross');
-        const totalBuyAmountGrossKoreanEl = document.getElementById('totalBuyAmountGrossKorean');
-        const totalBuyQuantityEl = document.getElementById('totalBuyQuantity');
-        const totalBuyQuantityKoreanEl = document.getElementById('totalBuyQuantityKorean');
-        const accumulatedBuyFeeEl = document.getElementById('accumulatedBuyFee');
-        const accumulatedBuyFeeKoreanEl = document.getElementById('accumulatedBuyFeeKorean');
-        const totalSellAmountGrossEl = document.getElementById('totalSellAmountGross');
-        const totalSellAmountGrossKoreanEl = document.getElementById('totalSellAmountGrossKorean');
-        const totalSellQuantityEl = document.getElementById('totalSellQuantity');
-        const totalSellQuantityKoreanEl = document.getElementById('totalSellQuantityKorean');
-        const accumulatedSellFeeEl = document.getElementById('accumulatedSellFee');
-        const accumulatedSellFeeKoreanEl = document.getElementById('accumulatedSellFeeKorean');
-        const currentHoldingQuantityEl = document.getElementById('currentHoldingQuantity');
-        const currentHoldingQuantityKoreanEl = document.getElementById('currentHoldingQuantityKorean');
-        const avgBuyPriceNoFeeLabelEl = document.getElementById('avgBuyPriceNoFeeLabel'); 
-        const avgBuyPriceNoFeeEl = document.getElementById('avgBuyPriceNoFee');
-        const avgBuyPriceNoFeeKoreanEl = document.getElementById('avgBuyPriceNoFeeKorean');
-        const totalFeesPaidEl = document.getElementById('totalFeesPaid');
-        const totalFeesPaidKoreanEl = document.getElementById('totalFeesPaidKorean');
-        const netInvestmentStatusLabelEl = document.getElementById('netInvestmentStatusLabel'); 
-        const netInvestmentStatusEl = document.getElementById('netInvestmentStatus'); 
-        const netInvestmentStatusKoreanEl = document.getElementById('netInvestmentStatusKorean'); 
-        const avgHoldingPriceItemEl = document.getElementById('avgHoldingPriceItem'); 
-        const avgHoldingPriceWithFeeEl = document.getElementById('avgHoldingPriceWithFee');
-        const avgHoldingPriceWithFeeKoreanEl = document.getElementById('avgHoldingPriceWithFeeKorean');
-        const estimatedOverallProfitLossEl = document.getElementById('estimatedOverallProfitLoss'); 
-        const estimatedOverallProfitLossKoreanEl = document.getElementById('estimatedOverallProfitLossKorean');
-        const estimatedOverallProfitLossPercentEl = document.getElementById('estimatedOverallProfitLossPercent'); // 손익 퍼센트 DOM 요소 추가
-        const confirmationModalEl = document.getElementById('confirmationModal');
-        const modalQuantityEl = document.getElementById('modalQuantity');
-        const modalAvgPriceEl = document.getElementById('modalAvgPrice');
-        const confirmSetNewStartBtn = document.getElementById('confirmSetNewStart');
-        const cancelSetNewStartBtn = document.getElementById('cancelSetNewStart');
-        const simCurrentPriceEl = document.getElementById('simCurrentPrice'); 
-        const simTypeRadios = document.querySelectorAll('input[name="simType"]');
-        const simBuyPriceEl = document.getElementById('simBuyPrice');
-        const simBuyAmountEl = document.getElementById('simBuyAmount');
-        const simBuyQuantityEl = document.getElementById('simBuyQuantity');
-        const simAmountRowEl = document.getElementById('simAmountRow');
-        const simQuantityRowEl = document.getElementById('simQuantityRow');
-        const simAmountSliderContainerEl = document.getElementById('simAmountSliderContainer'); 
-        const simBuyAmountSliderEl = document.getElementById('simBuyAmountSlider'); 
-        const simUnitBtns = document.querySelectorAll('.sim-unit-btn'); 
-        const simTotalAdditionalAmountEl = document.getElementById('simTotalAdditionalAmount');
-        const simCurrentAvgPriceEl = document.getElementById('simCurrentAvgPrice');
-        const simCurrentPnlEl = document.getElementById('simCurrentPnl');
-        const simExpectedAvgPriceEl = document.getElementById('simExpectedAvgPrice');
-        const simExpectedPnlEl = document.getElementById('simExpectedPnl');
-        const toastMessageEl = document.getElementById('toastMessage');
+            let rowCount = 0;
+            let lastCalculatedAvgHoldingPrice = 0; 
+            let lastCalculatedHoldingQuantity = 0;
+            let currentNetInvestmentOrRealizedProfit = 0;
 
-        let rowCount = 0;
-        let lastCalculatedAvgHoldingPrice = 0; 
-        let lastCalculatedHoldingQuantity = 0;
-        let currentNetInvestmentOrRealizedProfit = 0; 
-        
-        // 입력 필드 숫자 포맷팅 함수 (쉼표 추가 및 소수점 처리)
-        function formatNumberInput(inputElement, allowEmpty = false, decimalPlaces = -1) { 
-            const rawValue = inputElement.value;
-            let cursorPosition = inputElement.selectionStart;
-            let nonDelimiterCharsBeforeCursor = 0;
-            for (let i = 0; i < cursorPosition; i++) {
-                if (rawValue[i] !== ',') nonDelimiterCharsBeforeCursor++;
-            }
-            let valueToFormat = rawValue.replace(/,/g, '');
-            valueToFormat = valueToFormat.replace(/[^\d.]/g, ''); // 숫자와 점 이외의 문자 제거
-            const parts = valueToFormat.split('.');
-            if (parts.length > 2) valueToFormat = parts[0] + '.' + parts.slice(1).join(''); // 점이 여러 개일 경우 첫 번째 점만 인정
-            
-            let formattedValue = "";
-            if (valueToFormat === "" && allowEmpty) { 
-                formattedValue = "";
-            } else if (valueToFormat === "") {
-                 formattedValue = ""; 
-            } else if (valueToFormat === ".") {
-                formattedValue = "0.";
-            } else {
-                let [integerPart, decimalPart] = valueToFormat.split('.');
-                if (integerPart === undefined) integerPart = "";
-                if (integerPart === "" && decimalPart !== undefined) integerPart = "0";
+            function formatNumberInput(inputElement, allowEmpty = false, decimalPlaces = -1) { 
+                const rawValue = inputElement.value;
+                let cursorPosition = inputElement.selectionStart;
+                let nonDelimiterCharsBeforeCursor = 0;
+                for (let i = 0; i < cursorPosition; i++) {
+                    if (rawValue[i] !== ',') nonDelimiterCharsBeforeCursor++;
+                }
+                let valueToFormat = rawValue.replace(/,/g, '');
+                valueToFormat = valueToFormat.replace(/[^\d.]/g, '');
+                const parts = valueToFormat.split('.');
+                if (parts.length > 2) valueToFormat = parts[0] + '.' + parts.slice(1).join('');
                 
-                let formattedInteger = "";
-                if (integerPart !== "") {
-                    // 0으로 시작하는 정수 부분 처리 (예: 0123 -> 123)
-                    if (integerPart.length > 1 && integerPart.startsWith('0')) {
-                        integerPart = integerPart.replace(/^0+/, '');
-                        if (integerPart === '') integerPart = '0'; // 모두 0이었을 경우 (예: 000)
-                    }
-                    const numInt = parseFloat(integerPart); 
-                    if (!isNaN(numInt)) {
-                        formattedInteger = numInt.toLocaleString('en-US');
-                    } else { 
-                        formattedInteger = integerPart; 
-                    }
-                } else if (valueToFormat.startsWith('0') && decimalPart === undefined && integerPart === "0") {
-                    formattedInteger = "0";
-                }
-
-
-                formattedValue = formattedInteger;
-                if (decimalPart !== undefined) {
-                    // decimalPlaces가 지정된 경우 해당 자릿수까지 자름
-                    if (decimalPlaces !== -1 && decimalPart.length > decimalPlaces) {
-                        decimalPart = decimalPart.substring(0, decimalPlaces);
-                    }
-                    formattedValue += '.' + decimalPart;
-                }
-            }
-            if (formattedValue.toLowerCase() === "nan") { // NaN 방지
-                 formattedValue = decimalPart !== undefined ? "0." + decimalPart : "";
-            }
-             // . 으로 시작하는 경우 앞에 0 추가 (예: .5 -> 0.5)
-             if (valueToFormat.startsWith(".") && !formattedValue.startsWith("0.")) {
-                if (formattedValue.startsWith(".")) formattedValue = "0" + formattedValue;
-                else if (formattedValue === "") formattedValue = "0.";
-            }
-            
-            inputElement.value = formattedValue;
-
-            // 커서 위치 조정
-            if (valueToFormat === "" && !allowEmpty && inputElement !== simBuyAmountEl && inputElement !== simBuyQuantityEl && inputElement !== simBuyPriceEl && inputElement !== simCurrentPriceEl ) { 
-                // 특정 시뮬레이션 입력이 아닌 경우, 비어있으면 0으로 처리하지 않음
-            } else {
-                let newCursorPos = 0;
-                let currentNonDelimiterChars = 0;
-                for (let i = 0; i < formattedValue.length; i++) {
-                    if (formattedValue[i] !== ',') currentNonDelimiterChars++;
-                    newCursorPos = i + 1;
-                    if (currentNonDelimiterChars >= nonDelimiterCharsBeforeCursor) break;
-                }
-                if (valueToFormat === "" || formattedValue === "") newCursorPos = 0;
-                else if (currentNonDelimiterChars < nonDelimiterCharsBeforeCursor) newCursorPos = formattedValue.length;
-                inputElement.selectionStart = inputElement.selectionEnd = newCursorPos;
-            }
-        }
-        
-        // 수수료 입력 필드 포맷팅 함수
-        function formatFeeInput(inputElement) { 
-            let value = inputElement.value;
-            value = value.replace(/[^\d.]/g, ""); // 숫자와 점 이외의 문자 제거
-            const parts = value.split('.');
-            if (parts.length > 2) { // 점이 여러 개일 경우 첫 번째 점만 인정
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            inputElement.value = value;
-        }
-
-        // 행 스타일 업데이트 (매수/매도에 따라 배경색 변경)
-        function updateRowStyle(rowElement, transactionType) { 
-            rowElement.classList.remove('row-buy', 'row-sell');
-            if (transactionType === 'buy') {
-                rowElement.classList.add('row-buy');
-            } else if (transactionType === 'sell') {
-                rowElement.classList.add('row-sell');
-            }
-        }
-
-        // 입력 행 초기화 (기본 한 줄 추가)
-        function initializeRows() { 
-            inputRowsContainer.innerHTML = ''; 
-            rowCount = 0;
-            addNewRow(); 
-            calculateAndDisplayResults();
-        }
-
-        // 새 입력 행 추가 함수
-        function addNewRow() { 
-            rowCount++;
-            const row = document.createElement('tr');
-            row.classList.add('input-row');
-            row.dataset.rowId = rowCount; 
-            row.innerHTML = `
-                <td data-label="거래 유형">
-                    <select class="select-field type-select">
-                        <option value="buy" selected>매수</option>
-                        <option value="sell">매도</option>
-                    </select>
-                </td>
-                <td data-label="단가"><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
-                <td class="symbol-cell text-xs text-gray-400">↔</td>
-                <td data-label="수량"><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량 (최대 8자리)"></td>
-                <td class="symbol-cell text-xs text-gray-400">=</td>
-                <td data-label="금액"><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
-                <td data-label="삭제"><button class="delete-btn">X</button></td>
-            `;
-            inputRowsContainer.appendChild(row);
-            attachEventListenersToRow(row);
-            updateRowStyle(row, 'buy'); 
-            return row;
-        }
-
-        // 각 행의 입력 필드에 이벤트 리스너 연결
-        function attachEventListenersToRow(rowElement) { 
-            const typeSelect = rowElement.querySelector('.type-select');
-            const priceInput = rowElement.querySelector('.price-input');
-            const quantityInput = rowElement.querySelector('.quantity-input');
-            const amountInput = rowElement.querySelector('.amount-input');
-            const deleteButton = rowElement.querySelector('.delete-btn');
-            let lastEditedField = null; // 마지막으로 수정된 필드 추적 (단가, 수량, 금액 간 자동 계산용)
-
-            typeSelect.addEventListener('change', (event) => {
-                updateRowStyle(rowElement, event.target.value);
-                calculateAndDisplayResults();
-                calculateSimulation(); 
-            });
-            priceInput.addEventListener('input', () => { 
-                formatNumberInput(priceInput); lastEditedField = 'price';
-                handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField); 
-            });
-            quantityInput.addEventListener('input', () => {
-                formatNumberInput(quantityInput, false, 8); lastEditedField = 'quantity'; // 수량은 소수점 8자리까지 포맷팅
-                handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
-            });
-            amountInput.addEventListener('input', () => {
-                formatNumberInput(amountInput); lastEditedField = 'amount';
-                handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
-            });
-            
-            deleteButton.addEventListener('click', () => {
-                rowElement.remove();
-                if (inputRowsContainer.querySelectorAll('.input-row').length === 0) { // 모든 행이 삭제되면 새 행 추가
-                    addNewRow();
-                }
-                calculateAndDisplayResults(); 
-                calculateSimulation();
-            });
-        }
-
-        // 행 입력 변경 시 자동 계산 처리 (단가, 수량, 금액)
-        function handleRowInputChange(priceEl, quantityEl, amountEl, editedField) { 
-            const price = parseFloat(priceEl.value.replace(/,/g, '')) || 0;
-            // 수량을 파싱할 때는 8자리 정밀도를 유지하기 위해 toFixed를 아직 적용하지 않음
-            let quantity = parseFloat(quantityEl.value.replace(/,/g, '')) || 0; 
-            let amount = parseFloat(amountEl.value.replace(/,/g, '')) || 0;
-
-            if (editedField === 'price' || editedField === 'quantity') { // 단가 또는 수량 변경 시
-                if (price > 0 && quantity > 0) {
-                    amount = price * quantity;
-                    amountEl.value = amount.toFixed(2); // 금액은 소수점 2자리로 고정
-                    formatNumberInput(amountEl); 
-                } else if ((editedField === 'quantity' && price > 0 && quantity <= 0) || (editedField === 'price' && price <=0 && quantity > 0)) {
-                     amountEl.value = ''; // 유효하지 않은 입력 시 금액 필드 비움
-                }
-            } else if (editedField === 'amount') { // 금액 변경 시
-                if (price > 0 && amount > 0) {
-                    quantity = amount / price;
-                    quantityEl.value = quantity.toFixed(8); // 수량은 소수점 8자리로 고정
-                    formatNumberInput(quantityEl, false, 8); 
-                } else if (price > 0 && amount <= 0) {
-                    quantityEl.value = ''; // 유효하지 않은 입력 시 수량 필드 비움
-                }
-            }
-            
-            // 음수 입력 방지
-            if (priceEl.value && parseFloat(priceEl.value.replace(/,/g, '')) < 0) priceEl.value = '0';
-            if (quantityEl.value && parseFloat(quantityEl.value.replace(/,/g, '')) < 0) quantityEl.value = '0';
-            if (amountEl.value && parseFloat(amountEl.value.replace(/,/g, '')) < 0) amountEl.value = '0';
-            
-            calculateAndDisplayResults();
-            calculateSimulation();
-        }
-
-        // 전체 결과 계산 및 화면 표시
-        function calculateAndDisplayResults() { 
-            let totalBuyAmountVal = 0;
-            let totalBuyQuantityVal = 0;
-            let totalBuyFeeVal = 0;
-            let totalSellAmountVal = 0;
-            let totalSellQuantityVal = 0;
-            let totalSellFeeVal = 0;
-            
-            const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
-            const sellFeeRate = parseFloat(sellFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
-            const userLiquidationPrice = parseFloat(liquidationPriceEl.value.replace(/,/g, '')) || 0; // 이 줄을 위로 이동
-
-            const uiRows = inputRowsContainer.querySelectorAll('.input-row');
-            uiRows.forEach(uiRow => {
-                const type = uiRow.querySelector('.type-select').value;
-                const price = parseFloat(uiRow.querySelector('.price-input').value.replace(/,/g, '')) || 0;
-                const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0; 
-                
-                if (price > 0 && quantity > 0) {
-                    const amount = price * quantity; 
-                    if (type === 'buy') {
-                        totalBuyAmountVal += amount;
-                        totalBuyQuantityVal += quantity;
-                        totalBuyFeeVal += amount * buyFeeRate;
-                    } else if (type === 'sell') {
-                        totalSellAmountVal += amount;
-                        totalSellQuantityVal += quantity;
-                        totalSellFeeVal += amount * sellFeeRate;
-                    }
-                }
-            });
-
-            const currentHoldingQuantityVal = totalBuyQuantityVal - totalSellQuantityVal;
-            const avgBuyPriceNoFeeVal = totalBuyQuantityVal > 0 ? totalBuyAmountVal / totalBuyQuantityVal : 0;
-            const totalFeesPaidVal = totalBuyFeeVal + totalSellFeeVal;
-
-            const totalGrossBuyWithFees = totalBuyAmountVal + totalBuyFeeVal;
-            const totalNetSellProceeds = totalSellAmountVal - totalSellFeeVal;
-            
-            currentNetInvestmentOrRealizedProfit = totalGrossBuyWithFees - totalNetSellProceeds; 
-            
-            let avgHoldingPriceWithFeeVal = 0;
-            if (currentHoldingQuantityVal > 0 && currentNetInvestmentOrRealizedProfit > 0) {
-                avgHoldingPriceWithFeeVal = currentNetInvestmentOrRealizedProfit / currentHoldingQuantityVal;
-            } else if (currentHoldingQuantityVal > 0 && currentNetInvestmentOrRealizedProfit <= 0) {
-                avgHoldingPriceWithFeeVal = 0; 
-            }
-            
-            let estimatedOverallProfitLossVal = 0;
-            if (currentHoldingQuantityVal > 0 && userLiquidationPrice > 0) {
-                const grossValueOfHoldings = userLiquidationPrice * currentHoldingQuantityVal;
-                const sellFeeForLiquidation = grossValueOfHoldings * sellFeeRate;
-                const netProceedsFromLiquidation = grossValueOfHoldings - sellFeeForLiquidation;
-                estimatedOverallProfitLossVal = (totalNetSellProceeds + netProceedsFromLiquidation) - totalGrossBuyWithFees;
-            } else if (currentHoldingQuantityVal === 0) { 
-                 estimatedOverallProfitLossVal = totalNetSellProceeds - totalGrossBuyWithFees;
-            }
-
-            lastCalculatedAvgHoldingPrice = avgHoldingPriceWithFeeVal; 
-            lastCalculatedHoldingQuantity = currentHoldingQuantityVal;
-
-            // 결과 표시 (수량은 8자리, 금액은 2자리)
-            totalBuyAmountGrossEl.textContent = formatNumber(totalBuyAmountVal, 2);
-            totalBuyAmountGrossKoreanEl.textContent = formatNumberToKorean(totalBuyAmountVal, 'amount');
-            totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 8); 
-            totalBuyQuantityKoreanEl.textContent = formatNumberToKorean(totalBuyQuantityVal, 'quantity');
-            accumulatedBuyFeeEl.textContent = formatNumber(totalBuyFeeVal, 2);
-            accumulatedBuyFeeKoreanEl.textContent = formatNumberToKorean(totalBuyFeeVal, 'amount');
-
-            totalSellAmountGrossEl.textContent = formatNumber(totalSellAmountVal, 2);
-            totalSellAmountGrossKoreanEl.textContent = formatNumberToKorean(totalSellAmountVal, 'amount');
-            totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 8); 
-            totalSellQuantityKoreanEl.textContent = formatNumberToKorean(totalSellQuantityVal, 'quantity');
-            accumulatedSellFeeEl.textContent = formatNumber(totalSellFeeVal, 2);
-            accumulatedSellFeeKoreanEl.textContent = formatNumberToKorean(totalSellFeeVal, 'amount');
-
-            currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 8); 
-            currentHoldingQuantityKoreanEl.textContent = formatNumberToKorean(currentHoldingQuantityVal, 'quantity');
-            
-            avgBuyPriceNoFeeLabelEl.textContent = "매입 평균단가 (수수료 미반영)"; 
-            avgBuyPriceNoFeeEl.textContent = formatNumber(avgBuyPriceNoFeeVal, 2);
-            avgBuyPriceNoFeeKoreanEl.textContent = formatNumberToKorean(avgBuyPriceNoFeeVal, 'price');
-
-            totalFeesPaidEl.textContent = formatNumber(totalFeesPaidVal, 2);
-            totalFeesPaidKoreanEl.textContent = formatNumberToKorean(totalFeesPaidVal, 'amount');
-
-            if (currentNetInvestmentOrRealizedProfit > 0) {
-                netInvestmentStatusLabelEl.textContent = "실질 투자 원금 (회수 필요 금액)";
-                netInvestmentStatusEl.textContent = formatNumber(currentNetInvestmentOrRealizedProfit, 2);
-                netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(currentNetInvestmentOrRealizedProfit, 'amount');
-                netInvestmentStatusEl.className = 'result-value text-gray-800'; 
-                netInvestmentStatusKoreanEl.className = 'result-value-sub text-gray-500';
-            } else {
-                netInvestmentStatusLabelEl.textContent = "현재까지 누적 순이익";
-                const realizedProfit = Math.abs(currentNetInvestmentOrRealizedProfit);
-                netInvestmentStatusEl.textContent = formatNumber(realizedProfit, 2);
-                netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(realizedProfit, 'amount') + " 이익!";
-                netInvestmentStatusEl.className = 'result-value text-red-600'; 
-                netInvestmentStatusKoreanEl.className = 'result-value-sub text-red-600';
-            }
-            
-            avgHoldingPriceItemEl.classList.remove('bg-lime-50', 'bg-green-50', 'bg-red-50'); 
-            avgHoldingPriceWithFeeEl.classList.remove('text-red-500', 'text-gray-800');
-            avgHoldingPriceWithFeeKoreanEl.classList.remove('text-red-500', 'text-gray-500');
-
-            if (currentHoldingQuantityVal > 0) {
-                avgHoldingPriceWithFeeEl.textContent = formatNumber(avgHoldingPriceWithFeeVal, 2);
-                avgHoldingPriceWithFeeKoreanEl.textContent = formatNumberToKorean(avgHoldingPriceWithFeeVal, 'price');
-                if (currentNetInvestmentOrRealizedProfit <= 0) { 
-                    avgHoldingPriceWithFeeKoreanEl.textContent += " (이익 실현 중)";
-                    avgHoldingPriceWithFeeEl.classList.add('text-red-500');
-                    avgHoldingPriceWithFeeKoreanEl.classList.add('text-red-500');
-                    avgHoldingPriceItemEl.classList.add('bg-red-50'); 
+                let formattedValue = "";
+                if (valueToFormat === "" && allowEmpty) { 
+                    formattedValue = "";
+                } else if (valueToFormat === "") {
+                     formattedValue = ""; 
+                } else if (valueToFormat === ".") {
+                    formattedValue = "0.";
                 } else {
-                    avgHoldingPriceWithFeeEl.classList.add('text-gray-800'); 
+                    let [integerPart, decimalPart] = valueToFormat.split('.');
+                    if (integerPart === undefined) integerPart = "";
+                    if (integerPart === "" && decimalPart !== undefined) integerPart = "0";
+                    
+                    let formattedInteger = "";
+                    if (integerPart !== "") {
+                        if (integerPart.length > 1 && integerPart.startsWith('0')) {
+                            integerPart = integerPart.replace(/^0+/, '');
+                            if (integerPart === '') integerPart = '0';
+                        }
+                        const numInt = parseFloat(integerPart); 
+                        if (!isNaN(numInt)) {
+                            formattedInteger = numInt.toLocaleString('en-US');
+                        } else { 
+                            formattedInteger = integerPart; 
+                        }
+                    } else if (valueToFormat.startsWith('0') && decimalPart === undefined && integerPart === "0") {
+                        formattedInteger = "0";
+                    }
+                    formattedValue = formattedInteger;
+                    if (decimalPart !== undefined) {
+                        if (decimalPlaces !== -1 && decimalPart.length > decimalPlaces) {
+                            decimalPart = decimalPart.substring(0, decimalPlaces);
+                        }
+                        formattedValue += '.' + decimalPart;
+                    }
+                }
+                if (formattedValue.toLowerCase() === "nan") {
+                     formattedValue = decimalPart !== undefined ? "0." + decimalPart : "";
+                }
+                 if (valueToFormat.startsWith(".") && !formattedValue.startsWith("0.")) {
+                    if (formattedValue.startsWith(".")) formattedValue = "0" + formattedValue;
+                    else if (formattedValue === "") formattedValue = "0.";
+                }
+                inputElement.value = formattedValue;
+                if (valueToFormat === "" && !allowEmpty && inputElement !== simBuyAmountEl && inputElement !== simBuyQuantityEl && inputElement !== simBuyPriceEl && inputElement !== simCurrentPriceEl ) { 
+                } else {
+                    let newCursorPos = 0;
+                    let currentNonDelimiterChars = 0;
+                    for (let i = 0; i < formattedValue.length; i++) {
+                        if (formattedValue[i] !== ',') currentNonDelimiterChars++;
+                        newCursorPos = i + 1;
+                        if (currentNonDelimiterChars >= nonDelimiterCharsBeforeCursor) break;
+                    }
+                    if (valueToFormat === "" || formattedValue === "") newCursorPos = 0;
+                    else if (currentNonDelimiterChars < nonDelimiterCharsBeforeCursor) newCursorPos = formattedValue.length;
+                    inputElement.selectionStart = inputElement.selectionEnd = newCursorPos;
+                }
+            }
+            
+            function formatFeeInput(inputElement) { 
+                let value = inputElement.value;
+                value = value.replace(/[^\d.]/g, "");
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                inputElement.value = value;
+            }
+
+            function updateRowStyle(rowElement, transactionType) { 
+                rowElement.classList.remove('row-buy', 'row-sell');
+                if (transactionType === 'buy') {
+                    rowElement.classList.add('row-buy');
+                } else if (transactionType === 'sell') {
+                    rowElement.classList.add('row-sell');
+                }
+            }
+
+            function initializeRows() { 
+                inputRowsContainer.innerHTML = ''; 
+                rowCount = 0;
+                addNewRow(); 
+                calculateAndDisplayResults();
+            }
+
+            function addNewRow() { 
+                rowCount++;
+                const row = document.createElement('tr');
+                row.classList.add('input-row');
+                row.dataset.rowId = rowCount; 
+                row.innerHTML = `
+                    <td data-label="거래 유형">
+                        <select class="select-field type-select">
+                            <option value="buy" selected>매수</option>
+                            <option value="sell">매도</option>
+                        </select>
+                    </td>
+                    <td data-label="단가"><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
+                    <td class="symbol-cell text-xs text-gray-400">↔</td>
+                    <td data-label="수량"><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량 (최대 8자리)"></td>
+                    <td class="symbol-cell text-xs text-gray-400">=</td>
+                    <td data-label="금액"><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
+                    <td data-label="삭제"><button class="delete-btn">X</button></td>
+                `;
+                inputRowsContainer.appendChild(row);
+                attachEventListenersToRow(row);
+                updateRowStyle(row, 'buy'); 
+                return row;
+            }
+
+            function attachEventListenersToRow(rowElement) { 
+                const typeSelect = rowElement.querySelector('.type-select');
+                const priceInput = rowElement.querySelector('.price-input');
+                const quantityInput = rowElement.querySelector('.quantity-input');
+                const amountInput = rowElement.querySelector('.amount-input');
+                const deleteButton = rowElement.querySelector('.delete-btn');
+                let lastEditedField = null;
+
+                typeSelect.addEventListener('change', (event) => {
+                    updateRowStyle(rowElement, event.target.value);
+                    calculateAndDisplayResults();
+                    calculateSimulation(); 
+                });
+                priceInput.addEventListener('input', () => { 
+                    formatNumberInput(priceInput); lastEditedField = 'price';
+                    handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField); 
+                });
+                quantityInput.addEventListener('input', () => {
+                    formatNumberInput(quantityInput, false, 8); lastEditedField = 'quantity';
+                    handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
+                });
+                amountInput.addEventListener('input', () => {
+                    formatNumberInput(amountInput); lastEditedField = 'amount';
+                    handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField);
+                });
+                
+                deleteButton.addEventListener('click', () => {
+                    rowElement.remove();
+                    if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                        addNewRow();
+                    }
+                    calculateAndDisplayResults(); 
+                    calculateSimulation();
+                });
+            }
+
+            function handleRowInputChange(priceEl, quantityEl, amountEl, editedField) { 
+                const price = parseFloat(priceEl.value.replace(/,/g, '')) || 0;
+                let quantity = parseFloat(quantityEl.value.replace(/,/g, '')) || 0; 
+                let amount = parseFloat(amountEl.value.replace(/,/g, '')) || 0;
+
+                if (editedField === 'price' || editedField === 'quantity') {
+                    if (price > 0 && quantity > 0) {
+                        amount = price * quantity;
+                        amountEl.value = amount.toFixed(2);
+                        formatNumberInput(amountEl); 
+                    } else if ((editedField === 'quantity' && price > 0 && quantity <= 0) || (editedField === 'price' && price <=0 && quantity > 0)) {
+                         amountEl.value = '';
+                    }
+                } else if (editedField === 'amount') {
+                    if (price > 0 && amount > 0) {
+                        quantity = amount / price;
+                        quantityEl.value = quantity.toFixed(8);
+                        formatNumberInput(quantityEl, false, 8); 
+                    } else if (price > 0 && amount <= 0) {
+                        quantityEl.value = '';
+                    }
+                }
+                if (priceEl.value && parseFloat(priceEl.value.replace(/,/g, '')) < 0) priceEl.value = '0';
+                if (quantityEl.value && parseFloat(quantityEl.value.replace(/,/g, '')) < 0) quantityEl.value = '0';
+                if (amountEl.value && parseFloat(amountEl.value.replace(/,/g, '')) < 0) amountEl.value = '0';
+                
+                calculateAndDisplayResults();
+                calculateSimulation();
+            }
+
+            function calculateAndDisplayResults() { 
+                let totalBuyAmountVal = 0;
+                let totalBuyQuantityVal = 0;
+                let totalBuyFeeVal = 0;
+                let totalSellAmountVal = 0;
+                let totalSellQuantityVal = 0;
+                let totalSellFeeVal = 0;
+                
+                const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+                const sellFeeRate = parseFloat(sellFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+                const userLiquidationPrice = parseFloat(liquidationPriceEl.value.replace(/,/g, '')) || 0;
+
+                const uiRows = inputRowsContainer.querySelectorAll('.input-row');
+                uiRows.forEach(uiRow => {
+                    const type = uiRow.querySelector('.type-select').value;
+                    const price = parseFloat(uiRow.querySelector('.price-input').value.replace(/,/g, '')) || 0;
+                    const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0; 
+                    
+                    if (price > 0 && quantity > 0) {
+                        const amount = price * quantity; 
+                        if (type === 'buy') {
+                            totalBuyAmountVal += amount;
+                            totalBuyQuantityVal += quantity;
+                            totalBuyFeeVal += amount * buyFeeRate;
+                        } else if (type === 'sell') {
+                            totalSellAmountVal += amount;
+                            totalSellQuantityVal += quantity;
+                            totalSellFeeVal += amount * sellFeeRate;
+                        }
+                    }
+                });
+
+                const currentHoldingQuantityVal = totalBuyQuantityVal - totalSellQuantityVal;
+                const avgBuyPriceNoFeeVal = totalBuyQuantityVal > 0 ? totalBuyAmountVal / totalBuyQuantityVal : 0;
+                const totalFeesPaidVal = totalBuyFeeVal + totalSellFeeVal;
+                const totalGrossBuyWithFees = totalBuyAmountVal + totalBuyFeeVal;
+                const totalNetSellProceeds = totalSellAmountVal - totalSellFeeVal;
+                currentNetInvestmentOrRealizedProfit = totalGrossBuyWithFees - totalNetSellProceeds; 
+                
+                let avgHoldingPriceWithFeeVal = 0;
+                if (currentHoldingQuantityVal > 0 && currentNetInvestmentOrRealizedProfit > 0) {
+                    avgHoldingPriceWithFeeVal = currentNetInvestmentOrRealizedProfit / currentHoldingQuantityVal;
+                } else if (currentHoldingQuantityVal > 0 && currentNetInvestmentOrRealizedProfit <= 0) {
+                    avgHoldingPriceWithFeeVal = 0; 
+                }
+                
+                let estimatedOverallProfitLossVal = 0;
+                if (currentHoldingQuantityVal > 0 && userLiquidationPrice > 0) {
+                    const grossValueOfHoldings = userLiquidationPrice * currentHoldingQuantityVal;
+                    const sellFeeForLiquidation = grossValueOfHoldings * sellFeeRate;
+                    const netProceedsFromLiquidation = grossValueOfHoldings - sellFeeForLiquidation;
+                    estimatedOverallProfitLossVal = (totalNetSellProceeds + netProceedsFromLiquidation) - totalGrossBuyWithFees;
+                } else if (currentHoldingQuantityVal === 0) { 
+                     estimatedOverallProfitLossVal = totalNetSellProceeds - totalGrossBuyWithFees;
+                }
+
+                lastCalculatedAvgHoldingPrice = avgHoldingPriceWithFeeVal; 
+                lastCalculatedHoldingQuantity = currentHoldingQuantityVal;
+
+                totalBuyAmountGrossEl.textContent = formatNumber(totalBuyAmountVal, 2);
+                totalBuyAmountGrossKoreanEl.textContent = formatNumberToKorean(totalBuyAmountVal, 'amount');
+                totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 8); 
+                totalBuyQuantityKoreanEl.textContent = formatNumberToKorean(totalBuyQuantityVal, 'quantity');
+                accumulatedBuyFeeEl.textContent = formatNumber(totalBuyFeeVal, 2);
+                accumulatedBuyFeeKoreanEl.textContent = formatNumberToKorean(totalBuyFeeVal, 'amount');
+                totalSellAmountGrossEl.textContent = formatNumber(totalSellAmountVal, 2);
+                totalSellAmountGrossKoreanEl.textContent = formatNumberToKorean(totalSellAmountVal, 'amount');
+                totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 8); 
+                totalSellQuantityKoreanEl.textContent = formatNumberToKorean(totalSellQuantityVal, 'quantity');
+                accumulatedSellFeeEl.textContent = formatNumber(totalSellFeeVal, 2);
+                accumulatedSellFeeKoreanEl.textContent = formatNumberToKorean(totalSellFeeVal, 'amount');
+                currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 8); 
+                currentHoldingQuantityKoreanEl.textContent = formatNumberToKorean(currentHoldingQuantityVal, 'quantity');
+                avgBuyPriceNoFeeLabelEl.textContent = "매입 평균단가 (수수료 미반영)"; 
+                avgBuyPriceNoFeeEl.textContent = formatNumber(avgBuyPriceNoFeeVal, 2);
+                avgBuyPriceNoFeeKoreanEl.textContent = formatNumberToKorean(avgBuyPriceNoFeeVal, 'price');
+                totalFeesPaidEl.textContent = formatNumber(totalFeesPaidVal, 2);
+                totalFeesPaidKoreanEl.textContent = formatNumberToKorean(totalFeesPaidVal, 'amount');
+
+                if (currentNetInvestmentOrRealizedProfit > 0) {
+                    netInvestmentStatusLabelEl.textContent = "실질 투자 원금 (회수 필요 금액)";
+                    netInvestmentStatusEl.textContent = formatNumber(currentNetInvestmentOrRealizedProfit, 2);
+                    netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(currentNetInvestmentOrRealizedProfit, 'amount');
+                    netInvestmentStatusEl.className = 'result-value text-gray-800'; 
+                    netInvestmentStatusKoreanEl.className = 'result-value-sub text-gray-500';
+                } else {
+                    netInvestmentStatusLabelEl.textContent = "현재까지 누적 순이익";
+                    const realizedProfit = Math.abs(currentNetInvestmentOrRealizedProfit);
+                    netInvestmentStatusEl.textContent = formatNumber(realizedProfit, 2);
+                    netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(realizedProfit, 'amount') + " 이익!";
+                    netInvestmentStatusEl.className = 'result-value text-red-600'; 
+                    netInvestmentStatusKoreanEl.className = 'result-value-sub text-red-600';
+                }
+                
+                avgHoldingPriceItemEl.classList.remove('bg-lime-50', 'bg-green-50', 'bg-red-50'); 
+                avgHoldingPriceWithFeeEl.classList.remove('text-red-500', 'text-gray-800');
+                avgHoldingPriceWithFeeKoreanEl.classList.remove('text-red-500', 'text-gray-500');
+
+                if (currentHoldingQuantityVal > 0) {
+                    avgHoldingPriceWithFeeEl.textContent = formatNumber(avgHoldingPriceWithFeeVal, 2);
+                    avgHoldingPriceWithFeeKoreanEl.textContent = formatNumberToKorean(avgHoldingPriceWithFeeVal, 'price');
+                    if (currentNetInvestmentOrRealizedProfit <= 0) { 
+                        avgHoldingPriceWithFeeKoreanEl.textContent += " (이익 실현 중)";
+                        avgHoldingPriceWithFeeEl.classList.add('text-red-500');
+                        avgHoldingPriceWithFeeKoreanEl.classList.add('text-red-500');
+                        avgHoldingPriceItemEl.classList.add('bg-red-50'); 
+                    } else {
+                        avgHoldingPriceWithFeeEl.classList.add('text-gray-800'); 
+                        avgHoldingPriceWithFeeKoreanEl.classList.add('text-gray-500');
+                        avgHoldingPriceItemEl.classList.add('bg-lime-50'); 
+                    }
+                } else {
+                    avgHoldingPriceWithFeeEl.textContent = "0";
+                    avgHoldingPriceWithFeeKoreanEl.textContent = "0원";
+                    avgHoldingPriceWithFeeEl.classList.add('text-gray-800');
                     avgHoldingPriceWithFeeKoreanEl.classList.add('text-gray-500');
-                    avgHoldingPriceItemEl.classList.add('bg-lime-50'); 
                 }
-            } else {
-                avgHoldingPriceWithFeeEl.textContent = "0";
-                avgHoldingPriceWithFeeKoreanEl.textContent = "0원";
-                avgHoldingPriceWithFeeEl.classList.add('text-gray-800');
-                avgHoldingPriceWithFeeKoreanEl.classList.add('text-gray-500');
-            }
 
-            totalBuyAmountGrossEl.classList.remove('text-red-600'); 
-            totalBuyAmountGrossEl.classList.add('text-red-600');
+                totalBuyAmountGrossEl.classList.remove('text-red-600'); 
+                totalBuyAmountGrossEl.classList.add('text-red-600');
+                totalSellAmountGrossEl.classList.remove('text-blue-600'); 
+                totalSellAmountGrossEl.classList.add('text-blue-600');
+                currentHoldingQuantityEl.classList.remove('text-green-600'); 
+                currentHoldingQuantityEl.classList.add('text-green-600');
 
-            totalSellAmountGrossEl.classList.remove('text-blue-600'); 
-            totalSellAmountGrossEl.classList.add('text-blue-600');
-            
-            currentHoldingQuantityEl.classList.remove('text-green-600'); 
-            currentHoldingQuantityEl.classList.add('text-green-600');
+                estimatedOverallProfitLossEl.textContent = formatNumber(estimatedOverallProfitLossVal, 2);
+                estimatedOverallProfitLossKoreanEl.textContent = formatNumberToKorean(estimatedOverallProfitLossVal, 'amount');
 
-            // 예상 최종 손익 및 퍼센트 표시 로직 수정
-            estimatedOverallProfitLossEl.textContent = formatNumber(estimatedOverallProfitLossVal, 2);
-            estimatedOverallProfitLossKoreanEl.textContent = formatNumberToKorean(estimatedOverallProfitLossVal, 'amount');
+                let percentageString = "";
+                const canCalculatePercentage = totalGrossBuyWithFees > 0 || estimatedOverallProfitLossVal !== 0;
 
-            let percentageString = "";
-            const canCalculatePercentage = totalGrossBuyWithFees > 0 || estimatedOverallProfitLossVal !== 0;
-
-            if (canCalculatePercentage) {
-                if (totalGrossBuyWithFees > 0) {
-                    const percentageValue = (estimatedOverallProfitLossVal / totalGrossBuyWithFees) * 100;
-                    percentageString = `(${percentageValue.toFixed(2)}%)`;
+                if (canCalculatePercentage) {
+                    if (totalGrossBuyWithFees > 0) {
+                        const percentageValue = (estimatedOverallProfitLossVal / totalGrossBuyWithFees) * 100;
+                        percentageString = `(${percentageValue.toFixed(2)}%)`;
+                    } else { 
+                        percentageString = estimatedOverallProfitLossVal > 0 ? "(+∞%)" : "(-∞%)";
+                    }
                 } else { 
-                    percentageString = estimatedOverallProfitLossVal > 0 ? "(+∞%)" : "(-∞%)";
+                    percentageString = "(0.00%)";
                 }
-            } else { 
-                percentageString = "(0.00%)";
+                
+                const displayPercentage = (userLiquidationPrice > 0 && currentHoldingQuantityVal > 0) || (currentHoldingQuantityVal === 0 && (totalGrossBuyWithFees > 0 || estimatedOverallProfitLossVal !== 0)) || (totalGrossBuyWithFees === 0 && estimatedOverallProfitLossVal === 0) ;
+
+                estimatedOverallProfitLossPercentEl.textContent = displayPercentage ? percentageString : "";
+                let textColorClass = "text-gray-700"; 
+                let percentColorSuffix = "gray-500";
+
+                if (estimatedOverallProfitLossVal > 0) {
+                    textColorClass = "text-red-500";
+                    percentColorSuffix = "red-500";
+                } else if (estimatedOverallProfitLossVal < 0) {
+                    textColorClass = "text-blue-500";
+                    percentColorSuffix = "blue-500";
+                }
+
+                estimatedOverallProfitLossEl.className = `font-semibold ${textColorClass}`;
+                estimatedOverallProfitLossKoreanEl.className = `text-gray-600 ${textColorClass}`;
+                estimatedOverallProfitLossPercentEl.className = `ml-1 text-xs text-${percentColorSuffix}`;
+
+                if (!displayPercentage) {
+                    estimatedOverallProfitLossPercentEl.className = 'ml-1 text-xs'; 
+                } else if (estimatedOverallProfitLossVal === 0 && percentageString === "(0.00%)") { 
+                    estimatedOverallProfitLossPercentEl.className = `ml-1 text-xs text-gray-500`;
+                }
             }
-            
-            const displayPercentage = (userLiquidationPrice > 0 && currentHoldingQuantityVal > 0) ||
-                                      (currentHoldingQuantityVal === 0 && (totalGrossBuyWithFees > 0 || estimatedOverallProfitLossVal !== 0)) ||
-                                      (totalGrossBuyWithFees === 0 && estimatedOverallProfitLossVal === 0) ;
 
-            estimatedOverallProfitLossPercentEl.textContent = displayPercentage ? percentageString : "";
-
-            let textColorClass = "text-gray-700"; 
-            let percentColorSuffix = "gray-500";
-
-            if (estimatedOverallProfitLossVal > 0) {
-                textColorClass = "text-red-500";
-                percentColorSuffix = "red-500";
-            } else if (estimatedOverallProfitLossVal < 0) {
-                textColorClass = "text-blue-500";
-                percentColorSuffix = "blue-500";
-            }
-
-            estimatedOverallProfitLossEl.className = `font-semibold ${textColorClass}`;
-            estimatedOverallProfitLossKoreanEl.className = `text-gray-600 ${textColorClass}`;
-            estimatedOverallProfitLossPercentEl.className = `ml-1 text-xs text-${percentColorSuffix}`;
-
-            if (!displayPercentage) {
-                estimatedOverallProfitLossPercentEl.className = 'ml-1 text-xs'; 
-            } else if (estimatedOverallProfitLossVal === 0 && percentageString === "(0.00%)") { 
-                estimatedOverallProfitLossPercentEl.className = `ml-1 text-xs text-gray-500`;
-            }
-        }
-
-        // 숫자 포맷팅 (쉼표 및 소수점 자릿수 지정)
-        function formatNumber(num, decimalPlaces = 0) { 
-            if (isNaN(num) || !isFinite(num)) return '0';
-            if (num === 0 && decimalPlaces > 0) {
+            function formatNumber(num, decimalPlaces = 0) { 
+                if (isNaN(num) || !isFinite(num)) return '0';
+                if (num === 0 && decimalPlaces > 0) {
+                    return Number(num).toLocaleString('en-US', { 
+                        minimumFractionDigits: decimalPlaces,
+                        maximumFractionDigits: decimalPlaces 
+                    });
+                }
                 return Number(num).toLocaleString('en-US', { 
                     minimumFractionDigits: decimalPlaces,
                     maximumFractionDigits: decimalPlaces 
                 });
             }
-            return Number(num).toLocaleString('en-US', { 
-                minimumFractionDigits: decimalPlaces,
-                maximumFractionDigits: decimalPlaces 
-            });
-        }
 
-        // 숫자를 한글 단위로 포맷팅 (원, 개)
-        function formatNumberToKorean(num, type) { 
-            const n = parseFloat(num) || 0; 
-            if (isNaN(n)) return (type === 'quantity' ? '0개' : '0원');
+            function formatNumberToKorean(num, type) { 
+                const n = parseFloat(num) || 0; 
+                if (isNaN(n)) return (type === 'quantity' ? '0개' : '0원');
+                
+                if (type === 'quantity') {
+                    return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 8})}개`;
+                } else if (type === 'price' || type === 'amount') {
+                    const numForKorean = Math.floor(n); 
+                    if (numForKorean === 0 && n !== 0 && n > -1 && n < 1) { 
+                         return n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits:2}) + '원';
+                    }
+                    if (numForKorean === 0) return '0원';
+                    const units = ['', '만', '억', '조', '경'];
+                    let result = '';
+                    let tempNum = Math.abs(numForKorean); 
+                    let parts = [];
+                    if (tempNum === 0) return "0원"; 
+                    let unitIndex = 0;
+                    while (tempNum > 0) {
+                        const part = tempNum % 10000;
+                        if (part > 0) parts.push({value: part, unit: units[unitIndex]});
+                        tempNum = Math.floor(tempNum / 10000);
+                        unitIndex++;
+                    }
+                    result = (numForKorean < 0 ? "-" : "") + parts.reverse().map(p => `${p.value.toLocaleString('ko-KR')}${p.unit}`).join(' ') + '원';
+                    return result.replace(/\s+/g, ' ').trim();
+                }
+                return n.toLocaleString('ko-KR');
+            }
             
-            if (type === 'quantity') {
-                return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 8})}개`;
-            } else if (type === 'price' || type === 'amount') {
-                const numForKorean = Math.floor(n); 
-                if (numForKorean === 0 && n !== 0 && n > -1 && n < 1) { 
-                     return n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits:2}) + '원';
-                }
-                if (numForKorean === 0) return '0원';
-                const units = ['', '만', '억', '조', '경'];
-                let result = '';
-                let tempNum = Math.abs(numForKorean); 
-                let parts = [];
-                if (tempNum === 0) return "0원"; 
-                let unitIndex = 0;
-                while (tempNum > 0) {
-                    const part = tempNum % 10000;
-                    if (part > 0) parts.push({value: part, unit: units[unitIndex]});
-                    tempNum = Math.floor(tempNum / 10000);
-                    unitIndex++;
-                }
-                result = (numForKorean < 0 ? "-" : "") + parts.reverse().map(p => `${p.value.toLocaleString('ko-KR')}${p.unit}`).join(' ') + '원';
-                return result.replace(/\s+/g, ' ').trim();
+            function showToast(message) {
+                toastMessageEl.textContent = message;
+                toastMessageEl.classList.add('show');
+                setTimeout(() => {
+                    toastMessageEl.classList.remove('show');
+                }, 2000); 
             }
-            return n.toLocaleString('ko-KR');
-        }
-        
-        // 토스트 메시지 표시
-        function showToast(message) {
-            toastMessageEl.textContent = message;
-            toastMessageEl.classList.add('show');
-            setTimeout(() => {
-                toastMessageEl.classList.remove('show');
-            }, 2000); 
-        }
 
-        // 복사할 텍스트 생성
-        function generateReportText() { 
-            let report = "물림 계산기 내역\n";
-            const title = tradeTitleEl.value.trim();
-            const date = tradeDateEl.value;
-            if (title) {
-                report += `제목: ${title}\n`;
-            }
-            if (date) {
-                const [year, month, day] = date.split('-');
-                report += `거래 기준일: ${year}년 ${month}월 ${day}일\n`;
-            }
-            if (title || date) {
+            function generateReportText() { 
+                let report = "물림 계산기 내역\n";
+                const title = tradeTitleEl.value.trim();
+                const date = tradeDateEl.value;
+                if (title) { report += `제목: ${title}\n`; }
+                if (date) {
+                    const [year, month, day] = date.split('-');
+                    report += `거래 기준일: ${year}년 ${month}월 ${day}일\n`;
+                }
+                if (title || date) { report += "------------------------------------\n"; }
+                report += `매수 수수료: ${buyFeeRateEl.value}%\n`;
+                report += `매도 수수료: ${sellFeeRateEl.value}%\n`;
                 report += "------------------------------------\n";
-            }
-            report += `매수 수수료: ${buyFeeRateEl.value}%\n`;
-            report += `매도 수수료: ${sellFeeRateEl.value}%\n`;
-            report += "------------------------------------\n";
-            report += "거래 내역:\n";
-            const uiRows = inputRowsContainer.querySelectorAll('.input-row');
-            if (uiRows.length === 0 || (uiRows.length === 1 && !uiRows[0].querySelector('.price-input').value && !uiRows[0].querySelector('.quantity-input').value)) {
-                report += "  (입력된 거래 내역 없음)\n";
-            } else {
-                uiRows.forEach((row, index) => {
-                    const type = row.querySelector('.type-select').value === 'buy' ? '매수' : '매도';
-                    const price = row.querySelector('.price-input').value || '0';
-                    const quantityRaw = row.querySelector('.quantity-input').value || '0';
-                    const quantityFormatted = formatNumber(parseFloat(quantityRaw.replace(/,/g, '')), 8); 
-                    const amount = row.querySelector('.amount-input').value || '0';
-                    if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantityRaw.replace(/,/g, '')) > 0) {
-                         report += `  ${index + 1}. ${type}: ${quantityFormatted} @ ${price} = ${amount}원\n`;
-                    }
-                });
-            }
-            report += "------------------------------------\n";
-            report += "전량 매도 가정:\n";
-            report += `  만약, ${liquidationPriceEl.value || '0'}원에 전량 매도한다면?\n`;
-            report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} ${estimatedOverallProfitLossKoreanEl.textContent} ${estimatedOverallProfitLossPercentEl.textContent}\n`; // 퍼센트 추가
-            report += "------------------------------------\n";
-            report += "추가 매수 시뮬레이션:\n";
-            report += `  현재가(평가기준): ${simCurrentPriceEl.value || '미입력'}\n`;
-            report += `  추가 매수 단가: ${simBuyPriceEl.value || '미입력'}\n`;
-            const simType = document.querySelector('input[name="simType"]:checked').value === 'amount' ? '금액' : '수량';
-            if (simType === '금액') {
-                report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}원\n`;
-            } else {
-                report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`; 
-            }
-            report += `  총 추가 매수 금액: ${simTotalAdditionalAmountEl.textContent}\n`;
-            report += `  현재 평균: ${simCurrentAvgPriceEl.textContent} (${simCurrentPnlEl.textContent})\n`;
-            report += `  예상 평균: ${simExpectedAvgPriceEl.textContent} (${simExpectedPnlEl.textContent})\n`;
-            report += "====================================\n";
-            report += "계산 결과:\n";
-            document.querySelectorAll('#resultsSection .result-item').forEach(item => {
-                const label = item.querySelector('.result-label').textContent.trim();
-                const value = item.querySelector('.result-value').textContent.trim();
-                const sub = item.querySelector('.result-value-sub').textContent.trim();
-                report += `  ${label}: ${value} (${sub})\n`;
-            });
-            report += "====================================\n";
-            report += "본 계산기는 참고용이며, 투자 결정에 따른 법적 책임은 사용자 본인에게 있습니다.";
-            return report;
-        }
-
-        // 클립보드에 텍스트 복사
-        function copyToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; 
-            textArea.style.left = "-9999px";
-            textArea.style.top = "-9999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast('내역이 클립보드에 복사되었습니다!');
+                report += "거래 내역:\n";
+                const uiRows = inputRowsContainer.querySelectorAll('.input-row');
+                if (uiRows.length === 0 || (uiRows.length === 1 && !uiRows[0].querySelector('.price-input').value && !uiRows[0].querySelector('.quantity-input').value)) {
+                    report += "  (입력된 거래 내역 없음)\n";
                 } else {
-                    showToast('복사 실패. 브라우저 설정을 확인해주세요.');
+                    uiRows.forEach((row, index) => {
+                        const type = row.querySelector('.type-select').value === 'buy' ? '매수' : '매도';
+                        const price = row.querySelector('.price-input').value || '0';
+                        const quantityRaw = row.querySelector('.quantity-input').value || '0';
+                        const quantityFormatted = formatNumber(parseFloat(quantityRaw.replace(/,/g, '')), 8); 
+                        const amount = row.querySelector('.amount-input').value || '0';
+                        if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantityRaw.replace(/,/g, '')) > 0) {
+                             report += `  ${index + 1}. ${type}: ${quantityFormatted} @ ${price} = ${amount}원\n`;
+                        }
+                    });
                 }
-            } catch (err) {
-                showToast('복사 중 오류가 발생했습니다.');
-                console.error('Fallback: Oops, unable to copy', err);
+                report += "------------------------------------\n";
+                report += "전량 매도 가정:\n";
+                report += `  만약, ${liquidationPriceEl.value || '0'}원에 전량 매도한다면?\n`;
+                report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} ${estimatedOverallProfitLossKoreanEl.textContent} ${estimatedOverallProfitLossPercentEl.textContent}\n`;
+                report += "------------------------------------\n";
+                report += "추가 매수 시뮬레이션:\n";
+                report += `  현재가(평가기준): ${simCurrentPriceEl.value || '미입력'}\n`;
+                report += `  추가 매수 단가: ${simBuyPriceEl.value || '미입력'}\n`;
+                const simType = document.querySelector('input[name="simType"]:checked').value === 'amount' ? '금액' : '수량';
+                if (simType === '금액') {
+                    report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}원\n`;
+                } else {
+                    report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`; 
+                }
+                report += `  총 추가 매수 금액: ${simTotalAdditionalAmountEl.textContent}\n`;
+                report += `  현재 평균: ${simCurrentAvgPriceEl.textContent} (${simCurrentPnlEl.textContent})\n`;
+                report += `  예상 평균: ${simExpectedAvgPriceEl.textContent} (${simExpectedPnlEl.textContent})\n`;
+                report += "====================================\n";
+                report += "계산 결과:\n";
+                document.querySelectorAll('#resultsSection .result-item').forEach(item => {
+                    const label = item.querySelector('.result-label').textContent.trim();
+                    const value = item.querySelector('.result-value').textContent.trim();
+                    const sub = item.querySelector('.result-value-sub').textContent.trim();
+                    report += `  ${label}: ${value} (${sub})\n`;
+                });
+                report += "====================================\n";
+                report += "본 계산기는 참고용으로만 사용해주시고, 투자 결정에 따른 법적 책임은 사용자 본인에게 있습니다.";
+                return report;
             }
-            document.body.removeChild(textArea);
-        }
-        
-        // 현재 데이터를 JSON 파일로 저장
-        function saveDataToFile() {
-            const data = collectDataForFile();
-            const jsonData = JSON.stringify(data, null, 2); 
-            const blob = new Blob([jsonData], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const today = new Date();
-            const year = String(today.getFullYear()).slice(-2); 
-            const month = String(today.getMonth() + 1).padStart(2, '0'); 
-            const day = String(today.getDate()).padStart(2, '0'); 
-            const fileCreationDate = `${year}${month}${day}`; 
 
-            const tradeTitleInput = tradeTitleEl.value.trim();
-            const tradeDateInput = tradeDateEl.value;
-
-            let baseFileName = "물림계산내역";
-            let titlePart = "";
-            let tradeDatePart = "";
-            const creationDatePart = `_파일생성일자(${fileCreationDate})`;
-
-            if (tradeTitleInput && tradeDateInput) {
-                const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
-                tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
-                titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`; 
-                baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
-            } else if (tradeTitleInput && !tradeDateInput) {
-                titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`;
-                baseFileName += `${titlePart}${creationDatePart}`;
-            } else if (!tradeTitleInput && tradeDateInput) {
-                const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
-                tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
-                titlePart = "_제목없음";
-                baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
-            } else {
-                baseFileName += creationDatePart;
-            }
-            
-            const defaultFileName = `${baseFileName}.json`;
-            const fileName = prompt("저장할 파일 이름을 입력하세요:", defaultFileName) || defaultFileName;
-            
-            a.href = url;
-            a.download = fileName.endsWith('.json') ? fileName : `${fileName}.json`; 
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('파일이 저장되었습니다!');
-        }
-
-        // 파일에서 데이터 불러오기
-        function loadDataFromFile(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        restoreStateFromFile(data);
-                        showToast('파일을 성공적으로 불러왔습니다!');
-                    } catch (error) {
-                        showToast('파일을 불러오는 중 오류가 발생했습니다.');
-                        console.error("Error parsing JSON from file:", error);
+            function copyToClipboard(text) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed"; 
+                textArea.style.left = "-9999px";
+                textArea.style.top = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showToast('내역이 클립보드에 복사되었습니다!');
+                    } else {
+                        showToast('복사 실패. 브라우저 설정을 확인해주세요.');
                     }
-                };
-                reader.readAsText(file);
-                loadFileInput.value = ''; 
+                } catch (err) {
+                    showToast('복사 중 오류가 발생했습니다.');
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
             }
-        }
-        
-        // 파일 저장을 위한 데이터 수집
-        function collectDataForFile() {
-            const transactions = [];
-            inputRowsContainer.querySelectorAll('.input-row').forEach(row => {
-                const type = row.querySelector('.type-select').value;
-                const price = row.querySelector('.price-input').value;
-                const quantity = row.querySelector('.quantity-input').value; 
-                const amount = row.querySelector('.amount-input').value;
-                if (price || quantity || amount) { 
-                     transactions.push({ type, price, quantity, amount });
+            
+            function saveDataToFile() {
+                const data = collectDataForFile();
+                const jsonData = JSON.stringify(data, null, 2); 
+                const blob = new Blob([jsonData], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const today = new Date();
+                const year = String(today.getFullYear()).slice(-2); 
+                const month = String(today.getMonth() + 1).padStart(2, '0'); 
+                const day = String(today.getDate()).padStart(2, '0'); 
+                const fileCreationDate = `${year}${month}${day}`; 
+                const tradeTitleInput = tradeTitleEl.value.trim();
+                const tradeDateInput = tradeDateEl.value;
+                let baseFileName = "물림계산내역";
+                let titlePart = "";
+                let tradeDatePart = "";
+                const creationDatePart = `_파일생성일자(${fileCreationDate})`;
+
+                if (tradeTitleInput && tradeDateInput) {
+                    const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
+                    tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
+                    titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`; 
+                    baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
+                } else if (tradeTitleInput && !tradeDateInput) {
+                    titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`;
+                    baseFileName += `${titlePart}${creationDatePart}`;
+                } else if (!tradeTitleInput && tradeDateInput) {
+                    const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
+                    tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
+                    titlePart = "_제목없음";
+                    baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
+                } else {
+                    baseFileName += creationDatePart;
+                }
+                const defaultFileName = `${baseFileName}.json`;
+                const fileName = prompt("저장할 파일 이름을 입력하세요:", defaultFileName) || defaultFileName;
+                
+                a.href = url;
+                a.download = fileName.endsWith('.json') ? fileName : `${fileName}.json`; 
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('파일이 저장되었습니다!');
+            }
+
+            function loadDataFromFile(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            restoreStateFromFile(data);
+                            showToast('파일을 성공적으로 불러왔습니다!');
+                        } catch (error) {
+                            showToast('파일을 불러오는 중 오류가 발생했습니다.');
+                            console.error("Error parsing JSON from file:", error);
+                        }
+                    };
+                    reader.readAsText(file);
+                    loadFileInput.value = ''; 
+                }
+            }
+            
+            function collectDataForFile() {
+                const transactions = [];
+                inputRowsContainer.querySelectorAll('.input-row').forEach(row => {
+                    const type = row.querySelector('.type-select').value;
+                    const price = row.querySelector('.price-input').value;
+                    const quantity = row.querySelector('.quantity-input').value; 
+                    const amount = row.querySelector('.amount-input').value;
+                    if (price || quantity || amount) { 
+                         transactions.push({ type, price, quantity, amount });
+                    }
+                });
+
+                return {
+                    tradeTitle: tradeTitleEl.value,
+                    tradeDate: tradeDateEl.value,
+                    buyFeeRate: buyFeeRateEl.value,
+                    sellFeeRate: sellFeeRateEl.value,
+                    liquidationPrice: liquidationPriceEl.value,
+                    simCurrentPrice: simCurrentPriceEl.value,
+                    simBuyPrice: simBuyPriceEl.value,
+                    simType: document.querySelector('input[name="simType"]:checked').value,
+                    simBuyAmount: simBuyAmountEl.value,
+                    simBuyQuantity: simBuyQuantityEl.value,
+                    simActiveUnitMax: document.querySelector('.sim-unit-btn.active')?.dataset.max,
+                    transactions: transactions
+                };
+            }
+
+            function restoreStateFromFile(data) {
+                tradeTitleEl.value = data.tradeTitle || '';
+                tradeDateEl.value = data.tradeDate || '';
+                buyFeeRateEl.value = data.buyFeeRate || '0.05';
+                sellFeeRateEl.value = data.sellFeeRate || '0.05';
+                liquidationPriceEl.value = data.liquidationPrice || '';
+                formatNumberInput(liquidationPriceEl, true);
+                simCurrentPriceEl.value = data.simCurrentPrice || '';
+                formatNumberInput(simCurrentPriceEl, true);
+                simBuyPriceEl.value = data.simBuyPrice || '';
+                formatNumberInput(simBuyPriceEl, true);
+                const simTypeRadio = document.querySelector(`input[name="simType"][value="${data.simType || 'amount'}"]`);
+                if (simTypeRadio) simTypeRadio.checked = true;
+                simBuyAmountEl.value = data.simBuyAmount || '';
+                formatNumberInput(simBuyAmountEl, true);
+                simBuyQuantityEl.value = data.simBuyQuantity || '';
+                formatNumberInput(simBuyQuantityEl, true, 8); 
+
+                if (data.simActiveUnitMax) {
+                    simUnitBtns.forEach(btn => btn.classList.remove('active'));
+                    const activeBtn = document.querySelector(`.sim-unit-btn[data-max="${data.simActiveUnitMax}"]`);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active');
+                        simBuyAmountSliderEl.max = activeBtn.dataset.max;
+                        simBuyAmountSliderEl.step = activeBtn.dataset.step;
+                    }
+                }
+                simBuyAmountSliderEl.value = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+                inputRowsContainer.innerHTML = ''; 
+                rowCount = 0;
+                if (data.transactions && data.transactions.length > 0) {
+                    data.transactions.forEach(trx => {
+                        const newRow = addNewRow();
+                        newRow.querySelector('.type-select').value = trx.type;
+                        newRow.querySelector('.price-input').value = trx.price;
+                        formatNumberInput(newRow.querySelector('.price-input'), true);
+                        newRow.querySelector('.quantity-input').value = trx.quantity;
+                        formatNumberInput(newRow.querySelector('.quantity-input'), true, 8); 
+                        newRow.querySelector('.amount-input').value = trx.amount;
+                        formatNumberInput(newRow.querySelector('.amount-input'), true);
+                        updateRowStyle(newRow, trx.type);
+                    });
+                } else {
+                    addNewRow(); 
+                }
+                toggleSimInputFields(); 
+                calculateAndDisplayResults();
+                calculateSimulation();
+            }
+
+            function generateShareLink() {
+                const data = collectDataForFile();
+                try {
+                    const jsonString = JSON.stringify(data);
+                    const base64Data = btoa(encodeURIComponent(jsonString)); 
+                    const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Data}`;
+                    copyToClipboard(shareUrl); 
+                } catch (error) {
+                    console.error("Error generating share link:", error);
+                    showToast('공유 링크 생성 중 오류 발생');
+                }
+            }
+
+            function loadStateFromURL() {
+                if (window.location.hash && window.location.hash.length > 1) {
+                    try {
+                        const base64Data = window.location.hash.substring(1);
+                        const jsonString = decodeURIComponent(atob(base64Data)); 
+                        const data = JSON.parse(jsonString);
+                        restoreStateFromFile(data);
+                        showToast('공유된 내역을 불러왔습니다!');
+                        window.history.replaceState(null, null, window.location.pathname + window.location.search); 
+                    } catch (error) {
+                        console.error("Error loading state from URL:", error);
+                        showToast('공유 링크를 불러오는 중 오류가 발생했습니다.');
+                    }
+                }
+            }
+
+            function resetAll() { 
+                tradeTitleEl.value = ''; 
+                tradeDateEl.value = '';  
+                buyFeeRateEl.value = '0.05'; 
+                sellFeeRateEl.value = '0.05';
+                liquidationPriceEl.value = ''; 
+                simCurrentPriceEl.value = ''; 
+                simBuyPriceEl.value = '';
+                simBuyAmountEl.value = '';
+                simBuyAmountSliderEl.value = 0;
+                simBuyQuantityEl.value = '';
+                document.querySelector('input[name="simType"][value="amount"]').checked = true;
+                simUnitBtns.forEach(btn => btn.classList.remove('active'));
+                document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
+                simBuyAmountSliderEl.max = "1000000";
+                simBuyAmountSliderEl.step = "10000";
+                toggleSimInputFields();
+                initializeRows(); 
+                calculateSimulation(); 
+            }
+
+            function openConfirmationModal() { 
+                modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 8); 
+                modalAvgPriceEl.textContent = formatNumber(lastCalculatedAvgHoldingPrice, 2);
+                confirmationModalEl.classList.add('active');
+            }
+
+            function closeConfirmationModal() { 
+                confirmationModalEl.classList.remove('active');
+            }
+
+            function confirmAndSetNewStart() { 
+                closeConfirmationModal();
+                const newStartPrice = lastCalculatedAvgHoldingPrice; 
+                const newStartQuantity = lastCalculatedHoldingQuantity; 
+                inputRowsContainer.innerHTML = '';
+                rowCount = 0;
+                liquidationPriceEl.value = ''; 
+                simCurrentPriceEl.value = ''; 
+                const firstRowElement = addNewRow(); 
+                if (firstRowElement) {
+                    const typeSelect = firstRowElement.querySelector('.type-select');
+                    const priceInput = firstRowElement.querySelector('.price-input');
+                    const quantityInput = firstRowElement.querySelector('.quantity-input');
+                    const amountInput = firstRowElement.querySelector('.amount-input');
+                    typeSelect.value = 'buy'; 
+                    updateRowStyle(firstRowElement, 'buy');
+                    if (newStartPrice >= 0 && newStartQuantity > 0) { 
+                        priceInput.value = newStartPrice.toFixed(2);
+                        formatNumberInput(priceInput);
+                        quantityInput.value = newStartQuantity.toFixed(8); 
+                        formatNumberInput(quantityInput, false, 8);
+                        handleRowInputChange(priceInput, quantityInput, amountInput, 'price'); 
+                    } else { 
+                        priceInput.value = '';
+                        quantityInput.value = '';
+                        amountInput.value = '';
+                    }
+                }
+                if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                     addNewRow();
+                }
+                calculateAndDisplayResults(); 
+                calculateSimulation();
+            }
+            
+            function toggleSimInputFields() {
+                const selectedType = document.querySelector('input[name="simType"]:checked').value;
+                if (selectedType === 'amount') {
+                    simAmountSectionEl.style.display = 'block';
+                    simQuantitySectionEl.style.display = 'none';
+                    simBuyQuantityEl.value = ''; 
+                } else {
+                    simAmountSectionEl.style.display = 'none';
+                    simQuantitySectionEl.style.display = 'block';
+                    simBuyAmountEl.value = ''; 
+                    simBuyAmountSliderEl.value = 0;
+                }
+                calculateSimulation(); 
+            }
+
+            function calculateSimulation() {
+                const currentPriceForPnl = parseFloat(simCurrentPriceEl.value.replace(/,/g, '')) || 0; 
+                const simPrice = parseFloat(simBuyPriceEl.value.replace(/,/g, '')) || 0;
+                const simType = document.querySelector('input[name="simType"]:checked').value;
+                const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+                let simAdditionalAmount = 0;
+                let simAdditionalQuantity = 0;
+                if (simType === 'amount') {
+                    simAdditionalAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+                    if (simPrice > 0 && simAdditionalAmount > 0) {
+                        simAdditionalQuantity = simAdditionalAmount / simPrice; 
+                    }
+                } else { 
+                    simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0; 
+                    if (simPrice > 0 && simAdditionalQuantity > 0) {
+                        simAdditionalAmount = simPrice * simAdditionalQuantity;
+                    }
+                }
+                simTotalAdditionalAmountEl.textContent = formatNumberToKorean(simAdditionalAmount, 'amount');
+                const currentHoldQty = lastCalculatedHoldingQuantity; 
+                const currentAvgPrc = lastCalculatedAvgHoldingPrice; 
+                let currentPnlPercent = 0;
+                if (currentAvgPrc > 0 && currentPriceForPnl > 0 && currentHoldQty > 0) {
+                    currentPnlPercent = ((currentPriceForPnl / currentAvgPrc) - 1) * 100;
+                } else if (currentNetInvestmentOrRealizedProfit <= 0 && currentHoldQty > 0 && currentPriceForPnl > 0) {
+                     currentPnlPercent = Infinity; 
+                }
+                simCurrentAvgPriceEl.textContent = formatNumber(currentAvgPrc, 2) + " 원"; 
+                simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(2)} %` : "이익 중"; 
+                simCurrentPnlEl.style.color = currentPnlPercent >= 0 || !isFinite(currentPnlPercent) ? '#DC2626' : '#3B82F6';
+
+                if (simPrice > 0 && (simAdditionalAmount > 0 || simAdditionalQuantity > 0)) {
+                    const additionalBuyFee = simAdditionalAmount * buyFeeRate;
+                    const baseCostForCalc = currentNetInvestmentOrRealizedProfit > 0 ? currentNetInvestmentOrRealizedProfit : 0;
+                    const totalCostForSim = baseCostForCalc + simAdditionalAmount + additionalBuyFee;
+                    const totalQuantityForSim = currentHoldQty + simAdditionalQuantity; 
+                    const expectedAvgPrice = totalQuantityForSim > 0 ? totalCostForSim / totalQuantityForSim : 0;
+                    let expectedPnlPercent = 0;
+                    if (expectedAvgPrice > 0 && currentPriceForPnl > 0 && totalQuantityForSim > 0) {
+                         expectedPnlPercent = ((currentPriceForPnl / expectedAvgPrice) - 1) * 100;
+                    } else if (totalCostForSim <= 0 && totalQuantityForSim > 0 && currentPriceForPnl > 0) { 
+                        expectedPnlPercent = Infinity;
+                    }
+                    simExpectedAvgPriceEl.textContent = formatNumber(expectedAvgPrice, 2) + " 원"; 
+                    simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(2)} %` : "이익 중"; 
+                    simExpectedPnlEl.style.color = expectedPnlPercent >= 0 || !isFinite(expectedPnlPercent) ? '#DC2626' : '#3B82F6';
+                } else {
+                    simExpectedAvgPriceEl.textContent = "- 원";
+                    simExpectedPnlEl.textContent = "- %";
+                    simExpectedPnlEl.style.color = '#6b7280';
+                    simTotalAdditionalAmountEl.textContent = "0 원"; 
+                }
+            }
+            
+            buyFeeRateEl.addEventListener('input', () => { formatFeeInput(buyFeeRateEl); calculateAndDisplayResults(); calculateSimulation(); });
+            sellFeeRateEl.addEventListener('input', () => { formatFeeInput(sellFeeRateEl); calculateAndDisplayResults(); calculateSimulation(); });
+            liquidationPriceEl.addEventListener('input', () => { formatNumberInput(liquidationPriceEl); calculateAndDisplayResults(); }); 
+            addRowBtn.addEventListener('click', () => {
+                addNewRow();
+                const newRows = inputRowsContainer.querySelectorAll('.input-row');
+                if (newRows.length > 0) {
+                    const lastRow = newRows[newRows.length - 1];
+                    const priceInput = lastRow.querySelector('.price-input');
+                    if (priceInput) { priceInput.focus(); }
                 }
             });
-
-            return {
-                tradeTitle: tradeTitleEl.value,
-                tradeDate: tradeDateEl.value,
-                buyFeeRate: buyFeeRateEl.value,
-                sellFeeRate: sellFeeRateEl.value,
-                liquidationPrice: liquidationPriceEl.value,
-                simCurrentPrice: simCurrentPriceEl.value,
-                simBuyPrice: simBuyPriceEl.value,
-                simType: document.querySelector('input[name="simType"]:checked').value,
-                simBuyAmount: simBuyAmountEl.value,
-                simBuyQuantity: simBuyQuantityEl.value,
-                simActiveUnitMax: document.querySelector('.sim-unit-btn.active')?.dataset.max,
-                transactions: transactions
-            };
-        }
-
-        // 파일 또는 URL에서 상태 복원
-        function restoreStateFromFile(data) {
-            tradeTitleEl.value = data.tradeTitle || '';
-            tradeDateEl.value = data.tradeDate || '';
-            buyFeeRateEl.value = data.buyFeeRate || '0.05';
-            sellFeeRateEl.value = data.sellFeeRate || '0.05';
-            liquidationPriceEl.value = data.liquidationPrice || '';
-            formatNumberInput(liquidationPriceEl, true);
-
-            simCurrentPriceEl.value = data.simCurrentPrice || '';
-            formatNumberInput(simCurrentPriceEl, true);
-            simBuyPriceEl.value = data.simBuyPrice || '';
-            formatNumberInput(simBuyPriceEl, true);
-
-            const simTypeRadio = document.querySelector(`input[name="simType"][value="${data.simType || 'amount'}"]`);
-            if (simTypeRadio) simTypeRadio.checked = true;
-            
-            simBuyAmountEl.value = data.simBuyAmount || '';
-            formatNumberInput(simBuyAmountEl, true);
-            simBuyQuantityEl.value = data.simBuyQuantity || '';
-            formatNumberInput(simBuyQuantityEl, true, 8); 
-
-            if (data.simActiveUnitMax) {
-                simUnitBtns.forEach(btn => btn.classList.remove('active'));
-                const activeBtn = document.querySelector(`.sim-unit-btn[data-max="${data.simActiveUnitMax}"]`);
-                if (activeBtn) {
-                    activeBtn.classList.add('active');
-                    simBuyAmountSliderEl.max = activeBtn.dataset.max;
-                    simBuyAmountSliderEl.step = activeBtn.dataset.step;
-                }
-            }
-            simBuyAmountSliderEl.value = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-
-
-            inputRowsContainer.innerHTML = ''; 
-            rowCount = 0;
-            if (data.transactions && data.transactions.length > 0) {
-                data.transactions.forEach(trx => {
-                    const newRow = addNewRow();
-                    newRow.querySelector('.type-select').value = trx.type;
-                    newRow.querySelector('.price-input').value = trx.price;
-                    formatNumberInput(newRow.querySelector('.price-input'), true);
-                    newRow.querySelector('.quantity-input').value = trx.quantity;
-                    formatNumberInput(newRow.querySelector('.quantity-input'), true, 8); 
-                    newRow.querySelector('.amount-input').value = trx.amount;
-                    formatNumberInput(newRow.querySelector('.amount-input'), true);
-                    updateRowStyle(newRow, trx.type);
-                });
-            } else {
-                addNewRow(); 
-            }
-            
-            toggleSimInputFields(); 
-            calculateAndDisplayResults();
-            calculateSimulation();
-        }
-
-        // 공유 링크 생성
-        function generateShareLink() {
-            const data = collectDataForFile();
-            try {
-                const jsonString = JSON.stringify(data);
-                const base64Data = btoa(encodeURIComponent(jsonString)); 
-                const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Data}`;
-                copyToClipboard(shareUrl); 
-            } catch (error) {
-                console.error("Error generating share link:", error);
-                showToast('공유 링크 생성 중 오류 발생');
-            }
-        }
-
-        // URL에서 상태 불러오기
-        function loadStateFromURL() {
-            if (window.location.hash && window.location.hash.length > 1) {
-                try {
-                    const base64Data = window.location.hash.substring(1);
-                    const jsonString = decodeURIComponent(atob(base64Data)); 
-                    const data = JSON.parse(jsonString);
-                    restoreStateFromFile(data);
-                    showToast('공유된 내역을 불러왔습니다!');
-                    window.history.replaceState(null, null, window.location.pathname + window.location.search); 
-                } catch (error) {
-                    console.error("Error loading state from URL:", error);
-                    showToast('공유 링크를 불러오는 중 오류가 발생했습니다.');
-                }
-            }
-        }
-
-
-        // 모든 입력 초기화
-        function resetAll() { 
-            tradeTitleEl.value = ''; 
-            tradeDateEl.value = '';  
-            buyFeeRateEl.value = '0.05'; 
-            sellFeeRateEl.value = '0.05';
-            liquidationPriceEl.value = ''; 
-            simCurrentPriceEl.value = ''; 
-            simBuyPriceEl.value = '';
-            simBuyAmountEl.value = '';
-            simBuyAmountSliderEl.value = 0;
-            simBuyQuantityEl.value = '';
-            document.querySelector('input[name="simType"][value="amount"]').checked = true;
-            simUnitBtns.forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
-            simBuyAmountSliderEl.max = "1000000";
-            simBuyAmountSliderEl.step = "10000";
-            toggleSimInputFields();
-            initializeRows(); 
-            calculateSimulation(); 
-        }
-
-        // 새 시작점으로 설정 확인 모달 열기
-        function openConfirmationModal() { 
-            modalQuantityEl.textContent = formatNumber(lastCalculatedHoldingQuantity, 8); 
-            modalAvgPriceEl.textContent = formatNumber(lastCalculatedAvgHoldingPrice, 2);
-            confirmationModalEl.classList.add('active');
-        }
-
-        // 새 시작점으로 설정 확인 모달 닫기
-        function closeConfirmationModal() { 
-            confirmationModalEl.classList.remove('active');
-        }
-
-        // 새 시작점으로 설정 확정 및 실행
-        function confirmAndSetNewStart() { 
-            closeConfirmationModal();
-            const newStartPrice = lastCalculatedAvgHoldingPrice; 
-            const newStartQuantity = lastCalculatedHoldingQuantity; 
-
-            inputRowsContainer.innerHTML = '';
-            rowCount = 0;
-            liquidationPriceEl.value = ''; 
-            simCurrentPriceEl.value = ''; 
-
-            const firstRowElement = addNewRow(); 
-            if (firstRowElement) {
-                const typeSelect = firstRowElement.querySelector('.type-select');
-                const priceInput = firstRowElement.querySelector('.price-input');
-                const quantityInput = firstRowElement.querySelector('.quantity-input');
-                const amountInput = firstRowElement.querySelector('.amount-input');
-
-                typeSelect.value = 'buy'; 
-                updateRowStyle(firstRowElement, 'buy');
-
-                if (newStartPrice >= 0 && newStartQuantity > 0) { 
-                    priceInput.value = newStartPrice.toFixed(2);
-                    formatNumberInput(priceInput);
-                
-                    quantityInput.value = newStartQuantity.toFixed(8); 
-                    formatNumberInput(quantityInput, false, 8);
-                
-                    handleRowInputChange(priceInput, quantityInput, amountInput, 'price'); 
-                } else { 
-                    priceInput.value = '';
-                    quantityInput.value = '';
-                    amountInput.value = '';
-                }
-            }
-            if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
-                 addNewRow();
-            }
-            calculateAndDisplayResults(); 
-            calculateSimulation();
-        }
-        
-        // 추가 매수 시뮬레이션 입력 필드 토글 (금액/수량)
-        function toggleSimInputFields() {
-            const selectedType = document.querySelector('input[name="simType"]:checked').value;
-            if (selectedType === 'amount') {
-                simAmountRowEl.style.display = 'flex';
-                simAmountSliderContainerEl.style.display = 'block'; 
-                simQuantityRowEl.style.display = 'none';
-                simBuyQuantityEl.value = ''; 
-            } else {
-                simAmountRowEl.style.display = 'none';
-                simAmountSliderContainerEl.style.display = 'none'; 
-                simQuantityRowEl.style.display = 'flex';
-                simBuyAmountEl.value = ''; 
-                simBuyAmountSliderEl.value = 0;
-            }
-            calculateSimulation(); 
-        }
-
-        // 추가 매수 시뮬레이션 계산
-        function calculateSimulation() {
-            const currentPriceForPnl = parseFloat(simCurrentPriceEl.value.replace(/,/g, '')) || 0; 
-            const simPrice = parseFloat(simBuyPriceEl.value.replace(/,/g, '')) || 0;
-            const simType = document.querySelector('input[name="simType"]:checked').value;
-            const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
-            
-            let simAdditionalAmount = 0;
-            let simAdditionalQuantity = 0;
-
-            if (simType === 'amount') {
-                simAdditionalAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-                if (simPrice > 0 && simAdditionalAmount > 0) {
-                    simAdditionalQuantity = simAdditionalAmount / simPrice; 
-                }
-            } else { 
-                simAdditionalQuantity = parseFloat(simBuyQuantityEl.value.replace(/,/g, '')) || 0; 
-                if (simPrice > 0 && simAdditionalQuantity > 0) {
-                    simAdditionalAmount = simPrice * simAdditionalQuantity;
-                }
-            }
-            
-            simTotalAdditionalAmountEl.textContent = formatNumberToKorean(simAdditionalAmount, 'amount');
-
-            const currentHoldQty = lastCalculatedHoldingQuantity; 
-            const currentAvgPrc = lastCalculatedAvgHoldingPrice; 
-
-            let currentPnlPercent = 0;
-            if (currentAvgPrc > 0 && currentPriceForPnl > 0 && currentHoldQty > 0) {
-                currentPnlPercent = ((currentPriceForPnl / currentAvgPrc) - 1) * 100;
-            } else if (currentNetInvestmentOrRealizedProfit <= 0 && currentHoldQty > 0 && currentPriceForPnl > 0) {
-                 currentPnlPercent = Infinity; 
-            }
-
-            simCurrentAvgPriceEl.textContent = formatNumber(currentAvgPrc, 2) + " 원"; 
-            simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(2)} %` : "이익 중"; 
-            simCurrentPnlEl.style.color = currentPnlPercent >= 0 || !isFinite(currentPnlPercent) ? '#DC2626' : '#3B82F6';
-
-
-            if (simPrice > 0 && (simAdditionalAmount > 0 || simAdditionalQuantity > 0)) {
-                const additionalBuyFee = simAdditionalAmount * buyFeeRate;
-                const baseCostForCalc = currentNetInvestmentOrRealizedProfit > 0 ? currentNetInvestmentOrRealizedProfit : 0;
-                const totalCostForSim = baseCostForCalc + simAdditionalAmount + additionalBuyFee;
-                const totalQuantityForSim = currentHoldQty + simAdditionalQuantity; 
-                
-                const expectedAvgPrice = totalQuantityForSim > 0 ? totalCostForSim / totalQuantityForSim : 0;
-                
-                let expectedPnlPercent = 0;
-                if (expectedAvgPrice > 0 && currentPriceForPnl > 0 && totalQuantityForSim > 0) {
-                     expectedPnlPercent = ((currentPriceForPnl / expectedAvgPrice) - 1) * 100;
-                } else if (totalCostForSim <= 0 && totalQuantityForSim > 0 && currentPriceForPnl > 0) { 
-                    expectedPnlPercent = Infinity;
-                }
-
-                simExpectedAvgPriceEl.textContent = formatNumber(expectedAvgPrice, 2) + " 원"; 
-                simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(2)} %` : "이익 중"; 
-                simExpectedPnlEl.style.color = expectedPnlPercent >= 0 || !isFinite(expectedPnlPercent) ? '#DC2626' : '#3B82F6';
-
-            } else {
-                simExpectedAvgPriceEl.textContent = "- 원";
-                simExpectedPnlEl.textContent = "- %";
-                simExpectedPnlEl.style.color = '#6b7280';
-                simTotalAdditionalAmountEl.textContent = "0 원"; 
-            }
-        }
-        
-        // --- 이벤트 리스너 ---
-        buyFeeRateEl.addEventListener('input', () => { formatFeeInput(buyFeeRateEl); calculateAndDisplayResults(); calculateSimulation(); });
-        sellFeeRateEl.addEventListener('input', () => { formatFeeInput(sellFeeRateEl); calculateAndDisplayResults(); calculateSimulation(); });
-        liquidationPriceEl.addEventListener('input', () => { formatNumberInput(liquidationPriceEl); calculateAndDisplayResults(); }); 
-        addRowBtn.addEventListener('click', () => {
-            addNewRow();
-            const newRows = inputRowsContainer.querySelectorAll('.input-row');
-            if (newRows.length > 0) {
-                const lastRow = newRows[newRows.length - 1];
-                const priceInput = lastRow.querySelector('.price-input');
-                if (priceInput) { priceInput.focus(); }
-            }
-        });
-        resetBtn.addEventListener('click', resetAll);
-        setNewStartBtn.addEventListener('click', openConfirmationModal);
-        
-        copyDetailsBtn.addEventListener('click', () => {
-            const reportText = generateReportText();
-            copyToClipboard(reportText);
-        });
-        saveToFileBtn.addEventListener('click', saveDataToFile);
-        loadFileInput.addEventListener('change', loadDataFromFile);
-        createShareLinkBtn.addEventListener('click', generateShareLink);
-
-
-        confirmSetNewStartBtn.addEventListener('click', confirmAndSetNewStart);
-        cancelSetNewStartBtn.addEventListener('click', closeConfirmationModal);
-        confirmationModalEl.addEventListener('click', (event) => {
-            if (event.target === confirmationModalEl) { closeConfirmationModal(); }
-        });
-
-        // 시뮬레이션 이벤트 리스너
-        simCurrentPriceEl.addEventListener('input', () => { formatNumberInput(simCurrentPriceEl, true); calculateSimulation(); }); 
-        simTypeRadios.forEach(radio => radio.addEventListener('change', toggleSimInputFields));
-        
-        simBuyPriceEl.addEventListener('input', () => { formatNumberInput(simBuyPriceEl, true); calculateSimulation(); });
-        
-        simBuyAmountEl.addEventListener('input', () => { 
-            formatNumberInput(simBuyAmountEl, true);
-            const amount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-            if (amount <= parseFloat(simBuyAmountSliderEl.max)) { 
-                 simBuyAmountSliderEl.value = amount; 
-            } else { 
-                simBuyAmountSliderEl.value = simBuyAmountSliderEl.max;
-                simBuyAmountEl.value = formatNumber(parseFloat(simBuyAmountSliderEl.max),0);
+            resetBtn.addEventListener('click', resetAll);
+            setNewStartBtn.addEventListener('click', openConfirmationModal);
+            copyDetailsBtn.addEventListener('click', () => {
+                const reportText = generateReportText();
+                copyToClipboard(reportText);
+            });
+            saveToFileBtn.addEventListener('click', saveDataToFile);
+            loadFileInput.addEventListener('change', loadDataFromFile);
+            createShareLinkBtn.addEventListener('click', generateShareLink);
+            confirmSetNewStartBtn.addEventListener('click', confirmAndSetNewStart);
+            cancelSetNewStartBtn.addEventListener('click', closeConfirmationModal);
+            confirmationModalEl.addEventListener('click', (event) => {
+                if (event.target === confirmationModalEl) { closeConfirmationModal(); }
+            });
+            simCurrentPriceEl.addEventListener('input', () => { formatNumberInput(simCurrentPriceEl, true); calculateSimulation(); }); 
+            simTypeRadios.forEach(radio => radio.addEventListener('change', toggleSimInputFields));
+            simBuyPriceEl.addEventListener('input', () => { formatNumberInput(simBuyPriceEl, true); calculateSimulation(); });
+            simBuyAmountEl.addEventListener('input', () => { 
                 formatNumberInput(simBuyAmountEl, true);
-            }
-            calculateSimulation(); 
-        });
-        simBuyAmountSliderEl.addEventListener('input', () => {
-            simBuyAmountEl.value = simBuyAmountSliderEl.value;
-            formatNumberInput(simBuyAmountEl, true); 
-            calculateSimulation();
-        });
-
-        simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true, 8); calculateSimulation(); }); 
-
-        simUnitBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                simUnitBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const newMax = parseInt(btn.dataset.max);
-                const newStep = parseInt(btn.dataset.step);
-                
-                simBuyAmountSliderEl.max = newMax;
-                simBuyAmountSliderEl.step = newStep;
-                
-                let currentAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-                if (currentAmount > newMax) { 
-                    currentAmount = newMax;
-                } 
-                
-                simBuyAmountEl.value = formatNumber(currentAmount,0); 
+                const amount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+                if (amount <= parseFloat(simBuyAmountSliderEl.max)) { 
+                     simBuyAmountSliderEl.value = amount; 
+                } else { 
+                    simBuyAmountSliderEl.value = simBuyAmountSliderEl.max;
+                    simBuyAmountEl.value = formatNumber(parseFloat(simBuyAmountSliderEl.max),0);
+                    formatNumberInput(simBuyAmountEl, true);
+                }
+                calculateSimulation(); 
+            });
+            simBuyAmountSliderEl.addEventListener('input', () => {
+                simBuyAmountEl.value = simBuyAmountSliderEl.value;
                 formatNumberInput(simBuyAmountEl, true); 
-                simBuyAmountSliderEl.value = currentAmount; 
-
                 calculateSimulation();
             });
-        });
+            simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true, 8); calculateSimulation(); }); 
+            simUnitBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    simUnitBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const newMax = parseInt(btn.dataset.max);
+                    const newStep = parseInt(btn.dataset.step);
+                    simBuyAmountSliderEl.max = newMax;
+                    simBuyAmountSliderEl.step = newStep;
+                    let currentAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
+                    if (currentAmount > newMax) { 
+                        currentAmount = newMax;
+                    } 
+                    simBuyAmountEl.value = formatNumber(currentAmount,0); 
+                    formatNumberInput(simBuyAmountEl, true); 
+                    simBuyAmountSliderEl.value = currentAmount; 
+                    calculateSimulation();
+                });
+            });
 
-
-        // 페이지 로드 시 초기화
-        window.onload = () => {
             buyFeeRateEl.value = '0.05'; 
             sellFeeRateEl.value = '0.05';
             document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
@@ -1472,8 +1400,123 @@
             simBuyAmountSliderEl.step = "10000"; 
             initializeRows();
             loadStateFromURL(); 
-            calculateSimulation(); 
-        };
+            calculateSimulation();
+            toggleSimInputFields();
+        });
+    </script>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            const finnhubApiKey = "d15lr61r01qhqto6lpj0d15lr61r01qhqto6lpjg";
+            const tickerContainer = $('.finnhub-ticker-bar');
+            
+            const btcItem = { id: 'BTCUSD', name: 'BTC/USD', symbol: 'BINANCE:BTCUSDT' };
+
+            tickerContainer.append(`
+                <div class="ticker-item" id="ticker-${btcItem.id}">
+                    <span class="ticker-symbol">${btcItem.name}</span>
+                    <span class="ticker-price">...</span>
+                    <div class="ticker-change">
+                        <span>...</span>
+                    </div>
+                </div>
+            `);
+            
+            function fetchBtcQuoteData() {
+                const url = `https://finnhub.io/api/v1/quote?symbol=${btcItem.symbol}&token=${finnhubApiKey}`;
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(data) {
+                        if (data && typeof data.c !== 'undefined') {
+                            const changeElement = $(`#ticker-${btcItem.id} .ticker-change`);
+                            const change = data.d;
+                            const percentChange = data.dp;
+                            const changeText = `${change > 0 ? '+' : ''}${change.toFixed(2)} (${percentChange.toFixed(2)}%)`;
+                            
+                            changeElement.removeClass('text-green-400 text-red-400');
+                            if (change > 0) {
+                                changeElement.addClass('text-green-400').html(`<span>▲</span> ${changeText}`);
+                            } else if (change < 0) {
+                                changeElement.addClass('text-red-400').html(`<span>▼</span> ${changeText}`);
+                            } else {
+                                changeElement.html(`<span>-</span> ${changeText}`);
+                            }
+                        }
+                    },
+                    error: function() {
+                         $(`#ticker-${btcItem.id} .ticker-change`).text('Error');
+                    }
+                });
+            }
+
+            const socket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+
+            socket.addEventListener('open', function (event) {
+                socket.send(JSON.stringify({'type':'subscribe', 'symbol': btcItem.symbol}));
+            });
+
+            socket.addEventListener('message', function (event) {
+                const message = JSON.parse(event.data);
+                if(message.type === 'trade' && message.data[0].s === btcItem.symbol) {
+                    const price = message.data[0].p;
+                    const priceFormatted = price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    $(`#ticker-${btcItem.id} .ticker-price`).text(priceFormatted);
+                }
+            });
+
+            new TradingView.widget({
+                "autosize": true, "symbol": "UPBIT:BTCKRW", "interval": "5", "timezone": "Asia/Seoul",
+                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+                "container_id": "tradingview_btckrw"
+            });
+            
+            new TradingView.widget({
+                "autosize": true, "symbol": "BINANCE:BTCUSDT", "interval": "5", "timezone": "Asia/Seoul",
+                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+                "container_id": "tradingview_btcusd"
+            });
+            
+            new TradingView.widget({
+                "autosize": true, "symbol": "FX_IDC:USDKRW", "interval": "5", "timezone": "Asia/Seoul",
+                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+                "container_id": "tradingview_usdkrw"
+            });
+
+            new TradingView.widget({
+                "autosize": true, "symbol": "FOREXCOM:NAS100", "interval": "5", "timezone": "Etc/UTC",
+                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+                "container_id": "tradingview_nasdaq"
+            });
+            
+            new TradingView.widget({
+                "autosize": true, "symbol": "(UPBIT:USDTKRW - FX_IDC:USDKRW) / FX_IDC:USDKRW * 100",
+                "interval": "1", "timezone": "Asia/Seoul", "theme": "light", "style": "1", "locale": "kr",
+                "toolbar_bg": "#f1f3f6", "enable_publishing": false, "hide_side_toolbar": false,
+                "allow_symbol_change": true, "container_id": "tradingview_kimp"
+            });
+
+             new TradingView.widget({
+                "autosize": true, "symbol": "BITFINEX:BTCUSDLONGS", "interval": "240", "timezone": "Etc/UTC",
+                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+                "container_id": "tradingview_btclongs"
+            });
+
+             new TradingView.widget({
+                "autosize": true, "symbol": "BITFINEX:BTCUSDSHORTS", "interval": "240", "timezone": "Etc/UTC",
+                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+                "container_id": "tradingview_btcshorts"
+            });
+            
+            fetchBtcQuoteData();
+            setInterval(fetchBtcQuoteData, 1000); 
+        });
     </script>
 </body>
 </html>
