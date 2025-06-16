@@ -227,30 +227,31 @@
            ...
         }
 
-        /* ===== 여기에 위에 드린 코드를 붙여넣으세요 ===== */
-        @media (max-width: 768px) {
-            .realtime-ticker-bar {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                gap: 0.75rem;
-                padding: 0.25rem 0.5rem;
-                white-space: nowrap;
-            }
-            .ticker-item {
-                gap: 0.2rem;
-                padding: 0.2rem 0.2rem;
-            }
-            .ticker-symbol {
-                font-size: 0.7rem;
-            }
-            .ticker-price {
-                font-size: 0.75rem;
-                min-width: auto;
-            }
-            #real-time-clock {
-                font-size: 0.6rem;
-            }
-        }
+        /* ===== 모바일 상단바 수정을 위한 코드 ===== */
+@media (max-width: 768px) {
+    .realtime-ticker-bar {
+        justify-content: flex-start; /* 아이템들을 왼쪽부터 정렬 */
+        flex-wrap: nowrap;           /* 아이템들이 다음 줄로 넘어가지 않도록 설정 */
+        overflow-x: auto;            /* 내용이 길어지면 가로 스크롤 생성 */
+        gap: 0.75rem;                /* 아이템 사이의 간격을 줄임 */
+        padding: 0.25rem 0.5rem;     /* 상단바의 상하좌우 여백을 줄임 */
+        white-space: nowrap;         /* 자식 요소들이 줄바꿈되지 않도록 보조 */
+    }
+    .ticker-item {
+        gap: 0.25rem;                /* 심볼과 가격 사이의 간격을 줄임 */
+        padding: 0.2rem 0.3rem;      /* 각 아이템의 여백을 미세하게 줄임 */
+    }
+    .ticker-symbol {
+        font-size: 0.8rem;           /* 심볼 폰트 크기 줄임 */
+    }
+    .ticker-price {
+        font-size: 0.875rem;         /* 가격 폰트 크기 줄임 */
+        min-width: auto;             /* 최소 너비 제한을 없애 더 유연하게 크기 조절 */
+    }
+    #real-time-clock {
+        font-size: 0.75rem;          /* 시계 폰트 크기 줄임 */
+    }
+}
         /* ============================================== */
 
     </style>
