@@ -86,7 +86,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .header-inputs { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
+        .header-inputs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
         .header-inputs > div { flex-grow: 1; }
         .header-inputs label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
         .input-table-container { position: relative; }
@@ -267,7 +267,8 @@
     <div class="calculator-container">
         <h1>물림 계산기 & 실시간 차트</h1>
 
-        <div class="header-inputs">
+        <!-- [MODIFIED] 거래 제목과 거래 기준일을 한 줄에 표시 (grid layout 사용) -->
+        <div class="header-inputs grid grid-cols-2 gap-4">
             <div>
                 <label for="tradeTitle">거래 제목 (선택)</label>
                 <input type="text" id="tradeTitle" class="input-field" placeholder="예: 비트코인 물타기">
@@ -301,7 +302,8 @@
         </div>
         
         <div class="controls-top-section mt-4">
-            <div class="fee-group-container flex flex-wrap gap-4 justify-center mb-4">
+            <!-- [MODIFIED] 매수/매도 수수료를 한 줄에 표시 (flex-nowrap 사용) -->
+            <div class="fee-group-container flex flex-row flex-nowrap items-center justify-center gap-x-2 sm:gap-x-4 mb-4">
                 <div class="fee-group-item flex items-center gap-2">
                     <label for="buyFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매수 수수료(%):</label>
                     <input type="text" inputmode="decimal" id="buyFeeRate" class="input-field fee-input-field" value="0.05">
@@ -351,13 +353,10 @@
                     <div id="tradingview_kimp" style="height:300px;"></div>
                 </div>
                 <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">BTC 롱 포지션</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">골드/USD</h3>
                     <div id="tradingview_btclongs" style="height:300px;"></div>
                 </div>
-                 <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">BTC 숏 포지션</h3>
-                    <div id="tradingview_btcshorts" style="height:300px;"></div>
-                </div>
+
             </div>
         </div>
 
@@ -538,6 +537,14 @@
             // Calculator Script
             const tradeTitleEl = document.getElementById('tradeTitle'); 
             const tradeDateEl = document.getElementById('tradeDate');   
+            
+            // [MODIFIED] 거래 기준일을 오늘 날짜로 기본 설정
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            tradeDateEl.value = `${year}-${month}-${day}`;
+            
             const inputRowsContainer = document.getElementById('inputRows');
             const addRowBtn = document.getElementById('addRowBtn'); 
             const resetBtn = document.getElementById('resetBtn');
@@ -1266,7 +1273,13 @@
 
             function resetAll() { 
                 tradeTitleEl.value = ''; 
-                tradeDateEl.value = '';  
+                // [MODIFIED] 초기화 시 날짜를 다시 오늘로 설정
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                tradeDateEl.value = `${year}-${month}-${day}`;
+                
                 buyFeeRateEl.value = '0.05'; 
                 sellFeeRateEl.value = '0.05';
                 liquidationPriceEl.value = ''; 
@@ -1620,18 +1633,12 @@
             });
 
              new TradingView.widget({
-                "autosize": true, "symbol": "BITFINEX:BTCUSDLONGS", "interval": "W", "timezone": "Asia/Seoul",
+                "autosize": true, "symbol": "OANDA:XAUUSD", "interval": "W", "timezone": "Asia/Seoul",
                 "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
                 "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
                 "container_id": "tradingview_btclongs"
             });
 
-             new TradingView.widget({
-                "autosize": true, "symbol": "BITFINEX:BTCUSDSHORTS", "interval": "W", "timezone": "Asia/Seoul",
-                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
-                "container_id": "tradingview_btcshorts"
-            });
         });
     </script>
 </body>
