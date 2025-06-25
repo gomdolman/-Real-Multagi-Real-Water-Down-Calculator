@@ -152,6 +152,13 @@
         .info-section .disclaimer { margin-top: 1rem; font-weight: 500; color: #ef4444; } 
         h1 { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px; color: #111827; }
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        
+        /* [FIXED] 'active' 클래스가 추가되었을 때 모달을 보이게 하는 스타일 추가 */
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .modal-content { background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); width: 90%; max-width: 500px; text-align: left; }
         .modal-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937; }
         .modal-body p { margin-bottom: 0.5rem; color: #374151; font-size: 0.9rem; line-height: 1.6; }
@@ -209,54 +216,33 @@
                 font-size: 1rem;
             }
         }
-		<head>
-    ...
-    <style>
-        @import url('...');
-        body { ... }
-        ...
-
-        /* 기존의 다른 스타일들 */
-        .toast-message.show { opacity: 1; bottom: 40px; }
-
-        .tv-widget-section { ... }
-        .tv-widget-container { ... }
-
-        @media (max-width: 768px) {
-           /* 기존 모바일 테이블 관련 스타일 */
-           ...
-        }
-
+		
         /* ===== 모바일 상단바 수정을 위한 코드 ===== */
-@media (max-width: 768px) {
-    .realtime-ticker-bar {
-        justify-content: flex-start; /* 아이템들을 왼쪽부터 정렬 */
-        flex-wrap: nowrap;           /* 아이템들이 다음 줄로 넘어가지 않도록 설정 */
-        overflow-x: auto;            /* 내용이 길어지면 가로 스크롤 생성 */
-        gap: 0.75rem;                /* 아이템 사이의 간격을 줄임 */
-        padding: 0.25rem 0.5rem;     /* 상단바의 상하좌우 여백을 줄임 */
-        white-space: nowrap;         /* 자식 요소들이 줄바꿈되지 않도록 보조 */
-    }
-    .ticker-item {
-        gap: 0.25rem;                /* 심볼과 가격 사이의 간격을 줄임 */
-        padding: 0.2rem 0.3rem;      /* 각 아이템의 여백을 미세하게 줄임 */
-    }
-    .ticker-symbol {
-        font-size: 0.8rem;           /* 심볼 폰트 크기 줄임 */
-    }
-    .ticker-price {
-        font-size: 0.875rem;         /* 가격 폰트 크기 줄임 */
-        min-width: auto;             /* 최소 너비 제한을 없애 더 유연하게 크기 조절 */
-    }
-    #real-time-clock {
-        font-size: 0.75rem;          /* 시계 폰트 크기 줄임 */
-    }
-}
+        @media (max-width: 768px) {
+            .realtime-ticker-bar {
+                justify-content: flex-start; /* 아이템들을 왼쪽부터 정렬 */
+                flex-wrap: nowrap;           /* 아이템들이 다음 줄로 넘어가지 않도록 설정 */
+                overflow-x: auto;            /* 내용이 길어지면 가로 스크롤 생성 */
+                gap: 0.75rem;                /* 아이템 사이의 간격을 줄임 */
+                padding: 0.25rem 0.5rem;     /* 상단바의 상하좌우 여백을 줄임 */
+                white-space: nowrap;         /* 자식 요소들이 줄바꿈되지 않도록 보조 */
+            }
+            .ticker-item {
+                gap: 0.25rem;                /* 심볼과 가격 사이의 간격을 줄임 */
+                padding: 0.2rem 0.3rem;      /* 각 아이템의 여백을 미세하게 줄임 */
+            }
+            .ticker-symbol {
+                font-size: 0.8rem;           /* 심볼 폰트 크기 줄임 */
+            }
+            .ticker-price {
+                font-size: 0.875rem;         /* 가격 폰트 크기 줄임 */
+                min-width: auto;             /* 최소 너비 제한을 없애 더 유연하게 크기 조절 */
+            }
+            #real-time-clock {
+                font-size: 0.75rem;          /* 시계 폰트 크기 줄임 */
+            }
+        }
         /* ============================================== */
-
-    </style>
-</head>
-
     </style>
 </head>
 <body>
@@ -282,17 +268,17 @@
         <div class="input-table-container">
             <div class="overflow-x-auto">
                 <table class="w-full input-table">
-                     <thead>
-                        <tr>
-                            <th class="w-1/4 md:w-1/5">거래 유형</th> 
-                            <th class="w-1/4 md:w-1/5">단가</th>
-                            <th class="w-auto md:w-[5%] symbol-cell"></th> 
-                            <th class="w-1/4 md:w-1/5">수량</th>
-                            <th class="w-auto md:w-[5%] symbol-cell"></th>
-                            <th class="w-1/3 md:w-1/4">금액</th> 
-                            <th class="w-auto md:w-1/12">삭제</th>
-                        </tr>
-                    </thead>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4 md:w-1/5">거래 유형</th> 
+                                <th class="w-1/4 md:w-1/5">단가</th>
+                                <th class="w-auto md:w-[5%] symbol-cell"></th> 
+                                <th class="w-1/4 md:w-1/5">수량</th>
+                                <th class="w-auto md:w-[5%] symbol-cell"></th>
+                                <th class="w-1/3 md:w-1/4">금액</th> 
+                                <th class="w-auto md:w-1/12">삭제</th>
+                            </tr>
+                        </thead>
                     <tbody id="inputRows"></tbody>
                 </table>
             </div>
@@ -536,7 +522,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Calculator Script
             const tradeTitleEl = document.getElementById('tradeTitle'); 
-            const tradeDateEl = document.getElementById('tradeDate');   
+            const tradeDateEl = document.getElementById('tradeDate');    
             
             // [MODIFIED] 거래 기준일을 오늘 날짜로 기본 설정
             const today = new Date();
@@ -551,7 +537,7 @@
             const setNewStartBtn = document.getElementById('setNewStartBtn');
             const copyDetailsBtn = document.getElementById('copyDetailsBtn'); 
             const saveToFileBtn = document.getElementById('saveToFileBtn');
-            const loadFileInput = document.getElementById('loadFile');    
+            const loadFileInput = document.getElementById('loadFile');   
             const createShareLinkBtn = document.getElementById('createShareLinkBtn');
             const buyFeeRateEl = document.getElementById('buyFeeRate');
             const sellFeeRateEl = document.getElementById('sellFeeRate');
@@ -627,7 +613,7 @@
                 if (valueToFormat === "" && allowEmpty) { 
                     formattedValue = "";
                 } else if (valueToFormat === "") {
-                     formattedValue = ""; 
+                    formattedValue = ""; 
                 } else if (valueToFormat === ".") {
                     formattedValue = "0.";
                 } else {
@@ -659,7 +645,7 @@
                     }
                 }
                 if (formattedValue.toLowerCase() === "nan") {
-                     formattedValue = decimalPart !== undefined ? "0." + decimalPart : "";
+                    formattedValue = decimalPart !== undefined ? "0." + decimalPart : "";
                 }
                  if (valueToFormat.startsWith(".") && !formattedValue.startsWith("0.")) {
                     if (formattedValue.startsWith(".")) formattedValue = "0" + formattedValue;
@@ -851,7 +837,7 @@
                     const netProceedsFromLiquidation = grossValueOfHoldings - sellFeeForLiquidation;
                     estimatedOverallProfitLossVal = (totalNetSellProceeds + netProceedsFromLiquidation) - totalGrossBuyWithFees;
                 } else if (currentHoldingQuantityVal === 0) { 
-                     estimatedOverallProfitLossVal = totalNetSellProceeds - totalGrossBuyWithFees;
+                    estimatedOverallProfitLossVal = totalNetSellProceeds - totalGrossBuyWithFees;
                 }
 
                 lastCalculatedAvgHoldingPrice = avgHoldingPriceWithFeeVal; 
@@ -1172,7 +1158,7 @@
                     const quantity = row.querySelector('.quantity-input').value; 
                     const amount = row.querySelector('.amount-input').value;
                     if (price || quantity || amount) { 
-                         transactions.push({ type, price, quantity, amount });
+                        transactions.push({ type, price, quantity, amount });
                     }
                 });
 
@@ -1510,15 +1496,11 @@
                 clockElement.text(`${ampm} ${displayHours}:${minutes}:${seconds}`);
             }
             updateClock();
-            setInterval(updateClock, 1000);
+            setInterval(updateClock, 100);
             
             // --- Ticker Setup ---
             const tickers = [
-                { symbol: 'BINANCE:BTCUSDT', name: 'BTC/USDT' },
-                { symbol: 'VOO', name: 'VOO' },
-                { symbol: 'QQQ', name: 'QQQ' },
-                { symbol: 'NVDA', name: 'NVDA' },
-                { symbol: 'MSTR', name: 'MSTR' }
+                { symbol: 'BINANCE:BTCUSDT', name: 'BTC/USDT (바이낸스)' },
             ];
 
             // Dynamically create ticker elements
