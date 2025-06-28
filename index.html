@@ -86,20 +86,13 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .header-inputs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
-        .header-inputs > div { flex-grow: 1; }
-        .header-inputs label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
-        .input-table-container { position: relative; }
-        .input-table th, .input-table td { padding: 8px 4px; text-align: center; vertical-align: middle; border-bottom-width: 1px; border-color: #e5e7eb; }
-        .input-table tbody tr:last-child td { border-bottom-width: 0px; }
-        .input-table th { font-weight: 600; color: #4b5563; font-size: 0.875rem; border-bottom-width: 2px; }
-        .input-field, .select-field, .date-input { width: 100%; padding: 8px; border: 1px solid #D1D5DB; border-radius: 6px; box-sizing: border-box; font-size: 0.875rem; }
+        
+        .input-field, .date-input { width: 100%; padding: 8px; border: 1px solid #D1D5DB; border-radius: 6px; box-sizing: border-box; font-size: 0.875rem; }
         .input-field { text-align: right; }
-        .input-field:focus, .select-field:focus, .date-input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-        .select-field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
-        .row-buy { background-color: rgba(254, 226, 226, 0.5); }
-        .row-sell { background-color: rgba(219, 234, 254, 0.5); }
-        .fee-input-field { width: 70px; padding: 6px; font-size: 0.8rem; }
+        .input-field:focus, .date-input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        .date-input { padding-right: 0.5rem !important; }
+
+        .fee-input-field { width: 50px; padding: 6px; font-size: 0.8rem; }
         .liquidation-input { width: 120px; }
         .delete-btn { background-color: #EF4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
         .delete-btn:hover { background-color: #DC2626; }
@@ -114,25 +107,21 @@
         .file-btn:hover { background-color: #4338ca; }
         .share-link-btn { background-color: #8b5cf6; color:white; } 
         .share-link-btn:hover { background-color: #7c3aed; }
-        .add-row-icon-btn { background-color: #10B981; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background-color 0.2s, transform 0.1s; margin-top: 0.5rem; margin-left: auto; }
-        .add-row-icon-btn:hover { background-color: #059669; }
-        .add-row-icon-btn:active { transform: scale(0.95); }
-        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
+        
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
         .result-item { background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
         .result-label { font-size: 0.875rem; color: #4b5563; margin-bottom: 0.25rem; display: block; }
-        .result-value { font-size: 1.125rem; font-weight: 600; color: #1f2937; word-break: keep-all; }
+        .result-value { font-size: 1.125rem; font-weight: 600; color: #1f2937; word-break: break-all; }
         .result-value-sub { font-size: 0.875rem; color: #6b7280; display: block; margin-top: 0.125rem; }
         
         .simulation-section { margin-top: 1.25rem; margin-bottom: 1.25rem; padding: 1.5rem; border: 1px dashed #cbd5e1; border-radius: 0.75rem; background-color: #f8fafc; }
         .simulation-title { font-size: 1.25rem; font-weight: 700; color: #374151; margin-bottom: 1.5rem; text-align: center; }
-        .sim-input-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-        @media (min-width: 768px) { .sim-input-grid { grid-template-columns: repeat(2, 1fr); } }
         .sim-input-group label { display: block; font-size: 0.875rem; font-weight: 500; color: #4b5563; margin-bottom: 0.25rem; }
         .sim-method-switch { display: flex; justify-content: center; gap: 0.5rem; background-color: #e5e7eb; border-radius: 0.5rem; padding: 0.25rem; margin-bottom: 1.5rem; }
         .sim-method-switch label { flex: 1; text-align: center; padding: 0.5rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-size: 0.875rem; font-weight: 500; color: #4b5563; }
         .sim-method-switch input:checked + label { background-color: white; color: #3B82F6; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .sim-method-switch input { display: none; }
-        .sim-unit-btn { padding: 0.25rem 0.75rem; font-size: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; background-color: white; color: #374151; cursor: pointer; transition: all 0.2s ease-in-out; }
+        .sim-unit-btn { padding: 0.25rem; font-size: 0.7rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; background-color: white; color: #374151; cursor: pointer; transition: all 0.2s ease-in-out; text-align: center; }
         .sim-unit-btn.active { background-color: #3B82F6; color: white; border-color: #3B82F6; font-weight: 600; }
         .sim-result-group { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
         .sim-result-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-size: 1rem; }
@@ -142,7 +131,7 @@
         .sim-avg-comparison > div > span { display:block; }
         .sim-avg-comparison .avg-title { font-size: 0.9rem; color: #6b7280; font-weight: 500; margin-bottom: 0.25rem; }
         .sim-avg-comparison .avg-price { font-size: 1.5rem; font-weight:bold; color: #1f2937; }
-        .sim-avg-comparison .avg-pnl { font-size:0.9rem; font-weight: 600; }
+        .sim-avg-comparison .avg-pnl { font-size:0.8rem; font-weight: 600; word-break: keep-all; }
         
         .liquidation-section { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
         .info-section { margin-top: 30px; padding: 16px; background-color: #f9fafb; border-radius: 8px; font-size: 0.875rem; color: #374151; }
@@ -153,7 +142,6 @@
         h1 { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px; color: #111827; }
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         
-        /* [FIXED] 'active' 클래스가 추가되었을 때 모달을 보이게 하는 스타일 추가 */
         .modal-overlay.active {
             opacity: 1;
             visibility: visible;
@@ -168,81 +156,105 @@
         .toast-message.show { opacity: 1; bottom: 40px; }
 
         .tv-widget-section { margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #e5e7eb; }
-        .tv-widget-container { margin-top: 1rem; padding: 1rem; background-color: #f9fafb; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tv-widget-container { margin-bottom: 1rem; }
+        
+        .chart-header {
+            background-color: #f9fafb;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        .chart-content {
+            height: 350px;
+            padding-top: 0.5rem;
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
+        .chart-content.hidden {
+            height: 0;
+            padding-top: 0;
+            opacity: 0;
+        }
+        .toggle-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .toggle-icon.rotate-180 {
+            transform: rotate(-180deg);
+        }
 
-        @media (max-width: 768px) {
-            .input-table thead { display: none; }
-            .input-table tr.input-row {
-                display: grid;
-                grid-template-areas:
-                    "type qty"
-                    "price amount"
-                    "delete delete";
-                grid-template-columns: 1fr 1fr;
-                gap: 0.75rem;
-                margin-bottom: 1rem;
-                border: 1px solid #e5e7eb;
-                border-radius: 0.5rem;
-                padding: 1rem;
-                position: relative;
-            }
-            .input-table td {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                text-align: left;
-                padding: 0;
-                border: none;
-            }
-            .input-table td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #4b5563;
-                margin-bottom: 0.25rem;
-                font-size: 0.8rem;
-            }
-            .input-table td[data-label="거래 유형"] { grid-area: type; }
-            .input-table td[data-label="수량"] { grid-area: qty; }
-            .input-table td[data-label="단가"] { grid-area: price; }
-            .input-table td[data-label="금액"] { grid-area: amount; }
-            .input-table td[data-label="삭제"] {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
-            }
-            .input-table td[data-label="삭제"]::before { display: none; }
-            .input-table td .input-field,
-            .input-table td .select-field {
-                font-size: 1rem;
-            }
+        .input-row-card {
+            transition: background-color 0.3s ease;
         }
-		
-        /* ===== 모바일 상단바 수정을 위한 코드 ===== */
-        @media (max-width: 768px) {
-            .realtime-ticker-bar {
-                justify-content: flex-start; /* 아이템들을 왼쪽부터 정렬 */
-                flex-wrap: nowrap;           /* 아이템들이 다음 줄로 넘어가지 않도록 설정 */
-                overflow-x: auto;            /* 내용이 길어지면 가로 스크롤 생성 */
-                gap: 0.75rem;                /* 아이템 사이의 간격을 줄임 */
-                padding: 0.25rem 0.5rem;     /* 상단바의 상하좌우 여백을 줄임 */
-                white-space: nowrap;         /* 자식 요소들이 줄바꿈되지 않도록 보조 */
-            }
-            .ticker-item {
-                gap: 0.25rem;                /* 심볼과 가격 사이의 간격을 줄임 */
-                padding: 0.2rem 0.3rem;      /* 각 아이템의 여백을 미세하게 줄임 */
-            }
-            .ticker-symbol {
-                font-size: 0.8rem;           /* 심볼 폰트 크기 줄임 */
-            }
-            .ticker-price {
-                font-size: 0.875rem;         /* 가격 폰트 크기 줄임 */
-                min-width: auto;             /* 최소 너비 제한을 없애 더 유연하게 크기 조절 */
-            }
-            #real-time-clock {
-                font-size: 0.75rem;          /* 시계 폰트 크기 줄임 */
-            }
+        .trade-type-toggle .toggle-option {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            transition: all 0.2s ease-in-out;
+            font-weight: 500;
         }
-        /* ============================================== */
+        .trade-type-toggle {
+            display: inline-flex;
+        }
+        .trade-type-toggle .toggle-option:first-child {
+            border-radius: 0.375rem 0 0 0.375rem;
+        }
+        .trade-type-toggle .toggle-option:last-child {
+            border-radius: 0 0.375rem 0.375rem 0;
+            border-left-width: 0;
+        }
+        .trade-type-toggle .toggle-option.buy-toggle.active {
+            background-color: #fca5a5;
+            color: #b91c1c;
+            border-color: #f87171;
+            font-weight: 600;
+        }
+        .trade-type-toggle .toggle-option.sell-toggle.active {
+            background-color: #93c5fd;
+            color: #1e40af;
+            border-color: #60a5fa;
+            font-weight: 600;
+        }
+        .input-row-card.row-buy {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+        }
+        .input-row-card.row-sell {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+        }
+
+        .currency-toggle {
+             display: inline-flex;
+        }
+        .currency-toggle .toggle-option {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: 1px solid #D1D5DB;
+            color: #374151;
+            background-color: #f9fafb;
+            font-weight: 500;
+        }
+        .currency-toggle .toggle-option:first-child { 
+            border-radius: 0.375rem 0 0 0.375rem; 
+        }
+        .currency-toggle .toggle-option:last-child { 
+            border-radius: 0 0.375rem 0.375rem 0;
+            border-left-width: 0;
+        }
+        .currency-toggle .toggle-option.active {
+            background-color: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -253,58 +265,50 @@
     <div class="calculator-container">
         <h1>물림 계산기 & 실시간 차트</h1>
 
-        <!-- [MODIFIED] 거래 제목과 거래 기준일을 한 줄에 표시 (grid layout 사용) -->
-        <div class="header-inputs grid grid-cols-2 gap-4">
-            <div>
-                <label for="tradeTitle">거래 제목 (선택)</label>
-                <input type="text" id="tradeTitle" class="input-field" placeholder="예: 비트코인 물타기">
+        <!-- [REVISED & FIXED] Compact top input row for mobile responsiveness -->
+        <div class="flex flex-nowrap items-center gap-x-2 mb-6 pb-6 border-b">
+            <!-- 통화 선택: 너비 고정, 줄어들지 않음 -->
+            <div class="currency-toggle flex-shrink-0">
+                <button type="button" class="toggle-option px-3" data-currency="KRW">원</button>
+                <button type="button" class="toggle-option px-3" data-currency="USD">$</button>
             </div>
-            <div>
-                <label for="tradeDate">거래 기준일 (선택)</label>
-                <input type="date" id="tradeDate" class="date-input">
+            
+            <!-- 환율 입력: flex-1과 min-w-0을 사용하여 공간을 유연하게 차지하고 필요시 크게 줄어들도록 설정 -->
+            <div class="relative flex-1 min-w-0">
+                 <input type="text" inputmode="decimal" id="exchangeRate" class="input-field w-full pr-8" placeholder="환율">
+                 <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">원</span>
+            </div>
+
+            <!-- 날짜 입력: 고정 너비(w-[120px])를 제거하여 내용에 맞게 크기가 자동 조절되도록 함 -->
+            <div class="flex-shrink-0">
+                <input type="date" id="tradeDate" class="date-input p-2 text-sm">
             </div>
         </div>
 
-        <div class="input-table-container">
-            <div class="overflow-x-auto">
-                <table class="w-full input-table">
-                        <thead>
-                            <tr>
-                                <th class="w-1/4 md:w-1/5">거래 유형</th> 
-                                <th class="w-1/4 md:w-1/5">단가</th>
-                                <th class="w-auto md:w-[5%] symbol-cell"></th> 
-                                <th class="w-1/4 md:w-1/5">수량</th>
-                                <th class="w-auto md:w-[5%] symbol-cell"></th>
-                                <th class="w-1/3 md:w-1/4">금액</th> 
-                                <th class="w-auto md:w-1/12">삭제</th>
-                            </tr>
-                        </thead>
-                    <tbody id="inputRows"></tbody>
-                </table>
-            </div>
-            <button id="addRowBtn" class="add-row-icon-btn" title="행 추가">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
+
+        <div id="inputRows" class="space-y-4 my-6">
+            <!-- New input rows will be generated here by JavaScript -->
         </div>
+        <button id="addRowBtn" class="w-full mt-2 py-2.5 px-5 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300">
+            + 항목 추가
+        </button>
         
-        <div class="controls-top-section mt-4">
-            <!-- [MODIFIED] 매수/매도 수수료를 한 줄에 표시 (flex-nowrap 사용) -->
-            <div class="fee-group-container flex flex-row flex-nowrap items-center justify-center gap-x-2 sm:gap-x-4 mb-4">
-                <div class="fee-group-item flex items-center gap-2">
-                    <label for="buyFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매수 수수료(%):</label>
-                    <input type="text" inputmode="decimal" id="buyFeeRate" class="input-field fee-input-field" value="0.05">
-                </div>
-                <div class="fee-group-item flex items-center gap-2">
-                    <label for="sellFeeRate" class="text-sm font-medium text-gray-700 whitespace-nowrap">매도 수수료(%):</label>
-                    <input type="text" inputmode="decimal" id="sellFeeRate" class="input-field fee-input-field" value="0.05">
-                </div>
+        <div class="controls-top-section mt-6 border-t pt-6">
+             <!-- [REVISED] Compact fee input section -->
+            <div class="fee-group-container flex items-center justify-center gap-x-2 mb-4">
+                 <span class="text-sm font-medium text-gray-700">수수료</span>
+                 <label for="buyFeeRate" class="text-sm text-gray-600">매수:</label>
+                 <input type="text" inputmode="decimal" id="buyFeeRate" class="input-field fee-input-field" value="0.05">
+                 <label for="sellFeeRate" class="text-sm text-gray-600">매도:</label>
+                 <input type="text" inputmode="decimal" id="sellFeeRate" class="input-field fee-input-field" value="0.05">
+                 <span class="text-sm font-medium text-gray-700">(%)</span>
             </div>
 
             <div class="liquidation-section">
                 <div class="flex items-center justify-start gap-2 text-sm text-gray-700">
                     <span>만약,</span>
                     <input type="text" inputmode="decimal" id="liquidationPrice" class="input-field liquidation-input" placeholder="매도 가정 단가">
-                    <span>원에 전량 매도한다면?</span>
+                    <span id="liquidationCurrencyLabel">원에 전량 매도한다면?</span>
                 </div>
                 <div class="mt-2 text-sm">
                     <span class="font-medium text-gray-800">예상 최종 손익: </span>
@@ -315,49 +319,34 @@
             </div>
         </div>
 
-        <div class="tv-widget-section">
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">실시간 차트 정보</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">업비트 BTC/KRW</h3>
-                    <div id="tradingview_btckrw" style="height:300px;"></div>
+        <div id="primaryResultsContainer" class="mt-6 border-t pt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 text-center">핵심 결과 요약</h3>
+            <div id="primaryResultsSection" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div class="result-item">
+                    <span class="result-label">현재 보유 수량</span>
+                    <span id="currentHoldingQuantity" class="result-value text-green-600">0</span>
+                    <span id="currentHoldingQuantityKorean" class="result-value-sub">0개</span>
                 </div>
-                 <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">바이낸스 BTC/USDT</h3>
-                    <div id="tradingview_btcusd" style="height:300px;"></div>
+                <div class="result-item" id="avgHoldingPriceItem">
+                    <span class="result-label">현재 보유분 평단가 (수수료 포함)</span>
+                    <span id="avgHoldingPriceWithFee" class="result-value">0</span>
+                    <span id="avgHoldingPriceWithFeeKorean" class="result-value-sub">0원</span>
                 </div>
-                <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">원/달러 환율</h3>
-                    <div id="tradingview_usdkrw" style="height:300px;"></div>
+                <div class="result-item col-span-2 sm:col-span-1">
+                    <span id="netInvestmentStatusLabel" class="result-label">실질 투자 원금 (회수 필요 금액)</span>
+                    <span id="netInvestmentStatus" class="result-value">0</span>
+                    <span id="netInvestmentStatusKorean" class="result-value-sub">0원</span>
                 </div>
-                <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">나스닥 100 선물</h3>
-                    <div id="tradingview_nasdaq" style="height:300px;"></div>
-                </div>
-                <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">업비트 김프 프리미엄 (%)</h3>
-                    <div id="tradingview_kimp" style="height:300px;"></div>
-                </div>
-                <div class="tv-widget-container">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">골드/USD</h3>
-                    <div id="tradingview_btclongs" style="height:300px;"></div>
-                </div>
-
             </div>
         </div>
+
 
         <div class="simulation-section">
             <h3 class="simulation-title">추가 매수 시뮬레이션</h3>
             
-            <div class="sim-input-grid">
-                <div class="sim-input-group">
-                    <label for="simCurrentPrice">현재가 (평가 기준)</label>
-                    <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="현재 자산 가격 입력">
-                </div>
-                <div class="sim-input-group">
-                    <label for="simBuyPrice">추가 매수 단가</label>
-                    <input type="text" inputmode="decimal" id="simBuyPrice" class="input-field" placeholder="물탈 가격 입력">
-                </div>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <input type="text" inputmode="decimal" id="simBuyPrice" class="input-field" placeholder="물타기 단가 입력">
+                <input type="text" inputmode="decimal" id="simCurrentPrice" class="input-field" placeholder="기준 주가 입력">
             </div>
 
             <div class="sim-method-switch">
@@ -367,24 +356,21 @@
                 <label for="simTypeQuantity">수량으로</label>
             </div>
             
-            <div id="simAmountSection">
-                <div class="sim-input-group">
-                    <label for="simBuyAmount" class="mb-2">추가 매수 금액</label>
-                    <input type="text" inputmode="decimal" id="simBuyAmount" class="input-field mb-3" placeholder="추가 매수할 금액">
-                    <input type="range" id="simBuyAmountSlider" min="0" max="1000000" step="10000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mb-3">
-                    <div class="flex flex-wrap gap-2 justify-center">
-                        <button data-max="100000" data-step="1000" class="sim-unit-btn">십만원</button>
-                        <button data-max="1000000" data-step="10000" class="sim-unit-btn active">백만원</button>
-                        <button data-max="10000000" data-step="100000" class="sim-unit-btn">천만원</button>
-                        <button data-max="50000000" data-step="500000" class="sim-unit-btn">오천만원</button>
-                        <button data-max="100000000" data-step="1000000" class="sim-unit-btn">일억원</button>
-                    </div>
-                </div>
+            <div id="simAmountSection" class="space-y-2">
+                 <div class="flex items-center gap-2">
+                     <input type="text" inputmode="decimal" id="simBuyAmount" class="input-field w-2/5" placeholder="추가금액">
+                     <div class="flex-grow grid grid-cols-4 gap-1">
+                         <button data-max="10000000" data-step="100000" class="sim-unit-btn active">천만</button>
+                         <button data-max="50000000" data-step="500000" class="sim-unit-btn">0.5억</button>
+                         <button data-max="100000000" data-step="1000000" class="sim-unit-btn">1억</button>
+                         <button data-max="500000000" data-step="5000000" class="sim-unit-btn">5억</button>
+                     </div>
+                 </div>
+                 <input type="range" id="simBuyAmountSlider" min="0" max="10000000" step="100000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
 
             <div id="simQuantitySection" style="display: none;">
                 <div class="sim-input-group">
-                    <label for="simBuyQuantity">추가 매수 수량</label>
                     <input type="text" inputmode="decimal" id="simBuyQuantity" class="input-field" placeholder="추가 매수할 수량 (최대 8자리)">
                 </div>
             </div>
@@ -392,18 +378,18 @@
             <div class="sim-result-group">
                 <div class="sim-result-item">
                     <span class="label">총 추가 매수 금액:</span>
-                    <span class="value" id="simTotalAdditionalAmount">0 원</span>
+                    <span class="value" id="simTotalAdditionalAmount">0</span>
                 </div>
                 <div class="sim-avg-comparison">
                     <div>
                         <span class="avg-title">현재 평단</span>
-                        <span class="avg-price" id="simCurrentAvgPrice">0 원</span>
+                        <span class="avg-price" id="simCurrentAvgPrice">0</span>
                         <span class="avg-pnl" id="simCurrentPnl">- %</span>
                     </div>
                     <div class="text-2xl self-center text-gray-400 font-sans">→</div>
                     <div>
                         <span class="avg-title">예상 평단</span>
-                        <span class="avg-price" id="simExpectedAvgPrice">0 원</span>
+                        <span class="avg-price" id="simExpectedAvgPrice">0</span>
                         <span class="avg-pnl" id="simExpectedPnl">- %</span>
                     </div>
                 </div>
@@ -424,22 +410,17 @@
             <div class="result-item">
                 <span class="result-label" id="avgBuyPriceNoFeeLabel">매입 평균단가 (수수료 미반영)</span>
                 <span id="avgBuyPriceNoFee" class="result-value">0</span>
-                <span id="avgBuyPriceNoFeeKorean" class="result-value-sub">0원</span>
+                <span id="avgBuyPriceNoFeeKorean" class="result-value-sub">0</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 매수 체결 금액</span>
                 <span id="totalBuyAmountGross" class="result-value text-red-600">0</span>
-                <span id="totalBuyAmountGrossKorean" class="result-value-sub">0원</span>
+                <span id="totalBuyAmountGrossKorean" class="result-value-sub">0</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 매도 체결 금액</span>
                 <span id="totalSellAmountGross" class="result-value text-blue-600">0</span>
-                <span id="totalSellAmountGrossKorean" class="result-value-sub">0원</span>
-            </div>
-            <div class="result-item">
-                <span class="result-label">현재 보유 수량</span>
-                <span id="currentHoldingQuantity" class="result-value text-green-600">0</span>
-                <span id="currentHoldingQuantityKorean" class="result-value-sub">0개</span>
+                <span id="totalSellAmountGrossKorean" class="result-value-sub">0</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 매수 수량</span>
@@ -454,27 +435,17 @@
             <div class="result-item">
                 <span class="result-label">누적 매수 수수료</span>
                 <span id="accumulatedBuyFee" class="result-value">0</span>
-                <span id="accumulatedBuyFeeKorean" class="result-value-sub">0원</span>
+                <span id="accumulatedBuyFeeKorean" class="result-value-sub">0</span>
             </div>
             <div class="result-item">
                 <span class="result-label">누적 매도 수수료</span>
                 <span id="accumulatedSellFee" class="result-value">0</span>
-                <span id="accumulatedSellFeeKorean" class="result-value-sub">0원</span>
+                <span id="accumulatedSellFeeKorean" class="result-value-sub">0</span>
             </div>
             <div class="result-item">
                 <span class="result-label">총 발생 수수료</span>
                 <span id="totalFeesPaid" class="result-value">0</span>
-                <span id="totalFeesPaidKorean" class="result-value-sub">0원</span>
-            </div>
-            <div class="result-item">
-                <span id="netInvestmentStatusLabel" class="result-label">실질 투자 원금 (회수 필요 금액)</span>
-                <span id="netInvestmentStatus" class="result-value">0</span>
-                <span id="netInvestmentStatusKorean" class="result-value-sub">0원</span>
-            </div>
-            <div class="result-item" id="avgHoldingPriceItem"> 
-                <span class="result-label">현재 보유분 평단가 (수수료 포함)</span>
-                <span id="avgHoldingPriceWithFee" class="result-value">0</span>
-                <span id="avgHoldingPriceWithFeeKorean" class="result-value-sub">0원</span>
+                <span id="totalFeesPaidKorean" class="result-value-sub">0</span>
             </div>
         </div>
         
@@ -487,7 +458,7 @@
             <h3>사용법</h3>
             <ul>
                 <li>매수/매도 수수료율을 입력합니다 (기본값 0.05%).</li>
-                <li>테이블 하단의 '+' 버튼으로 거래 내역(매수 또는 매도)을 추가합니다.</li>
+                <li>테이블 하단의 '+ 항목 추가' 버튼으로 거래 내역(매수 또는 매도)을 추가합니다.</li>
                 <li>각 행에 거래 유형, 단가, 수량(또는 금액)을 입력합니다. 수량은 소수점 8자리까지 입력 가능합니다.</li>
                 <li>상단의 '만약, [가격]원에 전량 매도한다면?'에 가격을 입력하여 예상 최종 손익을 확인할 수 있습니다.</li>
                 <li>"새 시작점으로" 버튼은 현재 계산된 '보유분 평단가(수수료포함)'와 '보유 수량'을 첫 행으로 설정합니다.</li>
@@ -496,6 +467,90 @@
                 <li>"공유 링크" 버튼으로 현재 상태를 URL로 만들어 공유할 수 있습니다.</li>
             </ul>
             <p class="disclaimer">본 계산기는 참고용으로만 사용해주시고, 투자 결정에 따른 법적 책임은 본인에게 있습니다.</p>
+        </div>
+        
+        <div class="tv-widget-section">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">실시간 차트 정보</h2>
+                <button id="toggleAllChartsBtn" class="px-3 py-1.5 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    모두 접기
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="tv-widget-container">
+                    <div class="chart-header">
+                        <h3 class="text-lg font-semibold text-gray-700">1. 원/달러 환율</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">접기</span>
+                            <svg class="toggle-icon w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div id="tradingview_usdkrw" class="h-full w-full"></div>
+                    </div>
+                </div>
+                <div class="tv-widget-container">
+                    <div class="chart-header">
+                        <h3 class="text-lg font-semibold text-gray-700">2. 업비트 BTC/KRW</h3>
+                         <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">접기</span>
+                            <svg class="toggle-icon w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div id="tradingview_btckrw" class="h-full w-full"></div>
+                    </div>
+                </div>
+                <div class="tv-widget-container">
+                    <div class="chart-header">
+                        <h3 class="text-lg font-semibold text-gray-700">3. 바이낸스 BTC/USDT</h3>
+                         <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">접기</span>
+                            <svg class="toggle-icon w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div id="tradingview_btcusd" class="h-full w-full"></div>
+                    </div>
+                </div>
+                <div class="tv-widget-container">
+                    <div class="chart-header">
+                        <h3 class="text-lg font-semibold text-gray-700">4. 나스닥 100 선물</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">접기</span>
+                            <svg class="toggle-icon w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div id="tradingview_nasdaq" class="h-full w-full"></div>
+                    </div>
+                </div>
+                <div class="tv-widget-container">
+                    <div class="chart-header">
+                        <h3 class="text-lg font-semibold text-gray-700">5. 업비트 김프 프리미엄 (%)</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">접기</span>
+                            <svg class="toggle-icon w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                    </div>
+                    <div class="chart-content">
+                        <div id="tradingview_kimp" class="h-full w-full"></div>
+                    </div>
+                </div>
+                <div class="tv-widget-container">
+                    <div class="chart-header">
+                        <h3 class="text-lg font-semibold text-gray-700">6. 골드/USD</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">접기</span>
+                            <svg class="toggle-icon w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                    </div>
+                     <div class="chart-content">
+                        <div id="tradingview_gold" class="h-full w-full"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -514,17 +569,16 @@
             </div>
         </div>
     </div>
+
     <div id="toastMessage" class="toast-message"></div>
 
     <script>
-        // 모든 계산기 로직은 동일하게 유지됩니다.
-        // The entire calculator script remains the same.
         document.addEventListener('DOMContentLoaded', function() {
             // Calculator Script
-            const tradeTitleEl = document.getElementById('tradeTitle'); 
+            const currencyToggles = document.querySelectorAll('.currency-toggle .toggle-option');
+            const exchangeRateEl = document.getElementById('exchangeRate');
             const tradeDateEl = document.getElementById('tradeDate');    
             
-            // [MODIFIED] 거래 기준일을 오늘 날짜로 기본 설정
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -542,6 +596,7 @@
             const buyFeeRateEl = document.getElementById('buyFeeRate');
             const sellFeeRateEl = document.getElementById('sellFeeRate');
             const liquidationPriceEl = document.getElementById('liquidationPrice'); 
+            const liquidationCurrencyLabelEl = document.getElementById('liquidationCurrencyLabel');
             const totalBuyAmountGrossEl = document.getElementById('totalBuyAmountGross');
             const totalBuyAmountGrossKoreanEl = document.getElementById('totalBuyAmountGrossKorean');
             const totalBuyQuantityEl = document.getElementById('totalBuyQuantity');
@@ -596,6 +651,7 @@
             let lastCalculatedAvgHoldingPrice = 0; 
             let lastCalculatedHoldingQuantity = 0;
             let currentNetInvestmentOrRealizedProfit = 0;
+            let currentCurrency = 'KRW';
 
             function formatNumberInput(inputElement, allowEmpty = false, decimalPlaces = -1) { 
                 const rawValue = inputElement.value;
@@ -693,44 +749,70 @@
                 calculateAndDisplayResults();
             }
 
-            function addNewRow() { 
+            function addNewRow(type = 'buy', price = '', quantity = '', amount = '') { 
                 rowCount++;
-                const row = document.createElement('tr');
-                row.classList.add('input-row');
+                const row = document.createElement('div');
+                row.className = 'input-row-card p-3 rounded-lg border relative';
                 row.dataset.rowId = rowCount; 
+
+                const isBuyActive = type === 'buy';
+                
                 row.innerHTML = `
-                    <td data-label="거래 유형">
-                        <select class="select-field type-select">
-                            <option value="buy" selected>매수</option>
-                            <option value="sell">매도</option>
-                        </select>
-                    </td>
-                    <td data-label="단가"><input type="text" inputmode="decimal" class="input-field price-input" placeholder="단가"></td>
-                    <td class="symbol-cell text-xs text-gray-400">↔</td>
-                    <td data-label="수량"><input type="text" inputmode="decimal" class="input-field quantity-input" placeholder="수량 (최대 8자리)"></td>
-                    <td class="symbol-cell text-xs text-gray-400">=</td>
-                    <td data-label="금액"><input type="text" inputmode="decimal" class="input-field amount-input" placeholder="금액"></td>
-                    <td data-label="삭제"><button class="delete-btn">X</button></td>
+                    <input type="hidden" class="type-hidden-input" value="${type}">
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <div class="trade-type-toggle flex-shrink-0">
+                                <button type="button" class="toggle-option buy-toggle ${isBuyActive ? 'active' : ''}">매수</button>
+                                <button type="button" class="toggle-option sell-toggle ${!isBuyActive ? 'active' : ''}">매도</button>
+                            </div>
+                            <div class="relative flex-grow">
+                                <input type="text" inputmode="decimal" class="input-field price-input w-full pr-8" placeholder="가격" value="${price}">
+                                <span class="price-unit absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="relative">
+                                <input type="text" inputmode="decimal" class="input-field quantity-input w-full pr-7" placeholder="수량" value="${quantity}">
+                                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm">개</span>
+                            </div>
+                             <div class="relative">
+                                <input type="text" inputmode="decimal" class="input-field amount-input w-full pr-8" placeholder="총 금액" value="${amount}">
+                                <span class="price-unit absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="delete-btn absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center text-xs">X</button>
                 `;
                 inputRowsContainer.appendChild(row);
                 attachEventListenersToRow(row);
-                updateRowStyle(row, 'buy'); 
+                updateRowStyle(row, type);
+                updateCurrencyUnitsForRow(row);
                 return row;
             }
 
             function attachEventListenersToRow(rowElement) { 
-                const typeSelect = rowElement.querySelector('.type-select');
+                const hiddenInput = rowElement.querySelector('.type-hidden-input');
+                const buyToggle = rowElement.querySelector('.buy-toggle');
+                const sellToggle = rowElement.querySelector('.sell-toggle');
                 const priceInput = rowElement.querySelector('.price-input');
                 const quantityInput = rowElement.querySelector('.quantity-input');
                 const amountInput = rowElement.querySelector('.amount-input');
                 const deleteButton = rowElement.querySelector('.delete-btn');
                 let lastEditedField = null;
 
-                typeSelect.addEventListener('change', (event) => {
-                    updateRowStyle(rowElement, event.target.value);
+                function setType(type) {
+                    hiddenInput.value = type;
+                    const isBuy = type === 'buy';
+                    buyToggle.classList.toggle('active', isBuy);
+                    sellToggle.classList.toggle('active', !isBuy);
+                    updateRowStyle(rowElement, type);
                     calculateAndDisplayResults();
-                    calculateSimulation(); 
-                });
+                    calculateSimulation();
+                }
+
+                buyToggle.addEventListener('click', () => setType('buy'));
+                sellToggle.addEventListener('click', () => setType('sell'));
+
                 priceInput.addEventListener('input', () => { 
                     formatNumberInput(priceInput); lastEditedField = 'price';
                     handleRowInputChange(priceInput, quantityInput, amountInput, lastEditedField); 
@@ -746,7 +828,7 @@
                 
                 deleteButton.addEventListener('click', () => {
                     rowElement.remove();
-                    if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                    if (inputRowsContainer.children.length === 0) {
                         addNewRow();
                     }
                     calculateAndDisplayResults(); 
@@ -762,7 +844,7 @@
                 if (editedField === 'price' || editedField === 'quantity') {
                     if (price > 0 && quantity > 0) {
                         amount = price * quantity;
-                        amountEl.value = amount.toFixed(2);
+                        amountEl.value = amount.toLocaleString('en-US', {maximumFractionDigits: 2, useGrouping: false});
                         formatNumberInput(amountEl); 
                     } else if ((editedField === 'quantity' && price > 0 && quantity <= 0) || (editedField === 'price' && price <=0 && quantity > 0)) {
                          amountEl.value = '';
@@ -796,9 +878,9 @@
                 const sellFeeRate = parseFloat(sellFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
                 const userLiquidationPrice = parseFloat(liquidationPriceEl.value.replace(/,/g, '')) || 0;
 
-                const uiRows = inputRowsContainer.querySelectorAll('.input-row');
+                const uiRows = inputRowsContainer.querySelectorAll('.input-row-card');
                 uiRows.forEach(uiRow => {
-                    const type = uiRow.querySelector('.type-select').value;
+                    const type = uiRow.querySelector('.type-hidden-input').value;
                     const price = parseFloat(uiRow.querySelector('.price-input').value.replace(/,/g, '')) || 0;
                     const quantity = parseFloat(uiRow.querySelector('.quantity-input').value.replace(/,/g, '')) || 0; 
                     
@@ -842,37 +924,62 @@
 
                 lastCalculatedAvgHoldingPrice = avgHoldingPriceWithFeeVal; 
                 lastCalculatedHoldingQuantity = currentHoldingQuantityVal;
+                
+                const currencySymbol = currentCurrency === 'KRW' ? '원' : '$';
+                
+                function formatCurrency(value, decimalPlaces = -1) {
+                    const options = {};
+                    if (currentCurrency === 'KRW') {
+                        options.minimumFractionDigits = 0;
+                        options.maximumFractionDigits = 0;
+                    } else {
+                        options.minimumFractionDigits = 2;
+                        options.maximumFractionDigits = 2;
+                    }
 
-                totalBuyAmountGrossEl.textContent = formatNumber(totalBuyAmountVal, 2);
+                    if(decimalPlaces !== -1){
+                         if (currentCurrency === 'KRW') {
+                            options.minimumFractionDigits = 0;
+                            options.maximumFractionDigits = 0;
+                         } else {
+                            options.minimumFractionDigits = decimalPlaces;
+                            options.maximumFractionDigits = decimalPlaces;
+                         }
+                    }
+
+                    return value.toLocaleString(currentCurrency === 'KRW' ? 'ko-KR' : 'en-US', options) + currencySymbol;
+                }
+
+                totalBuyAmountGrossEl.textContent = formatCurrency(totalBuyAmountVal);
                 totalBuyAmountGrossKoreanEl.textContent = formatNumberToKorean(totalBuyAmountVal, 'amount');
                 totalBuyQuantityEl.textContent = formatNumber(totalBuyQuantityVal, 8); 
                 totalBuyQuantityKoreanEl.textContent = formatNumberToKorean(totalBuyQuantityVal, 'quantity');
-                accumulatedBuyFeeEl.textContent = formatNumber(totalBuyFeeVal, 2);
+                accumulatedBuyFeeEl.textContent = formatCurrency(totalBuyFeeVal);
                 accumulatedBuyFeeKoreanEl.textContent = formatNumberToKorean(totalBuyFeeVal, 'amount');
-                totalSellAmountGrossEl.textContent = formatNumber(totalSellAmountVal, 2);
+                totalSellAmountGrossEl.textContent = formatCurrency(totalSellAmountVal);
                 totalSellAmountGrossKoreanEl.textContent = formatNumberToKorean(totalSellAmountVal, 'amount');
                 totalSellQuantityEl.textContent = formatNumber(totalSellQuantityVal, 8); 
                 totalSellQuantityKoreanEl.textContent = formatNumberToKorean(totalSellQuantityVal, 'quantity');
-                accumulatedSellFeeEl.textContent = formatNumber(totalSellFeeVal, 2);
+                accumulatedSellFeeEl.textContent = formatCurrency(totalSellFeeVal);
                 accumulatedSellFeeKoreanEl.textContent = formatNumberToKorean(totalSellFeeVal, 'amount');
                 currentHoldingQuantityEl.textContent = formatNumber(currentHoldingQuantityVal, 8); 
                 currentHoldingQuantityKoreanEl.textContent = formatNumberToKorean(currentHoldingQuantityVal, 'quantity');
                 avgBuyPriceNoFeeLabelEl.textContent = "매입 평균단가 (수수료 미반영)"; 
-                avgBuyPriceNoFeeEl.textContent = formatNumber(avgBuyPriceNoFeeVal, 2);
+                avgBuyPriceNoFeeEl.textContent = formatCurrency(avgBuyPriceNoFeeVal);
                 avgBuyPriceNoFeeKoreanEl.textContent = formatNumberToKorean(avgBuyPriceNoFeeVal, 'price');
-                totalFeesPaidEl.textContent = formatNumber(totalFeesPaidVal, 2);
+                totalFeesPaidEl.textContent = formatCurrency(totalFeesPaidVal);
                 totalFeesPaidKoreanEl.textContent = formatNumberToKorean(totalFeesPaidVal, 'amount');
 
                 if (currentNetInvestmentOrRealizedProfit > 0) {
                     netInvestmentStatusLabelEl.textContent = "실질 투자 원금 (회수 필요 금액)";
-                    netInvestmentStatusEl.textContent = formatNumber(currentNetInvestmentOrRealizedProfit, 2);
+                    netInvestmentStatusEl.textContent = formatCurrency(currentNetInvestmentOrRealizedProfit);
                     netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(currentNetInvestmentOrRealizedProfit, 'amount');
                     netInvestmentStatusEl.className = 'result-value text-gray-800'; 
                     netInvestmentStatusKoreanEl.className = 'result-value-sub text-gray-500';
                 } else {
                     netInvestmentStatusLabelEl.textContent = "현재까지 누적 순이익";
                     const realizedProfit = Math.abs(currentNetInvestmentOrRealizedProfit);
-                    netInvestmentStatusEl.textContent = formatNumber(realizedProfit, 2);
+                    netInvestmentStatusEl.textContent = formatCurrency(realizedProfit);
                     netInvestmentStatusKoreanEl.textContent = formatNumberToKorean(realizedProfit, 'amount') + " 이익!";
                     netInvestmentStatusEl.className = 'result-value text-red-600'; 
                     netInvestmentStatusKoreanEl.className = 'result-value-sub text-red-600';
@@ -883,7 +990,7 @@
                 avgHoldingPriceWithFeeKoreanEl.classList.remove('text-red-500', 'text-gray-500');
 
                 if (currentHoldingQuantityVal > 0) {
-                    avgHoldingPriceWithFeeEl.textContent = formatNumber(avgHoldingPriceWithFeeVal, 2);
+                    avgHoldingPriceWithFeeEl.textContent = formatCurrency(avgHoldingPriceWithFeeVal);
                     avgHoldingPriceWithFeeKoreanEl.textContent = formatNumberToKorean(avgHoldingPriceWithFeeVal, 'price');
                     if (currentNetInvestmentOrRealizedProfit <= 0) { 
                         avgHoldingPriceWithFeeKoreanEl.textContent += " (이익 실현 중)";
@@ -896,8 +1003,8 @@
                         avgHoldingPriceItemEl.classList.add('bg-lime-50'); 
                     }
                 } else {
-                    avgHoldingPriceWithFeeEl.textContent = "0";
-                    avgHoldingPriceWithFeeKoreanEl.textContent = "0원";
+                    avgHoldingPriceWithFeeEl.textContent = formatCurrency(0);
+                    avgHoldingPriceWithFeeKoreanEl.textContent = "0" + currencySymbol;
                     avgHoldingPriceWithFeeEl.classList.add('text-gray-800');
                     avgHoldingPriceWithFeeKoreanEl.classList.add('text-gray-500');
                 }
@@ -909,7 +1016,7 @@
                 currentHoldingQuantityEl.classList.remove('text-green-600'); 
                 currentHoldingQuantityEl.classList.add('text-green-600');
 
-                estimatedOverallProfitLossEl.textContent = formatNumber(estimatedOverallProfitLossVal, 2);
+                estimatedOverallProfitLossEl.textContent = formatCurrency(estimatedOverallProfitLossVal);
                 estimatedOverallProfitLossKoreanEl.textContent = formatNumberToKorean(estimatedOverallProfitLossVal, 'amount');
 
                 let percentageString = "";
@@ -953,12 +1060,6 @@
 
             function formatNumber(num, decimalPlaces = 0) { 
                 if (isNaN(num) || !isFinite(num)) return '0';
-                if (num === 0 && decimalPlaces > 0) {
-                    return Number(num).toLocaleString('en-US', { 
-                        minimumFractionDigits: decimalPlaces,
-                        maximumFractionDigits: decimalPlaces 
-                    });
-                }
                 return Number(num).toLocaleString('en-US', { 
                     minimumFractionDigits: decimalPlaces,
                     maximumFractionDigits: decimalPlaces 
@@ -967,14 +1068,15 @@
 
             function formatNumberToKorean(num, type) { 
                 const n = parseFloat(num) || 0; 
-                if (isNaN(n)) return (type === 'quantity' ? '0개' : '0원');
-                
+                const exRate = parseFloat(exchangeRateEl.value.replace(/,/g, '')) || 1;
+                const valueInKRW = currentCurrency === 'USD' ? n * exRate : n;
+
                 if (type === 'quantity') {
                     return `${n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits: 8})}개`;
                 } else if (type === 'price' || type === 'amount') {
-                    const numForKorean = Math.floor(n); 
-                    if (numForKorean === 0 && n !== 0 && n > -1 && n < 1) { 
-                         return n.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits:2}) + '원';
+                    const numForKorean = Math.floor(valueInKRW); 
+                    if (numForKorean === 0 && valueInKRW !== 0 && valueInKRW > -1 && valueInKRW < 1) { 
+                         return valueInKRW.toLocaleString('ko-KR', {minimumFractionDigits:0, maximumFractionDigits:2}) + '원';
                     }
                     if (numForKorean === 0) return '0원';
                     const units = ['', '만', '억', '조', '경'];
@@ -1005,44 +1107,45 @@
 
             function generateReportText() { 
                 let report = "물림 계산기 내역\n";
-                const title = tradeTitleEl.value.trim();
-                const date = tradeDateEl.value;
-                if (title) { report += `제목: ${title}\n`; }
-                if (date) {
-                    const [year, month, day] = date.split('-');
+                report += `계산 통화: ${currentCurrency}\n`;
+                if (currentCurrency === 'USD') {
+                    report += `적용 환율: 1$ = ${exchangeRateEl.value}원\n`;
+                }
+                if (tradeDateEl.value) {
+                    const [year, month, day] = tradeDateEl.value.split('-');
                     report += `거래 기준일: ${year}년 ${month}월 ${day}일\n`;
                 }
-                if (title || date) { report += "------------------------------------\n"; }
+                report += "------------------------------------\n"; 
                 report += `매수 수수료: ${buyFeeRateEl.value}%\n`;
                 report += `매도 수수료: ${sellFeeRateEl.value}%\n`;
                 report += "------------------------------------\n";
                 report += "거래 내역:\n";
-                const uiRows = inputRowsContainer.querySelectorAll('.input-row');
+                const uiRows = inputRowsContainer.querySelectorAll('.input-row-card');
                 if (uiRows.length === 0 || (uiRows.length === 1 && !uiRows[0].querySelector('.price-input').value && !uiRows[0].querySelector('.quantity-input').value)) {
                     report += "  (입력된 거래 내역 없음)\n";
                 } else {
                     uiRows.forEach((row, index) => {
-                        const type = row.querySelector('.type-select').value === 'buy' ? '매수' : '매도';
+                        const type = row.querySelector('.type-hidden-input').value === 'buy' ? '매수' : '매도';
                         const price = row.querySelector('.price-input').value || '0';
                         const quantityRaw = row.querySelector('.quantity-input').value || '0';
                         const quantityFormatted = formatNumber(parseFloat(quantityRaw.replace(/,/g, '')), 8); 
                         const amount = row.querySelector('.amount-input').value || '0';
                         if (parseFloat(price.replace(/,/g, '')) > 0 && parseFloat(quantityRaw.replace(/,/g, '')) > 0) {
-                             report += `  ${index + 1}. ${type}: ${quantityFormatted} @ ${price} = ${amount}원\n`;
+                             report += `  ${index + 1}. ${type}: ${quantityFormatted} @ ${price} = ${amount}\n`;
                         }
                     });
                 }
                 report += "------------------------------------\n";
                 report += "전량 매도 가정:\n";
-                report += `  만약, ${liquidationPriceEl.value || '0'}원에 전량 매도한다면?\n`;
-                report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} ${estimatedOverallProfitLossKoreanEl.textContent} ${estimatedOverallProfitLossPercentEl.textContent}\n`;
+                report += `  만약, ${liquidationPriceEl.value || '0'}${currentCurrency === 'KRW' ? '원' : '$'}에 전량 매도한다면?\n`;
+                report += `  예상 최종 손익: ${estimatedOverallProfitLossEl.textContent} (${estimatedOverallProfitLossKoreanEl.textContent}) ${estimatedOverallProfitLossPercentEl.textContent}\n`;
                 report += "------------------------------------\n";
                 report += "추가 매수 시뮬레이션:\n";
                 report += `  현재가(평가기준): ${simCurrentPriceEl.value || '미입력'}\n`;
                 report += `  추가 매수 단가: ${simBuyPriceEl.value || '미입력'}\n`;
                 const simType = document.querySelector('input[name="simType"]:checked').value === 'amount' ? '금액' : '수량';
                 if (simType === '금액') {
-                    report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}원\n`;
+                    report += `  추가 매수 금액: ${simBuyAmountEl.value || '0'}\n`;
                 } else {
                     report += `  추가 매수 수량: ${simBuyQuantityEl.value || '0'}개\n`; 
                 }
@@ -1051,7 +1154,7 @@
                 report += `  예상 평균: ${simExpectedAvgPriceEl.textContent} (${simExpectedPnlEl.textContent})\n`;
                 report += "====================================\n";
                 report += "계산 결과:\n";
-                document.querySelectorAll('#resultsSection .result-item').forEach(item => {
+                document.querySelectorAll('#resultsSection .result-item, #primaryResultsSection .result-item').forEach(item => {
                     const label = item.querySelector('.result-label').textContent.trim();
                     const value = item.querySelector('.result-value').textContent.trim();
                     const sub = item.querySelector('.result-value-sub').textContent.trim();
@@ -1096,29 +1199,9 @@
                 const month = String(today.getMonth() + 1).padStart(2, '0'); 
                 const day = String(today.getDate()).padStart(2, '0'); 
                 const fileCreationDate = `${year}${month}${day}`; 
-                const tradeTitleInput = tradeTitleEl.value.trim();
-                const tradeDateInput = tradeDateEl.value;
-                let baseFileName = "물림계산내역";
-                let titlePart = "";
-                let tradeDatePart = "";
-                const creationDatePart = `_파일생성일자(${fileCreationDate})`;
-
-                if (tradeTitleInput && tradeDateInput) {
-                    const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
-                    tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
-                    titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`; 
-                    baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
-                } else if (tradeTitleInput && !tradeDateInput) {
-                    titlePart = `_${tradeTitleInput.replace(/\s+/g, '_')}`;
-                    baseFileName += `${titlePart}${creationDatePart}`;
-                } else if (!tradeTitleInput && tradeDateInput) {
-                    const [tdYear, tdMonth, tdDay] = tradeDateInput.split('-');
-                    tradeDatePart = `_거래기준일(${String(tdYear).slice(-2)}${tdMonth}${tdDay})`;
-                    titlePart = "_제목없음";
-                    baseFileName += `${titlePart}${tradeDatePart}${creationDatePart}`;
-                } else {
-                    baseFileName += creationDatePart;
-                }
+                
+                let baseFileName = "물림계산내역" + `_${fileCreationDate}`;
+                
                 const defaultFileName = `${baseFileName}.json`;
                 const fileName = prompt("저장할 파일 이름을 입력하세요:", defaultFileName) || defaultFileName;
                 
@@ -1152,8 +1235,8 @@
             
             function collectDataForFile() {
                 const transactions = [];
-                inputRowsContainer.querySelectorAll('.input-row').forEach(row => {
-                    const type = row.querySelector('.type-select').value;
+                inputRowsContainer.querySelectorAll('.input-row-card').forEach(row => {
+                    const type = row.querySelector('.type-hidden-input').value;
                     const price = row.querySelector('.price-input').value;
                     const quantity = row.querySelector('.quantity-input').value; 
                     const amount = row.querySelector('.amount-input').value;
@@ -1163,7 +1246,8 @@
                 });
 
                 return {
-                    tradeTitle: tradeTitleEl.value,
+                    currency: currentCurrency,
+                    exchangeRate: exchangeRateEl.value,
                     tradeDate: tradeDateEl.value,
                     buyFeeRate: buyFeeRateEl.value,
                     sellFeeRate: sellFeeRateEl.value,
@@ -1179,7 +1263,10 @@
             }
 
             function restoreStateFromFile(data) {
-                tradeTitleEl.value = data.tradeTitle || '';
+                updateCurrency(data.currency || 'KRW');
+                exchangeRateEl.value = data.exchangeRate || '1350';
+                formatNumberInput(exchangeRateEl, false, 2);
+
                 tradeDateEl.value = data.tradeDate || '';
                 buyFeeRateEl.value = data.buyFeeRate || '0.05';
                 sellFeeRateEl.value = data.sellFeeRate || '0.05';
@@ -1210,15 +1297,13 @@
                 rowCount = 0;
                 if (data.transactions && data.transactions.length > 0) {
                     data.transactions.forEach(trx => {
-                        const newRow = addNewRow();
-                        newRow.querySelector('.type-select').value = trx.type;
-                        newRow.querySelector('.price-input').value = trx.price;
-                        formatNumberInput(newRow.querySelector('.price-input'), true);
-                        newRow.querySelector('.quantity-input').value = trx.quantity;
-                        formatNumberInput(newRow.querySelector('.quantity-input'), true, 8); 
-                        newRow.querySelector('.amount-input').value = trx.amount;
-                        formatNumberInput(newRow.querySelector('.amount-input'), true);
-                        updateRowStyle(newRow, trx.type);
+                        const newRow = addNewRow(trx.type, trx.price, trx.quantity, trx.amount);
+                        const priceInput = newRow.querySelector('.price-input');
+                        const quantityInput = newRow.querySelector('.quantity-input');
+                        const amountInput = newRow.querySelector('.amount-input');
+                        formatNumberInput(priceInput, true);
+                        formatNumberInput(quantityInput, true, 8);
+                        formatNumberInput(amountInput, true);
                     });
                 } else {
                     addNewRow(); 
@@ -1232,7 +1317,7 @@
                 const data = collectDataForFile();
                 try {
                     const jsonString = JSON.stringify(data);
-                    const base64Data = btoa(encodeURIComponent(jsonString)); 
+                    const base64Data = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
                     const shareUrl = `${window.location.origin}${window.location.pathname}#${base64Data}`;
                     copyToClipboard(shareUrl); 
                 } catch (error) {
@@ -1245,7 +1330,7 @@
                 if (window.location.hash && window.location.hash.length > 1) {
                     try {
                         const base64Data = window.location.hash.substring(1);
-                        const jsonString = decodeURIComponent(atob(base64Data)); 
+                         const jsonString = decodeURIComponent(Array.prototype.map.call(atob(base64Data), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                         const data = JSON.parse(jsonString);
                         restoreStateFromFile(data);
                         showToast('공유된 내역을 불러왔습니다!');
@@ -1258,8 +1343,10 @@
             }
 
             function resetAll() { 
-                tradeTitleEl.value = ''; 
-                // [MODIFIED] 초기화 시 날짜를 다시 오늘로 설정
+                updateCurrency('KRW');
+                exchangeRateEl.value = '1350';
+                formatNumberInput(exchangeRateEl, false, 2);
+
                 const today = new Date();
                 const year = today.getFullYear();
                 const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -1276,9 +1363,12 @@
                 simBuyQuantityEl.value = '';
                 document.querySelector('input[name="simType"][value="amount"]').checked = true;
                 simUnitBtns.forEach(btn => btn.classList.remove('active'));
-                document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
-                simBuyAmountSliderEl.max = "1000000";
-                simBuyAmountSliderEl.step = "10000";
+                const defaultSimBtn = document.querySelector('.sim-unit-btn[data-max="10000000"]');
+                if(defaultSimBtn) {
+                   defaultSimBtn.classList.add('active'); 
+                   simBuyAmountSliderEl.max = "10000000";
+                   simBuyAmountSliderEl.step = "100000";
+                }
                 toggleSimInputFields();
                 initializeRows(); 
                 calculateSimulation(); 
@@ -1302,29 +1392,25 @@
                 rowCount = 0;
                 liquidationPriceEl.value = ''; 
                 simCurrentPriceEl.value = ''; 
-                const firstRowElement = addNewRow(); 
-                if (firstRowElement) {
-                    const typeSelect = firstRowElement.querySelector('.type-select');
-                    const priceInput = firstRowElement.querySelector('.price-input');
-                    const quantityInput = firstRowElement.querySelector('.quantity-input');
-                    const amountInput = firstRowElement.querySelector('.amount-input');
-                    typeSelect.value = 'buy'; 
-                    updateRowStyle(firstRowElement, 'buy');
-                    if (newStartPrice >= 0 && newStartQuantity > 0) { 
-                        priceInput.value = newStartPrice.toFixed(2);
-                        formatNumberInput(priceInput);
-                        quantityInput.value = newStartQuantity.toFixed(8); 
-                        formatNumberInput(quantityInput, false, 8);
-                        handleRowInputChange(priceInput, quantityInput, amountInput, 'price'); 
-                    } else { 
-                        priceInput.value = '';
-                        quantityInput.value = '';
-                        amountInput.value = '';
-                    }
-                }
-                if (inputRowsContainer.querySelectorAll('.input-row').length === 0) {
+                if (newStartPrice >= 0 && newStartQuantity > 0) { 
+                    const priceStr = newStartPrice.toFixed(2);
+                    const quantityStr = newStartQuantity.toFixed(8);
+                    const amountStr = (newStartPrice * newStartQuantity).toFixed(2);
+                    addNewRow('buy', priceStr, quantityStr, amountStr);
+                } else {
                      addNewRow();
                 }
+                
+                if (inputRowsContainer.children.length > 0) {
+                    const firstRow = inputRowsContainer.children[0];
+                    const priceInput = firstRow.querySelector('.price-input');
+                    const quantityInput = firstRow.querySelector('.quantity-input');
+                    const amountInput = firstRow.querySelector('.amount-input');
+                    formatNumberInput(priceInput);
+                    formatNumberInput(quantityInput, false, 8);
+                    formatNumberInput(amountInput);
+                }
+
                 calculateAndDisplayResults(); 
                 calculateSimulation();
             }
@@ -1345,12 +1431,27 @@
             }
 
             function calculateSimulation() {
+                const currencySymbol = currentCurrency === 'KRW' ? '원' : '$';
                 const currentPriceForPnl = parseFloat(simCurrentPriceEl.value.replace(/,/g, '')) || 0; 
                 const simPrice = parseFloat(simBuyPriceEl.value.replace(/,/g, '')) || 0;
                 const simType = document.querySelector('input[name="simType"]:checked').value;
                 const buyFeeRate = parseFloat(buyFeeRateEl.value.replace(/,/g, '')) / 100 || 0;
+                
                 let simAdditionalAmount = 0;
                 let simAdditionalQuantity = 0;
+
+                const formatCurrencyLocal = (value) => {
+                     const options = {};
+                    if (currentCurrency === 'KRW') {
+                        options.minimumFractionDigits = 0;
+                        options.maximumFractionDigits = 0;
+                    } else {
+                        options.minimumFractionDigits = 2;
+                        options.maximumFractionDigits = 2;
+                    }
+                    return value.toLocaleString(currentCurrency === 'KRW' ? 'ko-KR' : 'en-US', options);
+                }
+
                 if (simType === 'amount') {
                     simAdditionalAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
                     if (simPrice > 0 && simAdditionalAmount > 0) {
@@ -1362,17 +1463,29 @@
                         simAdditionalAmount = simPrice * simAdditionalQuantity;
                     }
                 }
-                simTotalAdditionalAmountEl.textContent = formatNumberToKorean(simAdditionalAmount, 'amount');
+                
+                simTotalAdditionalAmountEl.textContent = `${formatNumber(simAdditionalAmount, 2)} ${currencySymbol}`;
+                
                 const currentHoldQty = lastCalculatedHoldingQuantity; 
                 const currentAvgPrc = lastCalculatedAvgHoldingPrice; 
                 let currentPnlPercent = 0;
+                let currentPnlAmount = 0;
+
                 if (currentAvgPrc > 0 && currentPriceForPnl > 0 && currentHoldQty > 0) {
                     currentPnlPercent = ((currentPriceForPnl / currentAvgPrc) - 1) * 100;
+                    currentPnlAmount = (currentPriceForPnl - currentAvgPrc) * currentHoldQty;
                 } else if (currentNetInvestmentOrRealizedProfit <= 0 && currentHoldQty > 0 && currentPriceForPnl > 0) {
-                     currentPnlPercent = Infinity; 
+                    currentPnlPercent = Infinity; 
+                    currentPnlAmount = (currentPriceForPnl - currentAvgPrc) * currentHoldQty;
                 }
-                simCurrentAvgPriceEl.textContent = formatNumber(currentAvgPrc, 2) + " 원"; 
-                simCurrentPnlEl.textContent = isFinite(currentPnlPercent) ? `${currentPnlPercent.toFixed(2)} %` : "이익 중"; 
+
+                simCurrentAvgPriceEl.textContent = `${formatNumber(currentAvgPrc, 2)} ${currencySymbol}`; 
+                
+                if(currentPriceForPnl > 0 && currentHoldQty > 0){
+                    simCurrentPnlEl.textContent = `${isFinite(currentPnlPercent) ? currentPnlPercent.toFixed(2) : "∞"}% (${formatCurrencyLocal(currentPnlAmount)})`;
+                } else {
+                    simCurrentPnlEl.textContent = "- %";
+                }
                 simCurrentPnlEl.style.color = currentPnlPercent >= 0 || !isFinite(currentPnlPercent) ? '#DC2626' : '#3B82F6';
 
                 if (simPrice > 0 && (simAdditionalAmount > 0 || simAdditionalQuantity > 0)) {
@@ -1381,20 +1494,97 @@
                     const totalCostForSim = baseCostForCalc + simAdditionalAmount + additionalBuyFee;
                     const totalQuantityForSim = currentHoldQty + simAdditionalQuantity; 
                     const expectedAvgPrice = totalQuantityForSim > 0 ? totalCostForSim / totalQuantityForSim : 0;
+                    
                     let expectedPnlPercent = 0;
+                    let expectedPnlAmount = 0;
+
                     if (expectedAvgPrice > 0 && currentPriceForPnl > 0 && totalQuantityForSim > 0) {
                          expectedPnlPercent = ((currentPriceForPnl / expectedAvgPrice) - 1) * 100;
+                         expectedPnlAmount = (currentPriceForPnl - expectedAvgPrice) * totalQuantityForSim;
                     } else if (totalCostForSim <= 0 && totalQuantityForSim > 0 && currentPriceForPnl > 0) { 
                         expectedPnlPercent = Infinity;
+                        expectedPnlAmount = (currentPriceForPnl - expectedAvgPrice) * totalQuantityForSim;
                     }
-                    simExpectedAvgPriceEl.textContent = formatNumber(expectedAvgPrice, 2) + " 원"; 
-                    simExpectedPnlEl.textContent = isFinite(expectedPnlPercent) ? `${expectedPnlPercent.toFixed(2)} %` : "이익 중"; 
+
+                    simExpectedAvgPriceEl.textContent = `${formatNumber(expectedAvgPrice, 2)} ${currencySymbol}`; 
+                    if(currentPriceForPnl > 0){
+                       simExpectedPnlEl.textContent = `${isFinite(expectedPnlPercent) ? expectedPnlPercent.toFixed(2) : "∞"}% (${formatCurrencyLocal(expectedPnlAmount)})`;
+                    } else {
+                        simExpectedPnlEl.textContent = "- %";
+                    }
                     simExpectedPnlEl.style.color = expectedPnlPercent >= 0 || !isFinite(expectedPnlPercent) ? '#DC2626' : '#3B82F6';
                 } else {
-                    simExpectedAvgPriceEl.textContent = "- 원";
+                    simExpectedAvgPriceEl.textContent = `- ${currencySymbol}`;
                     simExpectedPnlEl.textContent = "- %";
                     simExpectedPnlEl.style.color = '#6b7280';
-                    simTotalAdditionalAmountEl.textContent = "0 원"; 
+                    simTotalAdditionalAmountEl.textContent = `0 ${currencySymbol}`; 
+                }
+            }
+
+            function updateCurrencyUnitsForRow(row) {
+                 const currencySymbol = currentCurrency === 'KRW' ? '원' : '$';
+                 row.querySelectorAll('.price-unit').forEach(el => el.textContent = currencySymbol);
+            }
+
+            function updateCurrency(newCurrency) {
+                currentCurrency = newCurrency;
+                
+                document.querySelectorAll('.input-row-card').forEach(updateCurrencyUnitsForRow);
+
+                liquidationCurrencyLabelEl.textContent = `${currentCurrency === 'KRW' ? '원' : '$'}에 전량 매도한다면?`;
+
+                currencyToggles.forEach(toggle => {
+                    toggle.classList.toggle('active', toggle.dataset.currency === newCurrency);
+                });
+
+                exchangeRateEl.parentElement.style.display = 'block'; 
+                exchangeRateEl.disabled = newCurrency === 'KRW';
+                exchangeRateEl.parentElement.style.opacity = newCurrency === 'KRW' ? '0.5' : '1';
+
+
+                calculateAndDisplayResults();
+                calculateSimulation();
+            }
+
+            currencyToggles.forEach(toggle => {
+                toggle.addEventListener('click', (e) => {
+                    updateCurrency(e.target.dataset.currency);
+                });
+            });
+
+            exchangeRateEl.addEventListener('input', () => {
+                formatNumberInput(exchangeRateEl, false, 2);
+                if (currentCurrency === 'USD') {
+                    calculateAndDisplayResults();
+                    calculateSimulation();
+                }
+            });
+            
+            function updateActiveSimUnitButton(amount) {
+                const numericAmount = parseFloat(String(amount).replace(/,/g, '')) || 0;
+                let bestFitBtn = null;
+
+                simUnitBtns.forEach(b => b.classList.remove('active'));
+
+                for (const btn of simUnitBtns) {
+                    const max = parseInt(btn.dataset.max);
+                    if (numericAmount <= max) {
+                        bestFitBtn = btn;
+                        break;
+                    }
+                }
+                
+                if (!bestFitBtn && simUnitBtns.length > 0) {
+                    bestFitBtn = simUnitBtns[simUnitBtns.length - 1];
+                }
+
+                if (bestFitBtn) {
+                    bestFitBtn.classList.add('active');
+                    const newMax = parseInt(bestFitBtn.dataset.max);
+                    const newStep = parseInt(bestFitBtn.dataset.step);
+                    simBuyAmountSliderEl.max = newMax;
+                    simBuyAmountSliderEl.step = newStep;
+                    simBuyAmountSliderEl.value = Math.min(numericAmount, newMax);
                 }
             }
             
@@ -1403,7 +1593,7 @@
             liquidationPriceEl.addEventListener('input', () => { formatNumberInput(liquidationPriceEl); calculateAndDisplayResults(); }); 
             addRowBtn.addEventListener('click', () => {
                 addNewRow();
-                const newRows = inputRowsContainer.querySelectorAll('.input-row');
+                const newRows = inputRowsContainer.querySelectorAll('.input-row-card');
                 if (newRows.length > 0) {
                     const lastRow = newRows[newRows.length - 1];
                     const priceInput = lastRow.querySelector('.price-input');
@@ -1424,27 +1614,25 @@
             confirmationModalEl.addEventListener('click', (event) => {
                 if (event.target === confirmationModalEl) { closeConfirmationModal(); }
             });
+
             simCurrentPriceEl.addEventListener('input', () => { formatNumberInput(simCurrentPriceEl, true); calculateSimulation(); }); 
             simTypeRadios.forEach(radio => radio.addEventListener('change', toggleSimInputFields));
             simBuyPriceEl.addEventListener('input', () => { formatNumberInput(simBuyPriceEl, true); calculateSimulation(); });
+            
             simBuyAmountEl.addEventListener('input', () => { 
                 formatNumberInput(simBuyAmountEl, true);
-                const amount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-                if (amount <= parseFloat(simBuyAmountSliderEl.max)) { 
-                     simBuyAmountSliderEl.value = amount; 
-                } else { 
-                    simBuyAmountSliderEl.value = simBuyAmountSliderEl.max;
-                    simBuyAmountEl.value = formatNumber(parseFloat(simBuyAmountSliderEl.max),0);
-                    formatNumberInput(simBuyAmountEl, true);
-                }
-                calculateSimulation(); 
+                updateActiveSimUnitButton(simBuyAmountEl.value);
+                calculateSimulation();
             });
+
             simBuyAmountSliderEl.addEventListener('input', () => {
                 simBuyAmountEl.value = simBuyAmountSliderEl.value;
                 formatNumberInput(simBuyAmountEl, true); 
                 calculateSimulation();
             });
+            
             simBuyQuantityEl.addEventListener('input', () => { formatNumberInput(simBuyQuantityEl, true, 8); calculateSimulation(); }); 
+
             simUnitBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     simUnitBtns.forEach(b => b.classList.remove('active'));
@@ -1453,22 +1641,24 @@
                     const newStep = parseInt(btn.dataset.step);
                     simBuyAmountSliderEl.max = newMax;
                     simBuyAmountSliderEl.step = newStep;
+                    
                     let currentAmount = parseFloat(simBuyAmountEl.value.replace(/,/g, '')) || 0;
-                    if (currentAmount > newMax) { 
+                    if (currentAmount > newMax) {
                         currentAmount = newMax;
-                    } 
-                    simBuyAmountEl.value = formatNumber(currentAmount,0); 
-                    formatNumberInput(simBuyAmountEl, true); 
-                    simBuyAmountSliderEl.value = currentAmount; 
+                    }
+
+                    simBuyAmountEl.value = currentAmount;
+                    formatNumberInput(simBuyAmountEl, true);
+                    simBuyAmountSliderEl.value = currentAmount;
+                    
                     calculateSimulation();
                 });
             });
-
-            buyFeeRateEl.value = '0.05'; 
-            sellFeeRateEl.value = '0.05';
-            document.querySelector('.sim-unit-btn[data-max="1000000"]').classList.add('active'); 
-            simBuyAmountSliderEl.max = "1000000"; 
-            simBuyAmountSliderEl.step = "10000"; 
+            
+            // --- Initial Setup ---
+            exchangeRateEl.value = '1350';
+            formatNumberInput(exchangeRateEl, false, 2);
+            updateCurrency('KRW');
             initializeRows();
             loadStateFromURL(); 
             calculateSimulation();
@@ -1520,7 +1710,6 @@
             // Connection opened
             socket.addEventListener('open', function (event) {
                 console.log('WebSocket connection established.');
-                // Subscribe to all tickers
                 tickers.forEach(ticker => {
                     console.log(`Subscribing to ${ticker.symbol}`);
                     socket.send(JSON.stringify({'type':'subscribe', 'symbol': ticker.symbol}));
@@ -1542,11 +1731,9 @@
                                 const lastPrice = parseFloat(priceElement.attr('data-last-price'));
                                 const priceFormatted = price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                                 
-                                // Update price text
                                 priceElement.text(priceFormatted);
 
-                                // Add animation effect
-                                if (lastPrice !== 0) { // Don't animate on first load
+                                if (lastPrice !== 0) {
                                     if (price > lastPrice) {
                                         priceElement.addClass('flash-green');
                                     } else if (price < lastPrice) {
@@ -1554,11 +1741,10 @@
                                     }
                                 }
 
-                                // Update last price and remove animation class after it finishes
                                 priceElement.attr('data-last-price', price);
                                 setTimeout(() => {
                                     priceElement.removeClass('flash-green flash-red');
-                                }, 700); // Animation duration is 0.7s
+                                }, 700);
                             }
                         });
                     }
@@ -1567,60 +1753,121 @@
                 }
             });
 
-            // WebSocket error handling
             socket.addEventListener('error', function(event) {
                 console.error("WebSocket error observed:", event);
             });
 
-            // WebSocket close handling
             socket.addEventListener('close', function(event) {
-                console.log("WebSocket connection closed. Attempting to reconnect...");
-                // Note: A robust implementation would have a reconnect mechanism.
+                console.log("WebSocket connection closed.");
             });
 
             // --- TradingView Widgets ---
-            new TradingView.widget({
-                "autosize": true, "symbol": "UPBIT:BTCKRW", "interval": "5", "timezone": "Asia/Seoul",
-                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
-                "container_id": "tradingview_btckrw"
-            });
-            
-            new TradingView.widget({
-                "autosize": true, "symbol": "BINANCE:BTCUSDT", "interval": "5", "timezone": "Asia/Seoul",
-                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
-                "container_id": "tradingview_btcusd"
-            });
-            
-            new TradingView.widget({
-                "autosize": true, "symbol": "FX_IDC:USDKRW", "interval": "5", "timezone": "Asia/Seoul",
-                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
-                "container_id": "tradingview_usdkrw"
+            const widgetConfigs = [
+                { container_id: "tradingview_usdkrw", symbol: "FX_IDC:USDKRW", interval: "5" },
+                { container_id: "tradingview_btckrw", symbol: "UPBIT:BTCKRW", interval: "15" },
+                { container_id: "tradingview_btcusd", symbol: "BINANCE:BTCUSDT", interval: "15" },
+                { container_id: "tradingview_nasdaq", symbol: "FOREXCOM:NAS100", interval: "15" },
+                { container_id: "tradingview_kimp",   symbol: "(UPBIT:USDTKRW - FX_IDC:USDKRW) / FX_IDC:USDKRW * 100", interval: "D" },
+                { container_id: "tradingview_gold",   symbol: "OANDA:XAUUSD", interval: "D" }
+            ];
+
+            function createWidget(config) {
+                 new TradingView.widget({
+                    "autosize": true,
+                    "symbol": config.symbol,
+                    "interval": config.interval,
+                    "timezone": "Asia/Seoul",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "kr",
+                    "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": false,
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": true,
+                    "container_id": config.container_id
+                });
+            }
+
+            const allChartContainers = document.querySelectorAll('.tv-widget-container');
+            const toggleAllBtn = document.getElementById('toggleAllChartsBtn');
+            let areAllCollapsed = false;
+
+            allChartContainers.forEach((container, index) => {
+                const header = container.querySelector('.chart-header');
+                const content = container.querySelector('.chart-content');
+                const toggleText = header.querySelector('span');
+                const toggleIcon = header.querySelector('.toggle-icon');
+                const widgetConfig = widgetConfigs.find(c => c.container_id === content.firstElementChild.id);
+                let isWidgetLoaded = false;
+
+                function toggleChart() {
+                    const isHidden = content.classList.toggle('hidden');
+                    toggleText.textContent = isHidden ? '펼치기' : '접기';
+                    toggleIcon.classList.toggle('rotate-180');
+
+                    if (!isHidden && !isWidgetLoaded && widgetConfig) {
+                        createWidget(widgetConfig);
+                        isWidgetLoaded = true;
+                    }
+                    updateToggleAllButtonState();
+                }
+
+                header.addEventListener('click', toggleChart);
+
+                if (index === 0) {
+                    toggleText.textContent = '접기';
+                    toggleIcon.classList.remove('rotate-180');
+                    content.classList.remove('hidden');
+                    if (widgetConfig) {
+                       createWidget(widgetConfig);
+                       isWidgetLoaded = true;
+                    }
+                } else {
+                    toggleText.textContent = '펼치기';
+                    toggleIcon.classList.add('rotate-180');
+                    content.classList.add('hidden');
+                }
             });
 
-            new TradingView.widget({
-                "autosize": true, "symbol": "FOREXCOM:NAS100", "interval": "5", "timezone": "Asia/Seoul",
-                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
-                "container_id": "tradingview_nasdaq"
-            });
-            
-            new TradingView.widget({
-                "autosize": true, "symbol": "(UPBIT:USDTKRW - FX_IDC:USDKRW) / FX_IDC:USDKRW * 100",
-                "interval": "1", "timezone": "Asia/Seoul", "theme": "light", "style": "1", "locale": "kr",
-                "toolbar_bg": "#f1f3f6", "enable_publishing": false, "hide_side_toolbar": false,
-                "allow_symbol_change": true, "container_id": "tradingview_kimp"
+            function updateToggleAllButtonState() {
+                 const collapsedCount = document.querySelectorAll('.chart-content.hidden').length;
+                 if (collapsedCount === allChartContainers.length) {
+                     toggleAllBtn.textContent = '모두 펼치기';
+                     areAllCollapsed = true;
+                 } else {
+                     toggleAllBtn.textContent = '모두 접기';
+                     areAllCollapsed = false;
+                 }
+            }
+
+            toggleAllBtn.addEventListener('click', () => {
+                const targetState = areAllCollapsed ? 'expand' : 'collapse';
+                allChartContainers.forEach(container => {
+                    const header = container.querySelector('.chart-header');
+                    const content = container.querySelector('.chart-content');
+                    const toggleText = header.querySelector('span');
+                    const toggleIcon = header.querySelector('.toggle-icon');
+                    const widgetConfig = widgetConfigs.find(c => c.container_id === content.firstElementChild.id);
+                    let isWidgetLoaded = container.dataset.widgetLoaded === 'true';
+
+                    if (targetState === 'collapse') {
+                        content.classList.add('hidden');
+                        toggleText.textContent = '펼치기';
+                        toggleIcon.classList.add('rotate-180');
+                    } else { 
+                        content.classList.remove('hidden');
+                        toggleText.textContent = '접기';
+                        toggleIcon.classList.remove('rotate-180');
+                         if (!isWidgetLoaded && widgetConfig) {
+                            createWidget(widgetConfig);
+                            container.dataset.widgetLoaded = 'true';
+                        }
+                    }
+                });
+                updateToggleAllButtonState();
             });
 
-             new TradingView.widget({
-                "autosize": true, "symbol": "OANDA:XAUUSD", "interval": "W", "timezone": "Asia/Seoul",
-                "theme": "light", "style": "1", "locale": "kr", "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
-                "container_id": "tradingview_btclongs"
-            });
-
+            updateToggleAllButtonState(); 
         });
     </script>
 </body>
